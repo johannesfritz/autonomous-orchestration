@@ -1,0 +1,19 @@
+{
+  "// NOTE": "This is an example file. Rename to settings.local.json and customize for your environment.",
+  "permissions": {
+    "allow": [
+      "// Add project-specific permissions here",
+      "Bash(./venv/bin/pip:*)",
+      "Bash(./venv/bin/python:*)",
+      "Bash(./venv/bin/pytest:*)",
+      "Bash(./venv/bin/uvicorn:*)",
+      "Bash(sqlite3:*)",
+
+      "// Skill permissions",
+      "Skill(run-test-suite)",
+      "Skill(security-audit)",
+      "Skill(create-plan)",
+      "Skill(queue-fix)"
+    ]
+  }
+}

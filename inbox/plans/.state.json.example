@@ -1,0 +1,13 @@
+{
+  "plans": {},
+  "metadata": {
+    "last_updated": null,
+    "portfolio_manager_version": "1.0.0",
+    "total_plans_shipped": 0,
+    "total_plans_failed": 0
+  },
+  "currently_executing": [],
+  "queue": [],
+  "shipped": [],
+  "failed": []
+}

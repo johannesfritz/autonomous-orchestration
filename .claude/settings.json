@@ -1,0 +1,238 @@
+{
+  "permissions": {
+    "allow": [
+      "// === PYTHON & DEVELOPMENT TOOLS ===",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(pipx:*)",
+      "Bash(poetry:*)",
+      "Bash(pdm:*)",
+      "Bash(uv:*)",
+      "Bash(virtualenv:*)",
+      "Bash(venv:*)",
+      "Bash(pytest:*)",
+      "Bash(mypy:*)",
+      "Bash(ruff:*)",
+      "Bash(black:*)",
+      "Bash(isort:*)",
+      "Bash(flake8:*)",
+      "Bash(pylint:*)",
+      "Bash(bandit:*)",
+      "Bash(uvicorn:*)",
+      "Bash(gunicorn:*)",
+      "Bash(flask:*)",
+      "Bash(django:*)",
+      "Bash(alembic:*)",
+      "Bash(pre-commit:*)",
+
+      "// === NODE.JS & JAVASCRIPT ===",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(yarn:*)",
+      "Bash(pnpm:*)",
+      "Bash(bun:*)",
+      "Bash(deno:*)",
+      "Bash(tsc:*)",
+      "Bash(eslint:*)",
+      "Bash(prettier:*)",
+      "Bash(vite:*)",
+      "Bash(webpack:*)",
+      "Bash(esbuild:*)",
+      "Bash(rollup:*)",
+      "Bash(jest:*)",
+      "Bash(vitest:*)",
+      "Bash(playwright:*)",
+
+      "// === PACKAGE MANAGERS & SYSTEM TOOLS ===",
+      "Bash(brew:*)",
+      "Bash(apt:*)",
+      "Bash(apt-get:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(go:*)",
+      "Bash(make:*)",
+      "Bash(cmake:*)",
+      "Bash(gcc:*)",
+      "Bash(g++:*)",
+      "Bash(clang:*)",
+
+      "// === GIT (ALL OPERATIONS) ===",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+
+      "// === SSH & REMOTE OPERATIONS ===",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(rsync:*)",
+
+      "// === DOCKER & CONTAINERS ===",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(podman:*)",
+
+      "// === FILE EXPLORATION (READ ONLY) ===",
+      "Bash(cd:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(ag:*)",
+      "Bash(fd:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(diff:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(which:*)",
+      "Bash(whereis:*)",
+      "Bash(type:*)",
+      "Bash(pwd)",
+      "Bash(env)",
+      "Bash(printenv:*)",
+      "Bash(echo:*)",
+      "Bash(date:*)",
+      "Bash(whoami)",
+      "Bash(id)",
+      "Bash(uname:*)",
+
+      "// === FILE OPERATIONS ===",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+
+      "// === CLAUDE CODE TOOLS ===",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Task",
+
+      "// === DEV UTILITIES ===",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(tr:*)",
+      "Bash(xargs:*)",
+      "Bash(tee:*)",
+      "Bash(less:*)",
+      "Bash(more:*)",
+      "Bash(man:*)",
+      "Bash(sleep:*)",
+      "Bash(time:*)",
+      "Bash(timeout:*)",
+      "Bash(ps:*)",
+      "Bash(kill:*)",
+      "Bash(pkill:*)",
+      "Bash(pgrep:*)",
+
+      "// === NETWORK TESTING ===",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(ping:*)",
+      "Bash(dig:*)",
+      "Bash(host:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/quality-check.md && echo '' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/code-standards.md"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '--- Reminder: Run tests to verify this change works as expected ---'"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/detect-production-review.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/detect-fix-request.sh"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "portfolio-manager",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/risk-assessment-required.md"
+          }
+        ]
+      },
+      {
+        "matcher": "tpm-orchestrator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⚠️ CRITICAL: Verify risk assessment exists in plan file before execution. Risk Manager invocation is MANDATORY.'"
+          }
+        ]
+      },
+      {
+        "matcher": "shadow-code-reviewer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/functional-verification.md"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "tpm-orchestrator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md"
+          }
+        ]
+      }
+    ]
+  }
+}
