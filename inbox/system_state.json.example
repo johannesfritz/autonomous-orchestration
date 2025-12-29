@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "last_updated": "2025-01-15T10:30:00Z",
+  "session_id": "example-session-id",
+
+  "queue": {},
+
+  "active_plans": [],
+
+  "learned_preferences": {
+    "priority_patterns": [
+      {
+        "id": "P-001",
+        "keywords": ["customer", "user-facing"],
+        "boost": 1,
+        "confidence": 0.8,
+        "examples": 5,
+        "correct_predictions": 3,
+        "incorrect_predictions": 0,
+        "created_at": "2025-01-10T00:00:00Z",
+        "last_applied": null
+      }
+    ],
+    "high_scrutiny_paths": [
+      {
+        "path": "auth/",
+        "detections": 5,
+        "added_at": "2025-01-08T00:00:00Z"
+      },
+      {
+        "path": "payments/",
+        "detections": 3,
+        "added_at": "2025-01-09T00:00:00Z"
+      },
+      {
+        "path": "database/migrations/",
+        "detections": 3,
+        "added_at": "2025-01-09T00:00:00Z"
+      }
+    ],
+    "override_history": []
+  },
+
+  "conflict_registry": {
+    "file_decisions": {}
+  },
+
+  "circuit_breaker_state": {},
+
+  "cost_tracking": {
+    "session_start": null,
+    "session_spend_usd": 0.0,
+    "daily_spend_usd": 0.0,
+    "plan_costs": {},
+    "limits": {
+      "max_daily_usd": 50.0,
+      "max_per_plan_usd": 20.0,
+      "max_session_usd": 100.0
+    }
+  },
+
+  "completed_plans": {},
+
+  "audit_cursor": 0
+}

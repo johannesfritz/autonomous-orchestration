@@ -1,0 +1,10 @@
+{"timestamp":"2025-01-15T10:30:00Z","event":"PLAN_SUBMITTED","plan_id":"PLAN-2025-001","source":"portfolio-manager","details":{"priority":"high","files":["src/api/auth.py","src/models/user.py"],"submitted_by":"user"}}
+{"timestamp":"2025-01-15T10:30:05Z","event":"RISK_ASSESSED","plan_id":"PLAN-2025-001","source":"risk-manager","details":{"overall_score":4,"decision":"APPROVED","user_disruption":3,"controllability":2,"liability":5,"ai_risk":1}}
+{"timestamp":"2025-01-15T10:30:10Z","event":"EXECUTION_STARTED","plan_id":"PLAN-2025-001","source":"tpm-orchestrator","details":{"workstreams":3,"tpm_id":"agent-123","branch":"feature/auth-improvements"}}
+{"timestamp":"2025-01-15T10:35:00Z","event":"WORKSTREAM_COMPLETE","plan_id":"PLAN-2025-001","source":"tpm-orchestrator","details":{"workstream":"backend-api","duration_seconds":290,"files_modified":2}}
+{"timestamp":"2025-01-15T10:43:00Z","event":"TESTS_PASSED","plan_id":"PLAN-2025-001","source":"tpm-orchestrator","details":{"suite":"pytest","passed":45,"failed":0,"skipped":2,"duration_seconds":32}}
+{"timestamp":"2025-01-15T10:44:00Z","event":"QA_REVIEW_COMPLETE","plan_id":"PLAN-2025-001","source":"qa-lead","details":{"verdict":"APPROVE","correctness":"PASS","integration":"PASS","security":"PASS","maintainability":"PASS","regression_risk":3}}
+{"timestamp":"2025-01-15T10:45:00Z","event":"SECURITY_AUDIT_COMPLETE","plan_id":"PLAN-2025-001","source":"security-audit","details":{"critical":0,"high":0,"medium":1,"low":2,"verdict":"PASS"}}
+{"timestamp":"2025-01-15T10:46:00Z","event":"PR_CREATED","plan_id":"PLAN-2025-001","source":"tpm-orchestrator","details":{"pr_number":42,"pr_url":"https://github.com/user/repo/pull/42","title":"Implement auth improvements"}}
+{"timestamp":"2025-01-15T10:46:30Z","event":"MERGE_COMPLETE","plan_id":"PLAN-2025-001","source":"tpm-orchestrator","details":{"merge_commit":"abc123def456","auto_merged":true,"risk_score":4}}
+{"timestamp":"2025-01-15T10:46:35Z","event":"PLAN_SHIPPED","plan_id":"PLAN-2025-001","source":"portfolio-manager","details":{"duration_seconds":995,"total_cost_usd":3.50,"pr_url":"https://github.com/user/repo/pull/42"}}
