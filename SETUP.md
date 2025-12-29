@@ -14,10 +14,10 @@ This guide covers complete installation and configuration of the autonomous orch
 
 ## Installation
 
-### Step 1: Extract Package
+### Step 1: Clone Repository
 
 ```bash
-unzip autonomous-orchestration-v1.0.zip
+git clone https://github.com/johannesfritz/autonomous-orchestration.git
 cd autonomous-orchestration
 ```
 
@@ -48,10 +48,11 @@ mv inbox/plans/.conflict_history.json.example inbox/plans/.conflict_history.json
 mv inbox/PORTFOLIO_STATUS.md.example inbox/PORTFOLIO_STATUS.md
 ```
 
-### Step 4: Make Hooks Executable
+### Step 4: Make Scripts Executable
 
 ```bash
 chmod +x .claude/hooks/*.sh
+chmod +x .claude/scripts/*.py
 ```
 
 ### Step 5: Customize settings.local.json (Optional)
@@ -89,9 +90,14 @@ Hooks in `settings.json` trigger at specific lifecycle events:
 | Hook | When | Purpose |
 |------|------|---------|
 | `PreToolUse(Edit\|Write)` | Before code changes | Inject quality protocols |
+| `PreToolUse(git add/commit)` | Before git staging | Run secrets scanner (v1.1) |
+| `PreToolUse(git push)` | Before push | Pre-push secrets warning (v1.1) |
+| `PreToolUse(rm -rf)` | Before deletion | Destructive op warning (v1.1) |
+| `PreToolUse(chmod)` | Before permission change | Permission warning (v1.1) |
 | `PostToolUse(Edit\|Write)` | After code changes | Remind to test |
 | `SubagentStart(portfolio-manager)` | PM starts | Inject risk requirements |
 | `SubagentStart(tpm-orchestrator)` | TPM starts | Verify risk assessment |
+| `SubagentStart(shadow-code-reviewer)` | Reviewer starts | Inject verification protocol |
 | `SubagentStop(tpm-orchestrator)` | TPM ends | Trigger state updates |
 
 ### Adjusting Risk Thresholds
@@ -111,11 +117,12 @@ your-project/
 ├── .claude/
 │   ├── settings.json           # Main config (hooks, permissions)
 │   ├── settings.local.json     # Local overrides (optional)
-│   ├── agents/                 # 9 agent definitions
-│   ├── skills/                 # 4 skill directories
-│   ├── commands/               # 7 slash commands
+│   ├── agents/                 # 10 agent definitions
+│   ├── skills/                 # 7 skill directories
+│   ├── commands/               # 13 slash commands
 │   ├── protocols/              # 6 quality protocols
-│   └── hooks/                  # 2 detection scripts
+│   ├── hooks/                  # 2 detection scripts
+│   └── scripts/                # 1 Python secrets scanner
 ├── inbox/
 │   ├── plans/
 │   │   ├── PLAN-TEMPLATE.md
@@ -123,6 +130,8 @@ your-project/
 │   │   ├── .state.json
 │   │   ├── .conflict_history.json
 │   │   └── completed/
+│   ├── system_state.json       # State persistence (v1.1)
+│   ├── audit_log.jsonl         # Audit trail (v1.1)
 │   └── PORTFOLIO_STATUS.md
 └── docs/                       # Reference documentation
 ```

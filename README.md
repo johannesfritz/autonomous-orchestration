@@ -13,8 +13,8 @@ A production-ready system that lets you submit multiple development plans and ha
 ### 1. Copy to Your Project
 
 ```bash
-# Unzip the package
-unzip autonomous-orchestration-v1.0.zip
+# Clone the repository
+git clone https://github.com/johannesfritz/autonomous-orchestration.git
 
 # Copy .claude directory to your project root
 cp -r autonomous-orchestration/.claude /path/to/your/project/
