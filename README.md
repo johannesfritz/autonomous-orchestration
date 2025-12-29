@@ -131,6 +131,7 @@ Every plan goes through:
 
 ## Documentation
 
+- [docs/ABOUT.md](docs/ABOUT.md) - **System overview and design philosophy**
 - [SETUP.md](SETUP.md) - Detailed installation guide
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design
 - [docs/AGENTS.md](docs/AGENTS.md) - Agent descriptions
