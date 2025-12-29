@@ -4,6 +4,8 @@ A production-ready system that lets you submit multiple development plans and ha
 
 **Your role shifts from executor to overseer:** Create plans, submit them, approve high-risk changes. The system handles everything else.
 
+**v1.1 Now with:** State persistence, circuit breakers, secrets scanning, audit trails, cost control, and learning persistence.
+
 ---
 
 ## Quick Start (3 Steps)
@@ -51,11 +53,12 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| **Agents** | 9 | Custom AI agents for orchestration, development, review |
-| **Skills** | 4 | Auto-triggered workflows (plan creation, tests, security) |
-| **Commands** | 7 | Slash commands for portfolio management |
+| **Agents** | 10 | Orchestration, development, review, QA leadership |
+| **Skills** | 7 | Tests, security, static analysis, dependency vetting, integration |
+| **Commands** | 13 | Portfolio, costs, audit, rollback, learning, git override |
 | **Protocols** | 6 | Quality gates and safety enforcement |
-| **Hooks** | 2 | Lifecycle automation scripts |
+| **Hooks** | 6 | Secrets scanning, destructive op warnings, quality injection |
+| **Scripts** | 1 | Python secrets scanner with pattern detection |
 | **Templates** | 3 | Plan and hotfix templates with example |
 
 ---
@@ -70,17 +73,23 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
                             ↓
 ┌─────────────────────────────────────────────────────────┐
 │  Layer 0: Risk Manager (MANDATORY)                      │
-│  Assesses 4 risk dimensions, approves or escalates      │
+│  Assesses 4 risk dimensions + prompt injection detection│
 └───────────────────────────┬─────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────┐
 │  Layer 1: Portfolio Manager                             │
-│  Prioritizes, detects conflicts, spawns orchestrators   │
+│  Prioritizes, detects conflicts, persists state,        │
+│  spawns orchestrators, learns from overrides            │
 └───────────────────────────┬─────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────┐
 │  Layer 2: TPM Orchestrator (per plan)                   │
-│  Executes workstreams, enforces quality gates, ships    │
+│  Circuit breakers, rebase-and-verify, quality gates     │
+└───────────────────────────┬─────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│  Layer 3: QA Lead (5-pass review)                       │
+│  Correctness → Standards → Security → Performance → UX  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -88,6 +97,7 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 
 ## Key Commands
 
+### Portfolio Management
 | Command | Purpose |
 |---------|---------|
 | `/add-plan <file>` | Submit plan to queue, trigger auto-execution |
@@ -98,22 +108,62 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 | `/show-conflicts` | Display resource conflicts |
 | `/queue-fix` | Queue a bug fix for background execution |
 
+### Observability & Control
+| Command | Purpose |
+|---------|---------|
+| `/audit [plan-id]` | View audit trail with timestamps |
+| `/costs` | View API cost breakdown by plan |
+| `/budget-override <amount>` | Authorize additional spend |
+| `/learning` | View/export learned preferences |
+| `/rollback <plan-id>` | Emergency rollback with verification |
+| `/force-git` | Override git safety for edge cases |
+
 ---
 
 ## Quality Gates (Never Skipped)
 
 Every plan goes through:
 
-1. **Risk Assessment** - Mandatory, scores 1-10
-2. **Development** - Workstreams execute in parallel
-3. **Tests** - pytest/jest must pass
-4. **Code Review** - Agent reviews for production readiness
-5. **Security Audit** - OWASP Top 10 scan
-6. **Git Workflow** - Commit, push, PR creation
-7. **Merge Decision** - Based on risk score:
-   - Low (1-3): Auto-merge
-   - Medium (4-6): Auto-merge after CI
-   - High (7-10): Manual approval required
+1. **Risk Assessment** - Mandatory, scores 1-10, prompt injection detection
+2. **Development** - Workstreams execute in parallel with circuit breakers
+3. **Static Analysis** - Automated code quality checks
+4. **Tests** - pytest/jest with Docker isolation option
+5. **Integration Tests** - Cross-component verification
+6. **QA Lead Review** - 5-pass review (correctness, standards, security, performance, UX)
+7. **Security Audit** - OWASP Top 10 + secrets scanning
+8. **Dependency Vetting** - Typosquatting detection for new packages
+9. **Git Workflow** - Rebase-and-verify protocol, commit, push, PR
+10. **Merge Decision** - Based on risk score:
+    - Low (1-3): Auto-merge
+    - Medium (4-6): Auto-merge after CI
+    - High (7-10): Manual approval required
+
+---
+
+## Production-Ready Features (v1.1)
+
+### Resilience
+- **State Persistence** - System recovers from crashes, resumes interrupted plans
+- **Circuit Breakers** - 3 fix attempts per issue, 5 total per plan, 60-min timeout
+- **Context Summarization** - Handles long-running plans without context overflow
+- **Rollback Command** - Emergency recovery with verification
+
+### Security
+- **Secrets Scanning** - Hook-enforced before git operations (API keys, passwords, tokens)
+- **Dependency Vetting** - Detects typosquatting in package names
+- **Prompt Injection Detection** - Sanitizes plan content before execution
+- **Destructive Op Warnings** - Alerts for rm -rf, chmod changes
+
+### Observability
+- **Audit Trail** - Full logging with timestamps, exportable via `/audit`
+- **Cost Control** - Real-time cost tracking via `/costs`, budget overrides
+- **Learning Persistence** - System improves from your overrides via `/learning`
+
+### Quality
+- **QA Lead Agent** - 5-pass code review (correctness, standards, security, performance, UX)
+- **Static Analysis Skill** - Automated linting and code quality
+- **Integration Testing** - Cross-component test coordination
+- **Docker Isolation** - Secure test execution environment
 
 ---
 
