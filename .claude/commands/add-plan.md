@@ -1,19 +1,35 @@
-Add a new development plan to the portfolio queue and trigger auto-execution.
+Add one or more development plans to the portfolio queue and trigger auto-execution.
 
-Usage: /add-plan <plan-file>
-Example: /add-plan PLAN-2025-006.md
+Usage: /add-plan <plan-file> [plan-file2] [plan-file3] ...
+Examples:
+  /add-plan PLAN-feature-a.md                          # Single plan
+  /add-plan PLAN-feature-a.md PLAN-feature-b.md        # Multiple plans
+  /add-plan *.md                                        # Glob pattern (all .md in Inbox)
 
-Expects the plan file to exist in 00 Inbox/ or 00 Inbox/plans/ directory.
+Expects plan files to exist in 00 Inbox/ or 00 Inbox/plans/ directory.
+
+## Multi-Plan Benefits
+
+Adding multiple plans in one command:
+- **No waiting** - Don't need to wait for each plan's ingestion to complete
+- **Better conflict detection** - Portfolio Manager sees all plans at once
+- **Batch efficiency** - Single risk assessment pass, single dashboard update
+- **Intra-batch conflicts** - Detects conflicts between the new plans themselves
 
 ## What This Command Does
 
 ### Step 0: File Normalization (BEFORE invoking Portfolio Manager)
+
+**For EACH plan file** (processed sequentially to avoid ID collisions):
 
 If the plan file is NOT in `00 Inbox/plans/`:
 1. **Check for ID conflicts** - If plan ID already exists in completed/ or plans/, assign next available ID (PLAN-YYYY-NNN)
 2. **Move file** to `00 Inbox/plans/PLAN-YYYY-NNN.md`
 3. **Update ID** in the plan file header to match filename
 4. **Delete the original file** to avoid duplicates
+5. **Track the normalized path** for batch submission to Portfolio Manager
+
+**Critical for multi-plan:** Increment the NNN counter after each assignment to prevent ID collisions within the batch.
 
 This ensures all plans follow consistent naming and location conventions.
 
@@ -44,33 +60,65 @@ High-risk plans (risk ≥ 7) are queued but NOT auto-executed - they require man
 ## Workflow
 
 ```
-/add-plan PLAN-2025-006.md    → Analyze, queue, auto-execute in background
-/portfolio                     → Check progress anytime
+/add-plan PLAN-feature-a.md                    → Single plan
+/add-plan PLAN-a.md PLAN-b.md PLAN-c.md        → Batch of plans
+/portfolio                                      → Check progress anytime
 ```
 
 ## Execution Instructions
 
-**BEFORE invoking Portfolio Manager**, perform file normalization yourself:
+**BEFORE invoking Portfolio Manager**, perform file normalization for ALL files:
 
-1. If plan file is NOT in `00 Inbox/plans/`:
-   - Check existing plan IDs in `00 Inbox/plans/` and `00 Inbox/plans/completed/`
-   - Assign next available ID (PLAN-YYYY-NNN where NNN is max+1)
-   - Copy file to `00 Inbox/plans/PLAN-YYYY-NNN.md`
-   - Edit the ID in the new file to match
-   - Delete the original file
+### Step 1: Expand Input (handle globs)
 
-2. Then use the Task tool with subagent_type='portfolio-manager' and prompt:
+1. Parse the argument(s) to get list of plan files
+2. If glob pattern (e.g., `*.md`), expand to matching files in `00 Inbox/`
+3. Validate each file exists
 
-'Add plan {normalized_plan_file} to the portfolio.
+### Step 2: Sequential Normalization (prevents ID collisions)
+
+For EACH plan file in order:
+
+1. Check existing plan IDs in `00 Inbox/plans/` and `00 Inbox/plans/completed/`
+2. Find max NNN value across all existing PLAN-YYYY-NNN files
+3. If plan needs new ID:
+   - Assign PLAN-YYYY-(max+1).md
+   - Increment max for next file in batch
+4. Copy file to `00 Inbox/plans/PLAN-YYYY-NNN.md`
+5. Edit the ID in the new file to match filename
+6. Delete the original file
+7. Add normalized path to `normalized_files` list
+
+### Step 3: Single Portfolio Manager Invocation
+
+Use the Task tool with subagent_type='portfolio-manager' and prompt:
+
+'Add the following plans to the portfolio (BATCH SUBMISSION):
+
+Plans: {comma-separated list of normalized_plan_files}
 
 Steps:
-1. Read and parse the plan file
-2. Invoke Risk Manager for risk assessment (MANDATORY)
-3. Check for conflicts with existing plans
+1. Read and parse ALL plan files
+2. For EACH plan, invoke Risk Manager for risk assessment (MANDATORY)
+3. Check for conflicts:
+   - Between new plans and existing plans
+   - Between new plans themselves (INTRA-BATCH CONFLICTS)
 4. Update state file (.state.json) and dashboard (PORTFOLIO_STATUS.md)
-5. For READY plans (risk < 7, no blocking dependencies):
-   - Spawn TPM orchestrator with run_in_background=true
+5. For ALL READY plans (risk < 7, no blocking dependencies):
+   - Spawn TPM orchestrators with run_in_background=true
+   - Launch multiple in SINGLE message for parallelism
    - Update plan status to EXECUTING
-6. Return analysis summary
+6. Return batch analysis summary
 
-IMPORTANT: You MUST spawn TPM orchestrators for ready plans BEFORE returning. Use run_in_background=true so execution continues while the command line returns to the user.'
+IMPORTANT:
+- Process ALL plans before returning
+- Spawn TPM orchestrators for ready plans BEFORE returning
+- Use run_in_background=true so execution continues while command line returns
+- Report any intra-batch conflicts found'
+
+### Error Handling
+
+If some files fail normalization:
+- Continue with valid files
+- Report failures to user
+- Don't invoke Portfolio Manager if ALL files fail
