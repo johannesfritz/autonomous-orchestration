@@ -7,8 +7,19 @@ Expects the plan file to exist in 00 Inbox/ or 00 Inbox/plans/ directory.
 
 ## What This Command Does
 
-1. Invoke Portfolio Manager to analyze the new plan
-2. Portfolio Manager will:
+### Step 0: File Normalization (BEFORE invoking Portfolio Manager)
+
+If the plan file is NOT in `00 Inbox/plans/`:
+1. **Check for ID conflicts** - If plan ID already exists in completed/ or plans/, assign next available ID (PLAN-YYYY-NNN)
+2. **Move file** to `00 Inbox/plans/PLAN-YYYY-NNN.md`
+3. **Update ID** in the plan file header to match filename
+4. **Delete the original file** to avoid duplicates
+
+This ensures all plans follow consistent naming and location conventions.
+
+### Step 1: Invoke Portfolio Manager
+
+Portfolio Manager will:
    - Parse plan metadata (dependencies, files, workstreams)
    - Invoke Risk Manager for risk assessment (MANDATORY)
    - Check for conflicts with existing plans
@@ -37,9 +48,20 @@ High-risk plans (risk ≥ 7) are queued but NOT auto-executed - they require man
 /portfolio                     → Check progress anytime
 ```
 
-Use the Task tool with subagent_type='portfolio-manager' and prompt:
+## Execution Instructions
 
-'Add plan {plan_file} to the portfolio.
+**BEFORE invoking Portfolio Manager**, perform file normalization yourself:
+
+1. If plan file is NOT in `00 Inbox/plans/`:
+   - Check existing plan IDs in `00 Inbox/plans/` and `00 Inbox/plans/completed/`
+   - Assign next available ID (PLAN-YYYY-NNN where NNN is max+1)
+   - Copy file to `00 Inbox/plans/PLAN-YYYY-NNN.md`
+   - Edit the ID in the new file to match
+   - Delete the original file
+
+2. Then use the Task tool with subagent_type='portfolio-manager' and prompt:
+
+'Add plan {normalized_plan_file} to the portfolio.
 
 Steps:
 1. Read and parse the plan file
