@@ -53,13 +53,29 @@ mv "00 Inbox/plans/PLAN-YYYY-NNN.md" "00 Inbox/plans/completed/PLAN-YYYY-NNN.md"
 4. Update "Last Updated" timestamp
 ```
 
-### 4. Verification
+### 4. Commit Portfolio State Changes
+
+**CRITICAL: Always commit state files after plan completion.**
+
+```bash
+git add -A "00 Inbox/plans/" "00 Inbox/PORTFOLIO_STATUS.md" "00 Inbox/system_state.json" "00 Inbox/audit_log.jsonl"
+git commit -m "Update portfolio state: PLAN-YYYY-NNN shipped"
+git push
+```
+
+This ensures:
+- State is persisted in Git (source of truth)
+- Other sessions see accurate portfolio state
+- No orphaned uncommitted state files
+
+### 5. Verification
 
 Before returning, verify:
 - [ ] `.state.json` has correct status
 - [ ] Plan file is in `completed/` folder (if shipped)
 - [ ] `PORTFOLIO_STATUS.md` reflects current state
 - [ ] No stale entries remain
+- [ ] **All state changes are committed and pushed to Git**
 
 ---
 
