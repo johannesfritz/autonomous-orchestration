@@ -1,22 +1,22 @@
 # Template vs. Production Divergence Report
 
-**Generated:** 2025-12-30
+**Generated:** 2025-12-30 (Updated after backport)
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/.claude/`
 
 ## Summary
 
-The production setup in `jf-private/.claude/` is a **superset** of this template. The template serves as a "starter kit" while the production setup contains additional features developed during active use.
+✅ **IN SYNC** - All orchestration improvements have been backported from production to template. The template now contains the complete, production-tested autonomous orchestration system.
 
 ## Divergence Status
 
 | Category | Template | Production | Status |
 |----------|----------|------------|--------|
-| Agents | 9 | 10 | Production has more |
-| Commands | 7 | 12 | Production has more |
-| Skills | 4 | 6 | Production has more |
-| Scripts | 0 | 1 | Production has more |
-| Hooks | 6 | 11 | Production has more |
+| Agents | 10 | 10 | ✅ In sync |
+| Commands | 13 | 13 | ✅ In sync |
+| Skills | 7 | 7 | ✅ In sync |
+| Scripts | 1 | 1 | ✅ In sync |
+| Hooks | 11 | 11 | ✅ In sync |
 
 ---
 
@@ -202,3 +202,36 @@ Keep the template as a "minimal starter kit" and production as the "full impleme
 | Date | Change |
 |------|--------|
 | 2025-12-30 | Initial divergence report created |
+| 2025-12-30 | Backport complete - template and production now in sync |
+
+---
+
+## Backported Items (2025-12-30)
+
+### Agents
+- ✅ Added qa-lead.md (new agent)
+- ✅ Updated portfolio-manager.md (added 3 protocols: State Persistence, Audit Logging, Learning System)
+- ✅ Updated tpm-orchestrator.md (added 3 protocols: Circuit Breaker, Rebase-and-Verify, Context Summarization)
+- ✅ Updated risk-manager.md (added Plan Content Sanitization protocol)
+
+### Commands
+- ✅ Added audit.md
+- ✅ Added costs.md
+- ✅ Added budget-override.md
+- ✅ Added force-git.md
+- ✅ Added learning.md
+- ✅ Added rollback.md
+
+### Skills
+- ✅ Added dependency-vetting/SKILL.md
+- ✅ Added integration-testing/SKILL.md
+- ✅ Added static-analysis/SKILL.md
+
+### Scripts
+- ✅ Added scripts/scan-secrets.py
+
+### Settings.json
+- ✅ Added MCP tools permissions
+- ✅ Added deny list (destructive operations)
+- ✅ Added PreToolUse hooks for git operations (secrets scanning)
+- ✅ Added destructive operation warnings

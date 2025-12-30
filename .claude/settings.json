@@ -121,6 +121,17 @@
       "Grep",
       "Task",
 
+      "// === MCP TOOLS ===",
+      "mcp__filesystem__read_file",
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__write_file",
+      "mcp__filesystem__edit_file",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__search_files",
+      "mcp__filesystem__get_file_info",
+      "mcp__filesystem__list_allowed_directories",
+
       "// === DEV UTILITIES ===",
       "Bash(jq:*)",
       "Bash(yq:*)",
@@ -149,6 +160,15 @@
       "Bash(ping:*)",
       "Bash(dig:*)",
       "Bash(host:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf .claude)",
+      "Bash(rm -rf .git)",
+      "Bash(git push --force origin main)",
+      "Bash(git push --force origin master)",
+      "Bash(git push -f origin main)",
+      "Bash(git push -f origin master)"
     ]
   },
   "hooks": {
@@ -159,6 +179,51 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/quality-check.md && echo '' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/code-standards.md"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git add *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/scripts/scan-secrets.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git commit *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $CLAUDE_PROJECT_DIR/.claude/scripts/scan-secrets.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git push *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⚠️ PRE-PUSH CHECK: Verify no secrets in staged changes'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(rm -rf *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⚠️ DESTRUCTIVE: Recursive deletion requested. Verify target path is correct.'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(chmod *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⚠️ PERMISSION CHANGE: Verify file permissions are intentional.'"
           }
         ]
       }
