@@ -150,6 +150,87 @@ Create `.claude/settings.local.json` for machine-specific permissions (not commi
 
 ---
 
+## Pre-Push Build Verification
+
+The orchestration system includes a pre-push hook that runs builds and tests before allowing `git push`. This catches errors locally during Claude Code sessions, preventing broken code from reaching CI/CD.
+
+### How It Works
+
+```
+Developer (Claude Code session)
+    │
+    └─→ git push
+          └─→ PreToolUse hook: pre-push-build-check.sh
+                ├─→ Detects which files changed
+                ├─→ Runs matching build/test commands
+                └─→ Exit 2 blocks push if any fail
+```
+
+### Configuring Project Checks
+
+Edit `.claude/hooks/pre-push-build-check.sh` and add entries to the `PROJECT_CHECKS` array:
+
+```bash
+PROJECT_CHECKS=(
+    "frontend/**|cd frontend && npm run build|Frontend Build"
+    "backend/**|cd backend && pytest -q|Backend Tests"
+    "src/**/*.ts|npm run typecheck|TypeScript Check"
+)
+```
+
+Each entry has three parts separated by `|`:
+1. **Path pattern** - Files that trigger this check (glob-style)
+2. **Build command** - Command to run (relative to project root)
+3. **Description** - Human-readable name for output
+
+### Example Configurations
+
+**React + Python Backend:**
+```bash
+PROJECT_CHECKS=(
+    "frontend/**|cd frontend && npm run build|Frontend TypeScript"
+    "backend/**|cd backend && ./venv/bin/pytest -q|Backend Tests"
+)
+```
+
+**Monorepo with Multiple Apps:**
+```bash
+PROJECT_CHECKS=(
+    "apps/web/**|cd apps/web && pnpm build|Web App Build"
+    "apps/api/**|cd apps/api && pnpm test|API Tests"
+    "packages/**|pnpm -r build|Shared Packages"
+)
+```
+
+**Single TypeScript Project:**
+```bash
+PROJECT_CHECKS=(
+    "src/**|npm run build|TypeScript Build"
+    "**/*.test.ts|npm test|Unit Tests"
+)
+```
+
+### Complementing CI/CD
+
+This hook works alongside GitHub Actions (or other CI):
+
+| Layer | What It Catches | When |
+|-------|-----------------|------|
+| Pre-push hook | Build errors during Claude Code sessions | Before push |
+| GitHub Actions | Build errors from any source | Before merge |
+
+**Best practice:** Configure your CI workflow with `pull_request` trigger:
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]  # <-- Add this
+```
+
+---
+
 ## Modifying Hooks
 
 ### Add New Hook

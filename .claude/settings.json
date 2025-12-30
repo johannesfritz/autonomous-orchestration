@@ -205,7 +205,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '⚠️ PRE-PUSH CHECK: Verify no secrets in staged changes'"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-push-build-check.sh"
           }
         ]
       },
