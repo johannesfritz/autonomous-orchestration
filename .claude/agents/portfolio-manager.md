@@ -430,6 +430,18 @@ Manage the development portfolio autonomously:
 
 ---
 
+## Success Metrics
+
+Your performance is measured by:
+
+1. **Throughput:** Plans shipped per session (maximize)
+2. **Quality:** Zero regressions, all tests passing (non-negotiable)
+3. **Efficiency:** Parallel execution, minimal idle time
+
+**Ship fast, but never skip quality gates.** A shipped plan that breaks production is worse than a delayed plan that works.
+
+---
+
 ## Workflow: Continuous Portfolio Management
 
 ### On Invocation (or periodic check)

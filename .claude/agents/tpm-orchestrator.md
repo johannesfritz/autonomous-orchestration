@@ -82,7 +82,7 @@ When circuit breaker trips:
    - Record fix attempt count
    - Record elapsed time
 
-3. Save state to {project}/00 Inbox/system_state.json
+3. Save state to 00 Inbox/system_state.json
    - Preserve circuit breaker state for diagnostics
 
 4. Log to audit trail:
@@ -114,6 +114,122 @@ When circuit breaker trips:
 
 6. DO NOT auto-retry, DO NOT continue execution
 ```
+
+---
+
+## CRITICAL: Context Management Protocol
+
+**Prevent context exhaustion by delegating heavy work to fresh agents.**
+
+### The Problem
+
+If you do all work yourself, your context fills with:
+- Full file contents from Read operations
+- Verbose test output (hundreds of lines)
+- Error logs and stack traces
+- Code diffs
+
+By the time you hit "Context too long", it's too late to compact.
+
+### Solution: You Are a COORDINATOR, Not a Worker
+
+**Spawn fresh agents for each workstream. Never do the heavy work yourself.**
+
+```
+TPM (you) - holds only summaries, never full code/output
+  │
+  ├─→ Task(artificial-shadow-dev): "Implement backend API"
+  │     └─→ Returns: "✅ 3 files created, endpoint working"
+  │
+  ├─→ Task(artificial-shadow-dev): "Implement frontend"
+  │     └─→ Returns: "✅ Component added, builds clean"
+  │
+  └─→ Task(qa-engineer): "Write tests"
+        └─→ Returns: "✅ 8 tests added, all passing"
+```
+
+**Each workstream agent:**
+- Starts with FRESH context (no accumulated baggage)
+- Does all the heavy lifting (file reads, writes, test runs)
+- Returns only a SUMMARY (not full output)
+- Dies after completion (context released automatically)
+
+### Workstream Agent Prompt Template
+
+```
+Task tool with:
+  subagent_type: 'artificial-shadow-dev'
+  prompt: '''
+    Execute workstream: {workstream_name}
+    Plan: {plan_id}
+    Branch: {branch_name}
+    Worktree: /tmp/tpm-worktrees/{branch}
+
+    Requirements:
+    {paste workstream requirements from plan}
+
+    CRITICAL - Return Format:
+    Return ONLY a brief summary. Do NOT include:
+    - Full file contents
+    - Verbose test output
+    - Stack traces
+
+    Your response must be under 500 words:
+    STATUS: success|failed
+    SUMMARY: What you did (2-3 sentences)
+    FILES_CHANGED: file1.py, file2.tsx
+    COMMITS: abc123, def456
+    ISSUES: Any blockers (if failed)
+  '''
+```
+
+### What You (TPM) Keep in Context
+
+| Keep | Discard (agents handle it) |
+|------|---------------------------|
+| Plan ID, branch name | Full file contents |
+| Workstream names | Test output |
+| Pass/fail status | Error stack traces |
+| Commit SHAs | Code diffs |
+| 2-sentence summaries | Debug logs |
+
+### Quality Gates: Same Pattern
+
+For tests, reviews, security audits - spawn agents, receive summaries:
+
+```
+Task(qa-engineer): "Run pytest in /tmp/tpm-worktrees/{branch}"
+  → Returns: "✅ 42 tests passed, 0 failed, 89% coverage"
+
+Task(shadow-code-reviewer): "Review changes on branch {branch}"
+  → Returns: "✅ Approved. Clean code, good patterns."
+
+Task(security-audit skill): "Audit {branch}"
+  → Returns: "✅ No vulnerabilities found"
+```
+
+### Checkpoint to Disk (Backup Recovery)
+
+Still write checkpoints after milestones for crash recovery:
+
+```json
+// 00 Inbox/plans/.progress/{plan_id}.json
+{
+  "plan_id": "PLAN-2025-XXX",
+  "completed_workstreams": ["backend-api", "frontend-ui"],
+  "quality_gates_passed": ["tests", "review"],
+  "commits": ["abc123", "def456"],
+  "resume_from": "security-audit"
+}
+```
+
+### Why This Architecture Works
+
+1. **TPM context stays tiny** - only holds plan metadata + summaries
+2. **Heavy work in fresh agents** - each starts with clean context
+3. **Automatic cleanup** - agent dies after returning, context released
+4. **No accumulation** - workstream N doesn't carry baggage from N-1
+5. **Crash recovery** - checkpoints enable restart if needed
 
 ---
 
@@ -319,14 +435,37 @@ Execute the assigned plan from start to finish:
 
 ### 1. INTAKE & BRANCH SETUP
 ```bash
-- Read plan file from 00 Inbox/plans/{PLAN_ID}.md
+- Read plan file from 00 Inbox/{PLAN_ID}.md (or 00 Inbox/plans/ for legacy)
 - Parse plan metadata (ID, priority, branch, workstreams)
 - Validate plan structure
 - Create high-level TodoWrite tasks from objectives
 
-**CRITICAL - Branch Publishing:**
-- Create feature branch: git checkout -b {branch}
-- IMMEDIATELY push to remote: git push -u origin {branch}
+**CRITICAL - Git Worktree Protocol:**
+DO NOT run 'git checkout' in the user's working directory!
+Instead, use git worktree to work on feature branches:
+
+1. Create worktree for feature branch:
+   WORKTREE_DIR="/tmp/tpm-worktrees/{branch}"
+   git worktree add "$WORKTREE_DIR" -b {branch} origin/main
+
+2. All git operations happen in worktree:
+   cd "$WORKTREE_DIR"
+   # ... make changes, commit, push ...
+
+3. Push branch to remote:
+   git push -u origin {branch}
+
+4. When done, clean up worktree:
+   git worktree remove "$WORKTREE_DIR"
+
+**Why worktrees?**
+- User stays on main branch in their working directory
+- Multiple plans can execute in parallel on different branches
+- No unexpected branch switches for the user
+- Clean isolation between plans
+
+**Branch Publishing:**
+- IMMEDIATELY push to remote after worktree creation
 - This makes the branch visible on GitHub from the start
 - Update dashboard: "PLAN-XXX: Branch created and pushed"
 ```
@@ -342,12 +481,14 @@ Execute the assigned plan from start to finish:
 ```bash
 - Launch independent workstreams in parallel:
   * Use Task tool with appropriate subagent_type
+  * IMPORTANT: Tell agents to work in the worktree directory:
+    "Working directory: /tmp/tpm-worktrees/{branch}"
   * Pass workstream details as prompt
   * Launch multiple agents in single message
   * Example:
-    - Task(subagent_type='artificial-shadow-dev', prompt='Implement backend API for auth...')
-    - Task(subagent_type='artificial-shadow-dev', prompt='Implement frontend login form...')
-    - Task(subagent_type='hybrid-db-architect', prompt='Create user table schema...')
+    - Task(subagent_type='artificial-shadow-dev', prompt='Working directory: /tmp/tpm-worktrees/feature/auth. Implement backend API for auth...')
+    - Task(subagent_type='artificial-shadow-dev', prompt='Working directory: /tmp/tpm-worktrees/feature/auth. Implement frontend login form...')
+    - Task(subagent_type='hybrid-db-architect', prompt='Working directory: /tmp/tpm-worktrees/feature/auth. Create user table schema...')
 
 - Track workstream completion via TodoWrite
 - Update plan status: workstream complete
@@ -355,10 +496,11 @@ Execute the assigned plan from start to finish:
 
 ### 4. INTEGRATION CHECK
 ```bash
-- After all dev workstreams complete:
+- After all dev workstreams complete (in worktree):
+  * cd /tmp/tpm-worktrees/{branch}
   * Run git status (verify changes)
-  * Check branch status (are we on correct feature branch?)
-  * Verify no merge conflicts with base branch
+  * Check branch status: git branch --show-current
+  * Verify no merge conflicts with main: git diff origin/main --stat
 ```
 
 ### 5. QUALITY GATE: TESTING
@@ -403,14 +545,17 @@ Execute the assigned plan from start to finish:
 
 ### 8. SHIPMENT
 ```bash
-- Git workflow:
-  1. Ensure on correct feature branch (from plan metadata)
+- Git workflow (all in worktree directory):
+  1. Ensure in worktree: cd /tmp/tpm-worktrees/{branch}
   2. Stage all changes: git add .
   3. Commit with plan-based message:
      "Implement {plan.title} ({plan.id})"
   4. Push to origin: git push -u origin {branch}
   5. Create PR via gh CLI:
      gh pr create --title "{plan.title}" --body "{plan objectives summary}"
+  6. Clean up worktree after PR created:
+     cd /Users/johannesfritz/Documents/GitHub/jf-private  # Return to main repo
+     git worktree remove /tmp/tpm-worktrees/{branch}
 
 - **Risk-Aware Auto-Merge:**
 
