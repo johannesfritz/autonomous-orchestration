@@ -1,200 +1,96 @@
 # Template vs. Production Divergence Report
 
-**Last Synced:** 2025-12-30
+**Last Verified:** 2025-12-30
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/.claude/`
 
 ## Summary
 
-✅ **IN SYNC** - Template has been synchronized with the production implementation on 2025-12-30. The template now contains the complete, production-tested autonomous orchestration system.
+✅ **IN SYNC** - Template matches the production implementation.
 
-## Divergence Status
+## Current Status
 
 | Category | Template | Production | Status |
 |----------|----------|------------|--------|
-| Agents | 10 | 10 | ✅ In sync |
-| Commands | 14 | 14 | ✅ In sync |
-| Skills | 7 | 7 | ✅ In sync |
-| Protocols | 6 | 6 | ✅ In sync |
-| Scripts | 2 | 2 | ✅ In sync |
-| Hooks (shell) | 3 | 3 | ✅ In sync |
+| settings.json | ✓ | ✓ | ✅ Identical |
+| Agents | 10 | 10 | ✅ Identical |
+| Commands | 14 | 14 | ✅ Identical |
+| Skills | 7 | 7 | ✅ Identical |
+| Protocols | 6 | 6 | ✅ Identical |
+| Scripts | 2 | 2 | ✅ Identical |
+| Hooks (shell) | 3 | 3 | ✅ Identical |
 
 ---
 
-## Detailed Differences
+## Components
 
-### Agents
-
-#### Present in Both (9)
+### Agents (10)
 - artificial-shadow-dev.md
 - artificial-shadow-llm-architect.md
 - database-engineer.md
 - hybrid-db-architect.md
 - portfolio-manager.md
 - qa-engineer.md
+- qa-lead.md
 - risk-manager.md
 - shadow-code-reviewer.md
 - tpm-orchestrator.md
 
-#### Production Only (1)
-| Agent | Purpose |
-|-------|---------|
-| **qa-lead.md** | Multi-pass code review with 5 review passes: correctness, integration, security, maintainability, regression risk. Outputs structured JSON verdicts (APPROVE/REQUEST_CHANGES/BLOCK) for automation. |
-
-#### Content Enhancements (Same file, more content in production)
-
-| Agent | Template Lines | Production Lines | Added Protocols |
-|-------|---------------|------------------|-----------------|
-| portfolio-manager.md | 258 | 565 | State Persistence Protocol, Audit Logging Protocol, Learning System Persistence |
-| tpm-orchestrator.md | 286 | 510 | Circuit Breaker Protocol, Rebase-and-Verify Before Merge, Context Summarization Protocol |
-| risk-manager.md | 297 | 422 | Plan Content Sanitization (prompt injection protection) |
-
----
-
-### Commands
-
-#### Present in Both (7)
+### Commands (14)
 - add-plan.md
+- audit.md
+- budget-override.md
+- costs.md
 - execute-plan.md
+- force-git.md
+- learning.md
 - plan-status.md
 - portfolio.md
 - prioritize.md
 - queue-fix.md
+- rollback.md
 - show-conflicts.md
+- sync-state.md
 
-#### Production Only (5)
-| Command | Purpose |
-|---------|---------|
-| **audit.md** | View audit trail for plans or system. Shows event history, decisions, and outcomes. |
-| **costs.md** | API cost tracking and budget status. Per-plan breakdown and alerts. |
-| **budget-override.md** | Override daily/session/per-plan budget limits. |
-| **force-git.md** | Bypass git safeguards (secrets scan, etc.) when needed. |
-| **learning.md** | View and manage Portfolio Manager's learned patterns. Adjust confidence, delete patterns, reset learning. |
-| **rollback.md** | Rollback deployments and revert changes. |
+### Skills (7)
+- create-plan
+- dependency-vetting
+- integration-testing
+- queue-fix
+- run-test-suite
+- security-audit
+- static-analysis
 
----
+### Protocols (6)
+- code-standards.md
+- functional-verification.md
+- production-ready-checklist.md
+- quality-check.md
+- risk-assessment-required.md
+- tpm-completion-checklist.md
 
-### Skills
+### Hooks (3)
+- detect-fix-request.sh
+- detect-production-review.sh
+- pre-push-build-check.sh
 
-#### Present in Both (4)
-- create-plan/SKILL.md
-- queue-fix/SKILL.md
-- run-test-suite/SKILL.md
-- security-audit/SKILL.md
-
-#### Production Only (3)
-| Skill | Purpose |
-|-------|---------|
-| **dependency-vetting/SKILL.md** | Vet dependencies for security and licensing |
-| **integration-testing/SKILL.md** | Integration test automation |
-| **static-analysis/SKILL.md** | Static code analysis |
-
----
-
-### Scripts
-
-#### Production Only (1)
-| Script | Purpose |
-|--------|---------|
-| **scripts/scan-secrets.py** | Pre-commit secrets scanner. Detects API keys, private keys, passwords, JWT tokens. Blocks git operations on critical/high severity findings. |
+### Scripts (2)
+- derive-state-from-audit.py
+- scan-secrets.py
 
 ---
 
-### Settings.json Differences
+## Project-Specific Files (Not in Template)
 
-#### Additional Permissions in Production
-```json
-// MCP Tools
-"mcp__filesystem__read_file",
-"mcp__filesystem__read_multiple_files",
-"mcp__filesystem__write_file",
-"mcp__filesystem__edit_file",
-"mcp__filesystem__list_directory",
-"mcp__filesystem__directory_tree",
-"mcp__filesystem__search_files",
-"mcp__filesystem__get_file_info",
-"mcp__filesystem__list_allowed_directories",
+The following files exist in production but are intentionally excluded from the template:
 
-// Additional utilities
-"Bash(tldr:*)",
-"Bash(history:*)",
-"Bash(clear)",
-"Bash(reset)",
-"Bash(true)",
-"Bash(false)",
-"Bash(test:*)",
-"Bash([:*)",
-"Bash(watch:*)",
-"Bash(nohup:*)",
-"Bash(bg)",
-"Bash(fg)",
-"Bash(jobs)",
-"Bash(top:*)",
-"Bash(htop:*)",
-"Bash(lsof:*)",
-"Bash(netstat:*)",
-"Bash(ss:*)",
-"Bash(nc:*)",
-"Bash(telnet:*)",
-"Bash(traceroute:*)",
-"Bash(nslookup:*)"
-```
-
-#### Deny List (Production Only)
-```json
-"deny": [
-  "Bash(rm -rf /)",
-  "Bash(rm -rf .claude)",
-  "Bash(rm -rf .git)",
-  "Bash(git push --force origin main)",
-  "Bash(git push --force origin master)",
-  "Bash(git push -f origin main)",
-  "Bash(git push -f origin master)"
-]
-```
-
-#### Additional Hooks in Production
-| Hook | Matcher | Purpose |
-|------|---------|---------|
-| PreToolUse | `Bash(git add *)` | Run scan-secrets.py |
-| PreToolUse | `Bash(git commit *)` | Run scan-secrets.py |
-| PreToolUse | `Bash(git push *)` | Pre-push warning |
-| PreToolUse | `Bash(rm -rf *)` | Destructive operation warning |
-| PreToolUse | `Bash(chmod *)` | Permission change warning |
-
----
-
-### Files Only in Template (Missing from Production)
-
-| File | Purpose |
-|------|---------|
-| settings.local.json.example | Example file for local setting overrides |
-
----
-
-## Recommendations
-
-### Option 1: Backport to Template (Recommended)
-Update this template to match production, making it the authoritative source for the orchestration system.
-
-**Benefits:**
-- Single source of truth
-- Template becomes reusable for other projects
-- Easier maintenance
-
-**Plan:** See `PLAN-2025-XXX-backport-orchestration.md`
-
-### Option 2: Keep Diverged
-Keep the template as a "minimal starter kit" and production as the "full implementation."
-
-**Benefits:**
-- Simpler template for new users
-- Production can evolve independently
-
-**Drawbacks:**
-- Two sources of truth
-- Risk of template becoming stale
-- Harder to track what's in production vs. template
+| File | Reason |
+|------|--------|
+| `settings.local.json` | Machine-specific permissions (gitignored) |
+| `00 Inbox/plans/*.md` | Actual development plans |
+| `00 Inbox/plans/.state.json` | Runtime state |
+| `00 Inbox/audit_log.jsonl` | Event history |
+| `00 Inbox/PORTFOLIO_STATUS.md` | Generated dashboard |
 
 ---
 
@@ -202,37 +98,17 @@ Keep the template as a "minimal starter kit" and production as the "full impleme
 
 | Date | Change |
 |------|--------|
-| 2025-12-30 | Initial divergence report created |
-| 2025-12-30 | Backport complete - template and production now in sync |
+| 2025-12-28 | Initial template created |
+| 2025-12-30 | Full backport from production - all components synchronized |
+| 2025-12-30 | Updated settings.local.json.example with all skill permissions |
 
 ---
 
-## Backported Items (2025-12-30)
+## Maintenance
 
-### Agents
-- ✅ Added qa-lead.md (new agent)
-- ✅ Updated portfolio-manager.md (added 3 protocols: State Persistence, Audit Logging, Learning System)
-- ✅ Updated tpm-orchestrator.md (added 3 protocols: Circuit Breaker, Rebase-and-Verify, Context Summarization)
-- ✅ Updated risk-manager.md (added Plan Content Sanitization protocol)
+To verify sync status:
+```bash
+diff -rq .claude/ claude-setup/autonomous-orchestration/.claude/
+```
 
-### Commands
-- ✅ Added audit.md
-- ✅ Added costs.md
-- ✅ Added budget-override.md
-- ✅ Added force-git.md
-- ✅ Added learning.md
-- ✅ Added rollback.md
-
-### Skills
-- ✅ Added dependency-vetting/SKILL.md
-- ✅ Added integration-testing/SKILL.md
-- ✅ Added static-analysis/SKILL.md
-
-### Scripts
-- ✅ Added scripts/scan-secrets.py
-
-### Settings.json
-- ✅ Added MCP tools permissions
-- ✅ Added deny list (destructive operations)
-- ✅ Added PreToolUse hooks for git operations (secrets scanning)
-- ✅ Added destructive operation warnings
+Expected output: No differences (settings.local.json is gitignored in production).

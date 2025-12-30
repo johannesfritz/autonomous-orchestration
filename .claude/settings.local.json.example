@@ -9,11 +9,15 @@
       "Bash(./venv/bin/uvicorn:*)",
       "Bash(sqlite3:*)",
 
-      "// Skill permissions",
+      "// Skill permissions (core portfolio commands)",
       "Skill(run-test-suite)",
       "Skill(security-audit)",
       "Skill(create-plan)",
-      "Skill(queue-fix)"
+      "Skill(queue-fix)",
+      "Skill(execute-plan)",
+      "Skill(add-plan)",
+      "Skill(portfolio)",
+      "Skill(sync-state)"
     ]
   }
 }
