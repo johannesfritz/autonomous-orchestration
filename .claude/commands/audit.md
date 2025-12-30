@@ -18,7 +18,7 @@ Provide full visibility into system decisions and actions:
 
 ## Audit Log Format
 
-The audit trail is stored in `{project}/00 Inbox/audit_log.jsonl` (JSON Lines format):
+The audit trail is stored in `00 Inbox/audit_log.jsonl` (JSON Lines format):
 
 ```json
 {"timestamp": "2025-01-15T10:30:00Z", "event": "PLAN_SUBMITTED", "plan_id": "PLAN-2025-001", "source": "user", "details": {"priority": "high", "files": ["src/api/auth.py"]}}
@@ -145,12 +145,12 @@ When the user invokes `/audit`:
 
 1. **Read audit log:**
    ```bash
-   cat {project}/00 Inbox/audit_log.jsonl
+   cat 00 Inbox/audit_log.jsonl
    ```
 
 2. **Filter by plan ID (if provided):**
    ```bash
-   grep "PLAN-2025-XXX" {project}/00 Inbox/audit_log.jsonl
+   grep "PLAN-2025-XXX" 00 Inbox/audit_log.jsonl
    ```
 
 3. **Format output:**
@@ -166,7 +166,7 @@ When the user invokes `/audit`:
 
 ## Audit Logging Protocol (For Agents)
 
-All agents MUST log to `{project}/00 Inbox/audit_log.jsonl`:
+All agents MUST log to `00 Inbox/audit_log.jsonl`:
 
 ```python
 def log_audit_event(event: str, plan_id: str, source: str, details: dict):
@@ -177,7 +177,7 @@ def log_audit_event(event: str, plan_id: str, source: str, details: dict):
         "source": source,
         "details": details
     }
-    with open("{project}/00 Inbox/audit_log.jsonl", "a") as f:
+    with open("00 Inbox/audit_log.jsonl", "a") as f:
         f.write(json.dumps(entry) + "\n")
 ```
 

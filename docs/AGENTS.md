@@ -1,6 +1,6 @@
 # Agent Descriptions
 
-This system includes 9 custom agents, each with a specific role.
+This system includes 10 custom agents, each with a specific role.
 
 ---
 
@@ -218,6 +218,32 @@ Task(subagent_type="qa-engineer", prompt="Create tests for...")
 
 ---
 
+### qa-lead
+
+**Role:** QA Lead / Senior Technical Reviewer
+
+**Purpose:** Multi-pass code review with structured verdicts
+
+**Capabilities:**
+- 5-pass review methodology:
+  1. Correctness pass
+  2. Integration pass
+  3. Security pass
+  4. Maintainability pass
+  5. Regression risk pass
+- Structured JSON output for automation
+- Verdict types: APPROVE, REQUEST_CHANGES, BLOCK
+- Confidence scores and specific line references
+
+**Invocation:**
+```
+Task(subagent_type="qa-lead", prompt="Review PR for...")
+```
+
+**Output format:** Returns structured JSON with verdicts, enabling automated decision-making in CI/CD pipelines.
+
+---
+
 ## Agent Selection Guide
 
 | Task | Recommended Agent |
@@ -231,6 +257,7 @@ Task(subagent_type="qa-engineer", prompt="Create tests for...")
 | LLM pipeline design | artificial-shadow-llm-architect |
 | Code review | shadow-code-reviewer |
 | Test creation | qa-engineer |
+| Multi-pass PR review | qa-lead |
 
 ---
 

@@ -70,12 +70,12 @@ Confirm this override? This will:
 ```bash
 # Update state file
 jq '.cost_tracking.limits.max_daily_usd = 75.0' \
-   {project}/00 Inbox/system_state.json > tmp.json && \
-   mv tmp.json {project}/00 Inbox/system_state.json
+   00 Inbox/system_state.json > tmp.json && \
+   mv tmp.json 00 Inbox/system_state.json
 
 # Log to audit trail
 echo '{"timestamp":"...","event":"BUDGET_OVERRIDE","details":{"type":"daily","old":50,"new":75}}' \
-   >> {project}/00 Inbox/audit_log.jsonl
+   >> 00 Inbox/audit_log.jsonl
 ```
 
 ### 3. Confirm Success

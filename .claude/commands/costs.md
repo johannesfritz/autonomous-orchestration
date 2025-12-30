@@ -17,7 +17,7 @@ Track and control API spending:
 
 ## Cost Tracking
 
-The system tracks costs in `{project}/00 Inbox/system_state.json`:
+The system tracks costs in `00 Inbox/system_state.json`:
 
 ```json
 {
@@ -164,7 +164,7 @@ Before executing a plan, the system estimates costs:
 
 When the user invokes `/costs`:
 
-1. Read state from `{project}/00 Inbox/system_state.json`
+1. Read state from `00 Inbox/system_state.json`
 2. Calculate current session duration
 3. Format cost summary
 4. If specific plan requested, show plan breakdown

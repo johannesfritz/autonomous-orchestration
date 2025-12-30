@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "// === ALLOW ALL BASH (rely on deny list for safety) ===",
+      "Bash",
+
       "// === PYTHON & DEVELOPMENT TOOLS ===",
       "Bash(python:*)",
       "Bash(python3:*)",
@@ -73,7 +76,7 @@
       "Bash(docker-compose:*)",
       "Bash(podman:*)",
 
-      "// === FILE EXPLORATION (READ ONLY) ===",
+      "// === FILE EXPLORATION (ANYWHERE - READ ONLY) ===",
       "Bash(cd:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
@@ -103,7 +106,7 @@
       "Bash(id)",
       "Bash(uname:*)",
 
-      "// === FILE OPERATIONS ===",
+      "// === DESTRUCTIVE BASH OPS (use with caution) ===",
       "Bash(rm:*)",
       "Bash(rmdir:*)",
       "Bash(mv:*)",
@@ -113,7 +116,7 @@
       "Bash(chmod:*)",
       "Bash(chown:*)",
 
-      "// === CLAUDE CODE TOOLS ===",
+      "// === CLAUDE CODE TOOLS (all paths) ===",
       "Read",
       "Edit",
       "Write",
@@ -132,7 +135,7 @@
       "mcp__filesystem__get_file_info",
       "mcp__filesystem__list_allowed_directories",
 
-      "// === DEV UTILITIES ===",
+      "// === MISC DEV UTILITIES ===",
       "Bash(jq:*)",
       "Bash(yq:*)",
       "Bash(sed:*)",
@@ -146,19 +149,41 @@
       "Bash(less:*)",
       "Bash(more:*)",
       "Bash(man:*)",
+      "Bash(tldr:*)",
+      "Bash(history:*)",
+      "Bash(clear)",
+      "Bash(reset)",
+      "Bash(true)",
+      "Bash(false)",
+      "Bash(test:*)",
+      "Bash([:*)",
       "Bash(sleep:*)",
       "Bash(time:*)",
       "Bash(timeout:*)",
+      "Bash(watch:*)",
+      "Bash(nohup:*)",
+      "Bash(bg)",
+      "Bash(fg)",
+      "Bash(jobs)",
       "Bash(ps:*)",
+      "Bash(top:*)",
+      "Bash(htop:*)",
       "Bash(kill:*)",
       "Bash(pkill:*)",
       "Bash(pgrep:*)",
+      "Bash(lsof:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)",
 
-      "// === NETWORK TESTING ===",
+      "// === NETWORK TESTING (for UAT) ===",
       "Bash(curl:*)",
       "Bash(wget:*)",
+      "Bash(nc:*)",
+      "Bash(telnet:*)",
       "Bash(ping:*)",
+      "Bash(traceroute:*)",
       "Bash(dig:*)",
+      "Bash(nslookup:*)",
       "Bash(host:*)"
     ],
     "deny": [
@@ -274,7 +299,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '⚠️ CRITICAL: Verify risk assessment exists in plan file before execution. Risk Manager invocation is MANDATORY.'"
+            "command": "echo '⚠️ CRITICAL: Verify risk assessment exists in plan file before execution. Risk Manager invocation is MANDATORY. See .claude/protocols/risk-assessment-required.md for details.'"
+          }
+        ]
+      },
+      {
+        "matcher": "risk-manager",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🛡️ Risk Manager activated - assessing plan risk dimensions...'"
           }
         ]
       },

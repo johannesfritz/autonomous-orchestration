@@ -51,11 +51,12 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| **Agents** | 9 | Custom AI agents for orchestration, development, review |
-| **Skills** | 4 | Auto-triggered workflows (plan creation, tests, security) |
-| **Commands** | 7 | Slash commands for portfolio management |
+| **Agents** | 10 | Custom AI agents for orchestration, development, review |
+| **Skills** | 7 | Auto-triggered workflows (plan creation, tests, security, analysis) |
+| **Commands** | 14 | Slash commands for portfolio management |
 | **Protocols** | 6 | Quality gates and safety enforcement |
-| **Hooks** | 2 | Lifecycle automation scripts |
+| **Hooks** | 3 | Lifecycle automation scripts (plus inline hooks in settings.json) |
+| **Scripts** | 2 | Python utilities (secrets scanning, state derivation) |
 | **Templates** | 3 | Plan and hotfix templates with example |
 
 ---
@@ -97,6 +98,13 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 | `/execute-plan <id>` | Force immediate execution |
 | `/show-conflicts` | Display resource conflicts |
 | `/queue-fix` | Queue a bug fix for background execution |
+| `/audit [plan-id]` | View audit trail and event history |
+| `/costs` | View API cost tracking and budget status |
+| `/budget-override` | Override daily/session budget limits |
+| `/learning` | View and manage learned priority patterns |
+| `/rollback <plan-id>` | Rollback a deployed plan |
+| `/force-git` | Bypass git safeguards (use with caution) |
+| `/sync-state` | Reconcile state files with git truth |
 
 ---
 

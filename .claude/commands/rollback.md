@@ -24,7 +24,7 @@ When the user invokes `/rollback PLAN-2025-XXX`:
 
 ```bash
 # Read from state file
-STATE=$(cat {project}/00 Inbox/system_state.json)
+STATE=$(cat 00 Inbox/system_state.json)
 
 # Extract merge info for this plan
 MERGE_COMMIT=$(echo "$STATE" | jq -r ".completed_plans[\"PLAN-2025-XXX\"].merge_commit")
@@ -89,7 +89,7 @@ fi
 jq '.completed_plans["PLAN-2025-XXX"].rolled_back = true' \
    '.completed_plans["PLAN-2025-XXX"].rollback_commit = "<new-commit>"' \
    '.completed_plans["PLAN-2025-XXX"].rollback_timestamp = "<now>"' \
-   {project}/00 Inbox/system_state.json > tmp.json && mv tmp.json {project}/00 Inbox/system_state.json
+   00 Inbox/system_state.json > tmp.json && mv tmp.json 00 Inbox/system_state.json
 ```
 
 ## Output

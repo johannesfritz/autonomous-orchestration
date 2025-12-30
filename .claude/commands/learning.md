@@ -236,7 +236,7 @@ Patterns are automatically created when:
 When `/learning` is invoked:
 
 ```bash
-1. Read state from {project}/00 Inbox/system_state.json
+1. Read state from 00 Inbox/system_state.json
 2. Extract learned_preferences section
 3. Format output based on subcommand:
    - (none) → Summary view

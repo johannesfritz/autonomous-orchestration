@@ -141,7 +141,7 @@ Track where plan content originated:
   "plan_id": "PLAN-2025-001",
   "source": {
     "type": "user_created",  // user_created | external_report | automated
-    "origin": "User Name",
+    "origin": "Johannes",
     "timestamp": "2025-01-15T10:00:00Z",
     "sanitized": false
   }

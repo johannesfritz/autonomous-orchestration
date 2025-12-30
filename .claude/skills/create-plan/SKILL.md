@@ -15,7 +15,7 @@ This skill will:
 - Estimate complexity and cost
 - Check for dependencies on other plans
 - Format the plan properly
-- Save to 00 Inbox/plans/
+- Save to 00 Inbox/ with descriptive filename
 - Optionally submit to portfolio via /add-plan
 
 ---
@@ -124,7 +124,7 @@ Once you have the information, generate a plan in this format:
 ```markdown
 # Plan: [Descriptive Title]
 
-**ID:** PLAN-YYYY-NNN
+**ID:** PLAN-[kebab-case-name]
 **Priority:** critical|high|medium|low
 **Branch:** feature/[descriptive-name]
 **Status:** queued
@@ -226,13 +226,18 @@ Once you have the information, generate a plan in this format:
 
 ## Plan ID Assignment
 
-Generate the next available plan ID:
+Generate a descriptive plan ID:
 
-1. List existing plans: `ls "00 Inbox/plans/PLAN-*.md" | sort | tail -1`
-2. Extract number, increment by 1
-3. Format: `PLAN-YYYY-NNN` (e.g., `PLAN-2025-002`)
+1. Convert the plan title to kebab-case (lowercase, hyphens instead of spaces)
+2. Prefix with `PLAN-`
+3. Format: `PLAN-[kebab-case-name]` (e.g., `PLAN-fsrs-consolidation`, `PLAN-offline-mode`, `PLAN-audio-pronunciation`)
 
-**If no plans exist yet:** Start with `PLAN-2025-001`
+**Examples:**
+- "Consolidate FSRS Training" → `PLAN-fsrs-consolidation`
+- "Add Offline Mode" → `PLAN-offline-mode`
+- "Backport Orchestration Template" → `PLAN-backport-orchestration-template`
+
+**Why verbose names?** When multiple plans execute simultaneously, descriptive names make it easy to identify which plan is which at a glance.
 
 ---
 
@@ -242,14 +247,19 @@ Generate the next available plan ID:
 
 Write the plan to:
 ```
-00 Inbox/plans/PLAN-YYYY-NNN.md
+00 Inbox/PLAN-[kebab-case-name].md
 ```
+
+**Examples:**
+- `00 Inbox/PLAN-fsrs-consolidation.md`
+- `00 Inbox/PLAN-offline-mode.md`
+- `00 Inbox/PLAN-audio-pronunciation.md`
 
 ### Step 6: Ask About Submission
 
 **Ask the user:**
 ```
-Plan created and saved to 00 Inbox/plans/PLAN-YYYY-NNN.md
+Plan created and saved to 00 Inbox/PLAN-[name].md
 
 Would you like me to:
 1. Submit to portfolio now (/add-plan) - Auto-executes if ready
@@ -259,12 +269,12 @@ Your choice?
 ```
 
 **If user says submit:**
-- Run `/add-plan PLAN-YYYY-NNN.md`
+- Run `/add-plan PLAN-[name].md`
 - Portfolio Manager takes over from there
 
 **If user wants to review:**
 - Show plan file location
-- Remind them to run `/add-plan PLAN-YYYY-NNN.md` when ready
+- Remind them to run `/add-plan PLAN-[name].md` when ready
 
 ---
 
@@ -286,7 +296,7 @@ If the user provides sparse information, that's okay! Generate a minimal plan wi
 ```markdown
 # Plan: Offline Mode for Stellaris
 
-**ID:** PLAN-2025-005
+**ID:** PLAN-stellaris-offline-mode
 **Priority:** medium
 
 ## Files

@@ -22,12 +22,84 @@ You are responsible for running the test suite to verify code quality and correc
 5. **Run appropriate tests**
 6. **Report results** clearly
 
-## Execution Steps
+## Docker Isolation (Preferred)
+
+**When Docker is available, prefer running tests in containers for isolation.**
+
+### Docker Test Protocol
+
+```bash
+1. Check for Docker availability:
+   if command -v docker &> /dev/null && docker info &> /dev/null; then
+       USE_DOCKER=true
+   fi
+
+2. Check for Dockerfile:
+   if [ -f "Dockerfile" ] || [ -f "Dockerfile.test" ]; then
+       DOCKER_AVAILABLE=true
+   fi
+
+3. If Docker available:
+   # Build test image
+   docker build -t test-runner:latest -f Dockerfile.test .
+
+   # Run tests in container
+   docker run --rm -v $(pwd):/app test-runner:latest pytest -v
+
+   # Compare deps in container vs requirements.txt
+   docker run --rm test-runner:latest pip freeze > /tmp/container_deps.txt
+   diff requirements.txt /tmp/container_deps.txt
+
+4. If Docker NOT available:
+   # Warn prominently
+   echo "⚠️ WARNING: Running tests on host, not in Docker container"
+   echo "Dependencies may differ from production environment"
+   # Fall back to host execution
+```
+
+### Dependency Verification
+
+When using Docker, verify dependencies match:
+
+```bash
+# Get installed packages in container
+docker run --rm test-runner pip freeze | sort > /tmp/container.txt
+
+# Get requirements
+sort requirements.txt > /tmp/required.txt
+
+# Check for undeclared dependencies (in container but not in requirements)
+comm -23 /tmp/container.txt /tmp/required.txt > /tmp/undeclared.txt
+
+if [ -s /tmp/undeclared.txt ]; then
+    echo "⚠️ UNDECLARED DEPENDENCIES FOUND:"
+    cat /tmp/undeclared.txt
+    echo ""
+    echo "These packages are installed but not in requirements.txt"
+    echo "Tests may pass locally but fail in production"
+fi
+```
+
+### Docker vs Host Decision Matrix
+
+| Condition | Action |
+|-----------|--------|
+| Docker + Dockerfile available | Run in Docker (preferred) |
+| Docker available, no Dockerfile | Run on host with warning |
+| Docker unavailable | Run on host with prominent warning |
+| CI/CD environment | Always use Docker |
+
+---
+
+## Execution Steps (Host Fallback)
 
 ### For hotel-de-ville/backend
 
 ```bash
 cd /home/user/jf-private/hotel-de-ville/backend
+
+# Warn if not using Docker
+echo "⚠️ Running tests on host (Docker not available)"
 
 # Activate venv if exists
 if [ -d "venv" ]; then
@@ -43,6 +115,9 @@ pytest -v --tb=short
 ```bash
 cd /home/user/jf-private/shadow-api
 
+# Warn if not using Docker
+echo "⚠️ Running tests on host (Docker not available)"
+
 # Activate venv if exists
 if [ -d "venv" ]; then
     source venv/bin/activate
@@ -56,6 +131,9 @@ pytest -v --tb=short
 
 ```bash
 cd /home/user/jf-private/stellaris/backend
+
+# Warn if not using Docker
+echo "⚠️ Running tests on host (Docker not available)"
 
 # Activate venv if exists
 if [ -d "venv" ]; then
