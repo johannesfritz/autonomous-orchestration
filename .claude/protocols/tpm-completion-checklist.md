@@ -6,6 +6,63 @@ This checklist is injected via `SubagentStop` hook to ensure deterministic portf
 
 ---
 
+## MANDATORY Ground Truth Verification
+
+**CRITICAL:** Before updating ANY state files, verify ground truth matches your claims.
+
+### Pre-Execution Verification (BEFORE marking EXECUTING)
+
+Before updating `.state.json` to EXECUTING status:
+
+1. **Branch Verification:**
+   ```bash
+   git branch -a | grep "feature/[plan-branch-name]"
+   ```
+   - MUST find the branch before proceeding
+   - If branch doesn't exist, DO NOT mark as EXECUTING
+
+2. **No False Starts:**
+   - Never mark a plan as EXECUTING based on intent alone
+   - Actual git branch creation is the ground truth
+   - If TPM says "starting execution" but no branch → status stays QUEUED
+
+### Completion Verification (BEFORE marking SHIPPED)
+
+**Do NOT report completion until ALL verification steps pass:**
+
+1. **Verify Branch Exists:**
+   ```bash
+   git branch -a | grep "feature/[plan-branch-name]"
+   ```
+   If branch doesn't exist, something is wrong. Investigate before proceeding.
+
+2. **Verify PR Status (if claiming SHIPPED):**
+   ```bash
+   gh pr view [branch-name] --json state,mergedAt
+   ```
+   - State must be "MERGED" or an open PR must exist
+   - If no PR found, status cannot be SHIPPED (create PR first)
+
+3. **Verify State Transition is Valid:**
+   - Read last event for this plan in `audit_log.jsonl`
+   - Valid transitions: QUEUED → READY → EXECUTING → SHIPPED
+   - Do not skip states (e.g., cannot go QUEUED → SHIPPED directly)
+
+---
+
+## Atomic State Update Order
+
+**CRITICAL:** Update state files in this exact order to maintain consistency:
+
+1. **audit_log.jsonl** (append event FIRST - this is the source of truth)
+2. **.state.json** (update status)
+3. **PORTFOLIO_STATUS.md** (update dashboard)
+4. **Commit all three together**
+
+If any step fails, do not proceed to the next. Investigate and fix the issue.
+
+---
+
 ## Completion Checklist
 
 ### 1. Update Plan Status in `.state.json`

@@ -736,3 +736,65 @@ Your job is to **free the user from coordination work**, not create more work by
 **If you have READY plans but didn't call Task tool → GO BACK AND CALL IT NOW.**
 
 Writing "Next action: Auto-execute" without actually calling Task tool is FAILURE.
+
+**The whole point of autonomous orchestration is that YOU execute, not that you report readiness and wait.**
+
+---
+
+## CRITICAL: Ground Truth Verification Protocol
+
+**Before claiming ANY plan status change, verify against ground truth sources.**
+
+### Status Transitions Must Be Verified
+
+| Transition | Verification Required |
+|------------|----------------------|
+| QUEUED → EXECUTING | Git branch exists: `git branch -a \| grep feature/[branch-name]` |
+| EXECUTING → SHIPPED | PR exists AND merged: `gh pr view [branch] --json state,mergedAt` |
+| Any → SHIPPED | Plan file in completed/ folder |
+
+### Verification Steps
+
+**BEFORE marking a plan as EXECUTING:**
+
+```bash
+# 1. Verify branch was actually created
+git branch -a | grep "feature/[plan-branch-name]"
+
+# If branch doesn't exist:
+# - DO NOT update status to EXECUTING
+# - Status remains QUEUED or READY
+# - This prevents "phantom execution" states
+```
+
+**BEFORE marking a plan as SHIPPED:**
+
+```bash
+# 1. Verify PR exists and is merged
+gh pr view [branch-name] --json state,mergedAt
+
+# 2. Verify plan file is in completed folder (or will be moved)
+ls "00 Inbox/plans/completed/PLAN-XXXX.md"
+
+# If PR is not merged or doesn't exist:
+# - DO NOT mark as SHIPPED
+# - Status remains EXECUTING or AWAITING_MERGE_APPROVAL
+```
+
+### Why This Matters
+
+This protocol prevents state desync caused by:
+- Agent claiming "execution started" without actually spawning TPM
+- Agent claiming "plan completed" without verifying PR merge
+- State files showing EXECUTING for plans with no git evidence
+
+**Remember:** Git is the source of truth. State files are derived from git reality, not from agent claims.
+
+### Recovery from Desync
+
+If you detect a mismatch between state files and git reality:
+
+1. Trust git over state files
+2. Use `/sync-state` command to reconcile
+3. Log a `STATE_RECONCILIATION` event to audit log
+4. Update state files to match git truth
