@@ -4,6 +4,61 @@ This guide covers typical usage patterns for the orchestration system.
 
 ---
 
+## Workflow 0: Full Discovery Flow (NEW)
+
+### When to Use
+
+- New feature ideas that need validation
+- Features with unclear requirements
+- Features that may need UX research
+- Major architectural decisions
+
+### The Flow
+
+```
+/discovery Add dark mode to the app
+```
+
+This triggers the full pipeline:
+
+1. **Product Manager** - Validates user need, calculates ICE score
+2. **UX Researcher** - Maps user journey (if UI feature)
+3. **Technical PM** - Translates to technical specs, assesses complexity
+4. **Spike** (if needed) - Resolves technical unknowns
+5. **Solutions Architect** (if needed) - Creates ADR for major decisions
+6. **create-plan** - Generates development plan with all context
+
+### Shortcuts
+
+```bash
+# Skip UX research (backend-only feature)
+/discovery --skip-ux Add caching layer
+
+# Skip PM validation (already validated)
+/discovery --skip-pm Implement approved design
+
+# Technical-only (skip PM and UX)
+/discovery --technical-only Refactor database queries
+```
+
+### Individual Commands
+
+```bash
+# Process feedback from production DB
+/intake
+
+# Prioritize features with scoring
+/prioritize-backlog rice
+
+# Technical investigation
+/spike Can we use WebSockets for real-time updates?
+
+# Architecture Decision Record
+/adr Choose PostgreSQL for relational data
+```
+
+---
+
 ## Workflow 1: Submit a New Feature
 
 ### Step 1: Create the Plan

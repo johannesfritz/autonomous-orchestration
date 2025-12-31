@@ -51,13 +51,48 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| **Agents** | 10 | Custom AI agents for orchestration, development, review |
-| **Skills** | 7 | Auto-triggered workflows (plan creation, tests, security, analysis) |
-| **Commands** | 14 | Slash commands for portfolio management |
-| **Protocols** | 6 | Quality gates and safety enforcement |
+| **Agents** | 15 | Custom AI agents for orchestration, development, review, product management |
+| **Skills** | 12 | Auto-triggered workflows (plan creation, tests, security, discovery) |
+| **Commands** | 19 | Slash commands for portfolio and discovery management |
+| **Protocols** | 12 | Quality gates, safety enforcement, and PM protocols |
 | **Hooks** | 3 | Lifecycle automation scripts (plus inline hooks in settings.json) |
-| **Scripts** | 2 | Python utilities (secrets scanning, state derivation) |
+| **Scripts** | 4 | Shell/Python utilities (secrets, major change detection, component validation) |
 | **Templates** | 3 | Plan and hotfix templates with example |
+
+---
+
+## Product Management Team (NEW)
+
+The system now includes a complete discovery-to-delivery pipeline:
+
+```
+User Feedback / Feature Ideas
+           │
+           ▼
+┌─────────────────────┐
+│ /intake             │  Process feedback from production DB
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│ Product Manager     │  Validate needs, prioritize (ICE/RICE)
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│ UX Researcher       │  User journeys, WCAG 2.1 AA compliance
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│ Technical PM        │  Translate to technical specs
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│ Solutions Architect │  ADRs for major decisions
+└──────────┬──────────┘
+           ▼
+    EXECUTION PIPELINE
+```
+
+Use `/discovery <idea>` to run the full flow, or individual commands for specific phases.
 
 ---
 
@@ -66,7 +101,7 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  You (Plan Creator)                                     │
-│  Submit plans via /add-plan                             │
+│  Submit plans via /add-plan or /discovery               │
 └───────────────────────────┬─────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────┐
@@ -105,6 +140,11 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 | `/rollback <plan-id>` | Rollback a deployed plan |
 | `/force-git` | Bypass git safeguards (use with caution) |
 | `/sync-state` | Reconcile state files with git truth |
+| `/discovery <idea>` | Full discovery flow (PM -> UX -> TPM -> plan) |
+| `/intake` | Process user feedback from production DB |
+| `/spike <question>` | Technical investigation |
+| `/adr <decision>` | Create Architecture Decision Record |
+| `/prioritize-backlog` | Apply RICE/ICE/MoSCoW scoring |
 
 ---
 

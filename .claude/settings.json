@@ -135,6 +135,13 @@
       "mcp__filesystem__get_file_info",
       "mcp__filesystem__list_allowed_directories",
 
+      "// === STELLARIS ADMIN MCP ===",
+      "mcp__stellaris-admin__get_open_feedback",
+      "mcp__stellaris-admin__get_feedback_details",
+      "mcp__stellaris-admin__update_feedback_status",
+      "mcp__stellaris-admin__respond_to_feedback",
+      "mcp__stellaris-admin__get_feedback_stats",
+
       "// === MISC DEV UTILITIES ===",
       "Bash(jq:*)",
       "Bash(yq:*)",
@@ -222,6 +229,10 @@
           {
             "type": "command",
             "command": "python3 $CLAUDE_PROJECT_DIR/.claude/scripts/scan-secrets.py"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/detect-major-changes.sh"
           }
         ]
       },
@@ -317,7 +328,52 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/functional-verification.md"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/functional-verification.md && $CLAUDE_PROJECT_DIR/.claude/scripts/detect-major-changes.sh && if [ $? -eq 0 ]; then echo ''; echo '📋 STRICT MODE: Major change detected - applying strict code standards'; cat $CLAUDE_PROJECT_DIR/.claude/protocols/strict-code-standards.md; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "gardener",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🌿 GARDENER ACTIVATED: Mission is to REDUCE code, not add. Delete duplicates, simplify, consolidate.'"
+          }
+        ]
+      },
+      {
+        "matcher": "product-manager",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/user-centricity.md"
+          }
+        ]
+      },
+      {
+        "matcher": "technical-pm",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/technical-translation.md"
+          }
+        ]
+      },
+      {
+        "matcher": "solutions-architect",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/architectural-documentation.md"
+          }
+        ]
+      },
+      {
+        "matcher": "ux-researcher",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🔍 UX RESEARCHER ACTIVE: Focus on user journeys, accessibility (WCAG 2.1 AA), and evidence-based recommendations.'"
           }
         ]
       }
@@ -328,7 +384,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md && echo '' && echo '🧹 JANITOR PROTOCOL: Clean up temp files, archive plan, commit and push.' && echo 'See .claude/skills/janitor/prompt.md for cleanup checklist.'"
           }
         ]
       }

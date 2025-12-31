@@ -1,17 +1,66 @@
 # System Architecture
 
-The autonomous orchestration system uses a three-layer architecture with mandatory safety gates.
+The autonomous orchestration system uses a multi-layer architecture with mandatory safety gates and optional discovery.
 
 ---
 
 ## Overview
 
 ```
-User → Risk Manager → Portfolio Manager → TPM Orchestrator → Shipped
-        (Layer 0)        (Layer 1)           (Layer 2)
+┌─────────────────────────────────────────────────────────┐
+│  DISCOVERY (Optional)                                   │
+│  /discovery or /intake → PM → UX → TPM → plan          │
+└───────────────────────────┬─────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│  EXECUTION PIPELINE                                     │
+│  Risk Manager → Portfolio Manager → TPM Orchestrator    │
+│     (Layer 0)        (Layer 1)          (Layer 2)       │
+└───────────────────────────┬─────────────────────────────┘
+                            ↓
+                         Shipped
 ```
 
 Each layer has a distinct responsibility and cannot be bypassed.
+
+---
+
+## Discovery Layer (Optional)
+
+**Purpose:** Bridge user needs to technical implementation
+
+```
+User Feedback → Product Manager → UX Researcher → Technical PM → Plan
+                     ↓                 ↓               ↓
+                ICE/RICE          User Journey    Tech Spec
+                 Score              (WCAG)       + Complexity
+```
+
+### Agents
+
+| Agent | Purpose |
+|-------|---------|
+| **product-manager** | Voice of Customer, ICE/RICE prioritization |
+| **ux-researcher** | User journeys, WCAG 2.1 AA compliance |
+| **technical-pm** | Business-to-technical translation |
+| **solutions-architect** | ADRs for major decisions |
+| **gardener** | Refactoring specialist (DELETE/CONDENSE code) |
+
+### Entry Points
+
+| Command | Purpose |
+|---------|---------|
+| `/discovery <idea>` | Full pipeline (PM → UX → TPM → plan) |
+| `/intake` | Process feedback from production DB |
+| `/spike <question>` | Technical investigation |
+| `/adr <decision>` | Architecture Decision Record |
+| `/prioritize-backlog` | Apply RICE/ICE/MoSCoW scoring |
+
+### Protocols Injected
+
+- `user-centricity.md` → product-manager
+- `technical-translation.md` → technical-pm
+- `architectural-documentation.md` → solutions-architect
 
 ---
 

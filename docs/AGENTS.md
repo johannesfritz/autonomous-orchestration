@@ -1,6 +1,6 @@
 # Agent Descriptions
 
-This system includes 10 custom agents, each with a specific role.
+This system includes 15 custom agents, each with a specific role.
 
 ---
 
@@ -174,6 +174,111 @@ Task(subagent_type="artificial-shadow-llm-architect", prompt="Design pipeline...
 
 ---
 
+## Product Management Agents
+
+### product-manager
+
+**Role:** Product Manager / Voice of Customer
+
+**Purpose:** Validate user needs and prioritize features
+
+**Capabilities:**
+- User need validation with evidence
+- ICE/RICE prioritization scoring
+- Roadmap alignment
+- Feature scoping
+
+**Invocation:**
+```
+Task(subagent_type="product-manager", prompt="Validate need for...")
+```
+
+**Protocol injected:** `user-centricity.md`
+
+---
+
+### ux-researcher
+
+**Role:** UX Designer / Researcher
+
+**Purpose:** User journey mapping and accessibility compliance
+
+**Capabilities:**
+- User persona identification
+- Journey mapping
+- WCAG 2.1 AA compliance checking
+- Text-based specifications (no images)
+
+**Invocation:**
+```
+Task(subagent_type="ux-researcher", prompt="Map user journey for...")
+```
+
+---
+
+### technical-pm
+
+**Role:** Technical Product Manager
+
+**Purpose:** Bridge business requirements to technical specs
+
+**Capabilities:**
+- Complexity assessment (Low/Medium/High)
+- Spike identification for unknowns
+- Technical specification writing
+- Dependency mapping
+
+**Invocation:**
+```
+Task(subagent_type="technical-pm", prompt="Translate requirements for...")
+```
+
+**Protocol injected:** `technical-translation.md`
+
+---
+
+### solutions-architect
+
+**Role:** Solutions Architect
+
+**Purpose:** Architecture decisions and documentation
+
+**Capabilities:**
+- Architecture Decision Records (ADRs)
+- Technology selection
+- Trade-off analysis
+- Reversibility assessment
+
+**Invocation:**
+```
+Task(subagent_type="solutions-architect", prompt="Document decision for...")
+```
+
+**Protocol injected:** `architectural-documentation.md`
+
+---
+
+### gardener
+
+**Role:** Refactoring Specialist
+
+**Purpose:** Reduce code complexity and technical debt
+
+**Capabilities:**
+- Delete duplicate code
+- Consolidate similar patterns
+- Simplify over-engineered solutions
+- Enforce Rule of Three
+
+**Invocation:**
+```
+Task(subagent_type="gardener", prompt="Refactor and simplify...")
+```
+
+**Key mission:** DELETE and CONDENSE code, not add to it.
+
+---
+
 ## Quality Agents
 
 ### shadow-code-reviewer
@@ -251,6 +356,11 @@ Task(subagent_type="qa-lead", prompt="Review PR for...")
 | Multi-plan coordination | portfolio-manager |
 | Single plan execution | tpm-orchestrator |
 | Risk assessment | risk-manager |
+| Feature prioritization | product-manager |
+| User journey mapping | ux-researcher |
+| Requirements translation | technical-pm |
+| Architecture decisions | solutions-architect |
+| Code refactoring/cleanup | gardener |
 | Backend/Frontend development | artificial-shadow-dev |
 | Database design | database-engineer |
 | Vector + SQL architecture | hybrid-db-architect |
