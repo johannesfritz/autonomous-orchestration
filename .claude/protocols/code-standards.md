@@ -67,3 +67,76 @@ Before writing code that handles:
 - Run tests before suggesting commits
 - Clear, descriptive commit messages
 - Never push to main without review
+
+## Database Changes (CRITICAL)
+
+**Schema changes are HIGH RISK and require enhanced verification.**
+
+### When This Applies
+
+Schema changes include:
+- ALTER TABLE (add/drop/modify columns)
+- CREATE TABLE / DROP TABLE
+- CREATE INDEX / DROP INDEX
+- Changes to models.py (new columns, new tables)
+- Changes to WHERE clauses in queries
+
+### Mandatory Requirements
+
+1. **Migration Script**
+   - File: `migrations/YYYYMMDD_HHMMSS_description.sql`
+   - Includes backfill for existing rows
+   - Tested against production snapshot
+   - Rollback plan documented
+
+2. **Migration Tests**
+   - Added to `tests/test_migrations.py`
+   - Tests verify NULL handling
+   - Tests verify backward compatibility
+
+3. **Code Updates**
+   - All INSERT statements include new column
+   - All helper functions set value explicitly
+   - All queries handle NULL gracefully
+   - Indexes added for new query patterns
+
+4. **Code Review**
+   - Schema-migration-checklist.md completed
+   - Senior review (shadow-code-reviewer in strict mode)
+   - Major change detection triggered
+
+5. **Deployment**
+   - Database backup created
+   - Smoke tests defined
+   - Monitoring plan documented
+
+### NULL Handling Pattern
+
+**Always handle NULL values in queries:**
+
+```python
+# ❌ WRONG - Excludes NULL
+items = session.query(Model).filter(Model.column == "value").all()
+
+# ✅ CORRECT - Includes NULL
+from sqlalchemy import or_
+items = session.query(Model).filter(
+    or_(Model.column == "value", Model.column.is_(None))
+).all()
+```
+
+### Helper Function Pattern
+
+**Always set values explicitly:**
+
+```python
+# ❌ WRONG - Relies on DEFAULT
+obj = Model(field1="value")  # field2 omitted
+
+# ✅ CORRECT - Explicit values
+obj = Model(field1="value", field2="default_value")
+```
+
+### Checklist Reference
+
+See `.claude/protocols/schema-migration-checklist.md` for complete requirements.

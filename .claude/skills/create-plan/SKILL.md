@@ -2,20 +2,24 @@
 
 Interactive plan creation skill that converts feature ideas into properly formatted development plans.
 
+**Enhanced:** Now accepts inputs from product discovery flow (Product Manager, Technical PM, UX Researcher, Solutions Architect) for enriched plans.
+
 Use this skill when:
 - User describes a feature idea or request
 - User says "I want to build..." or "Let's add..."
 - User asks "Can we implement..."
 - User has a concept but needs it turned into an executable plan
+- `/discovery` command invokes you with validated requirements
 
 This skill will:
-- Interview the user to extract critical information
+- Interview the user to extract critical information (or accept pre-validated inputs)
 - Identify file touchpoints (for conflict detection)
 - Suggest appropriate agents
 - Estimate complexity and cost
 - Check for dependencies on other plans
+- Include discovery context (PM validation, UX specs, technical specs, ADRs)
 - Format the plan properly
-- Save to 00 Inbox/ with descriptive filename
+- Save to 00 Inbox/plans/ with descriptive filename
 - Optionally submit to portfolio via /add-plan
 
 ---
@@ -30,11 +34,62 @@ Convert a rough idea into a well-structured development plan that includes all c
 
 ---
 
+## Discovery Context Handling (NEW)
+
+**If invoked by /discovery command**, you will receive pre-validated inputs from:
+
+### Product Manager Validation
+- Priority score (ICE/RICE: Impact × Confidence ÷ Effort)
+- User need statement (what problem this solves)
+- Evidence summary (user feedback, analytics, research)
+- Reach estimate (how many users affected)
+
+### UX Research (if applicable)
+- User journey map (trigger → goal with steps)
+- Accessibility requirements (WCAG 2.1 AA checklist)
+- Wireframe specifications (text-based layout specs)
+- UX recommendations
+
+### Technical PM Specification
+- Technical solution description
+- Complexity assessment (Simple/Moderate/Complex/Architectural)
+- Affected systems (frontend, backend, database)
+- File touchpoints list (critical for conflict detection)
+- Effort estimate with confidence level
+- Prerequisites and dependencies
+
+### Spike Results (if conducted)
+- Spike objective and findings
+- Go/No-Go decision
+- Updated effort estimate
+- Alternative approaches considered
+
+### Architectural Decision (if applicable)
+- ADR reference (e.g., ADR-015)
+- Decision summary
+- Implementation guidance
+
+**When you receive discovery context:**
+1. Skip the interview questions that were already answered
+2. Include discovery context in the plan (see "Discovery Context Section" below)
+3. Use validated priority score from Product Manager
+4. Use file touchpoints from Technical PM
+5. Use complexity assessment from Technical PM
+
+**When you don't receive discovery context:**
+- Follow standard interview process (backward compatible)
+- Ask all questions as usual
+- Generate plan without discovery section
+
+---
+
 ## Interview Process
 
 ### Step 1: Understand the Idea
 
-Ask clarifying questions to understand:
+**If discovery context provided:** Skip to Step 2 (requirements already validated)
+
+**If no discovery context:** Ask clarifying questions to understand:
 
 **What:**
 - What is the core feature/functionality?
@@ -154,6 +209,66 @@ Once you have the information, generate a plan in this format:
 
 ---
 
+## Discovery Context (NEW - if applicable)
+
+**Include this section only if discovery context was provided.**
+
+### Product Manager Validation
+
+**Priority Score:** [ICE/RICE score and breakdown]
+- Impact: [score]/10
+- Confidence: [score]/10
+- Effort: [score]/10
+- **Total:** [calculated score]
+
+**User Need:** [validated user need statement]
+
+**Evidence:**
+- User feedback: [summary]
+- Analytics: [data points]
+- Research: [findings]
+
+**Reach:** [estimated users affected]
+
+### UX Research (if applicable)
+
+**User Journey:** [link to journey map or inline summary]
+
+**Accessibility Requirements:**
+- [WCAG checklist summary]
+- [Critical accessibility concerns]
+
+**Wireframe Specifications:**
+- [Link to specs or inline summary]
+
+**UX Recommendations:**
+- [Key UX findings]
+
+### Technical Assessment
+
+**Complexity:** [Simple|Moderate|Complex|Architectural]
+
+**Affected Systems:**
+- Frontend: [components/pages]
+- Backend: [endpoints/services]
+- Database: [tables/migrations]
+
+**Effort Estimate:** [timeline]
+**Confidence:** [percentage]
+
+**Spike Results:** (if spike was conducted)
+- Objective: [what was tested]
+- Findings: [results]
+- Decision: [Go/No-Go]
+
+### Architectural Decision (if applicable)
+
+**ADR Reference:** [link to ADR-NNN]
+**Decision Summary:** [chosen approach and rationale]
+**Implementation Guidance:** [key points]
+
+---
+
 ## Objectives
 
 [What needs to be accomplished]
@@ -247,19 +362,21 @@ Generate a descriptive plan ID:
 
 Write the plan to:
 ```
-00 Inbox/PLAN-[kebab-case-name].md
+00 Inbox/plans/PLAN-[kebab-case-name].md
 ```
 
 **Examples:**
-- `00 Inbox/PLAN-fsrs-consolidation.md`
-- `00 Inbox/PLAN-offline-mode.md`
-- `00 Inbox/PLAN-audio-pronunciation.md`
+- `00 Inbox/plans/PLAN-fsrs-consolidation.md`
+- `00 Inbox/plans/PLAN-offline-mode.md`
+- `00 Inbox/plans/PLAN-audio-pronunciation.md`
+
+**Note:** Plans are now saved in `00 Inbox/plans/` subdirectory for better organization.
 
 ### Step 6: Ask About Submission
 
 **Ask the user:**
 ```
-Plan created and saved to 00 Inbox/PLAN-[name].md
+Plan created and saved to 00 Inbox/plans/PLAN-[name].md
 
 Would you like me to:
 1. Submit to portfolio now (/add-plan) - Auto-executes if ready
@@ -275,6 +392,10 @@ Your choice?
 **If user wants to review:**
 - Show plan file location
 - Remind them to run `/add-plan PLAN-[name].md` when ready
+
+**If invoked by /discovery command:**
+- Automatically submit to portfolio (no need to ask)
+- Discovery flow expects end-to-end automation
 
 ---
 

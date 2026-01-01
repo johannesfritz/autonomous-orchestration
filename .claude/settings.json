@@ -273,6 +273,15 @@
             "command": "echo '--- Reminder: Run tests to verify this change works as expected ---'"
           }
         ]
+      },
+      {
+        "matcher": "Bash(git push *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/wait-for-ci.sh"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -329,6 +338,10 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/functional-verification.md && $CLAUDE_PROJECT_DIR/.claude/scripts/detect-major-changes.sh && if [ $? -eq 0 ]; then echo ''; echo '📋 STRICT MODE: Major change detected - applying strict code standards'; cat $CLAUDE_PROJECT_DIR/.claude/protocols/strict-code-standards.md; fi"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/detect-schema-changes.sh && if [ $? -eq 0 ]; then echo ''; echo '📋 SCHEMA CHANGE DETECTED - Schema Migration Checklist Required'; cat $CLAUDE_PROJECT_DIR/.claude/protocols/schema-migration-checklist.md; fi || true"
           }
         ]
       },
@@ -384,7 +397,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md && echo '' && echo '🧹 JANITOR PROTOCOL: Clean up temp files, archive plan, commit and push.' && echo 'See .claude/skills/janitor/prompt.md for cleanup checklist.'"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md && echo '' && echo '⚠️ REMINDER: Check for User Requests section in plan file. If present, complete user notification protocol FIRST.' && echo '' && echo '🧹 JANITOR PROTOCOL: Clean up temp files, archive plan, commit and push.' && echo 'See .claude/skills/janitor/prompt.md for cleanup checklist.'"
           }
         ]
       }

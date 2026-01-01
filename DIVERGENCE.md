@@ -1,6 +1,6 @@
 # Template vs. Production Divergence Report
 
-**Last Verified:** 2025-12-31
+**Last Verified:** 2026-01-01
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/.claude/`
 
@@ -16,13 +16,29 @@
 | Agents | 15 | 15 | Identical |
 | Commands | 19 | 19 | Identical |
 | Skills | 12 | 12 | Identical |
-| Protocols | 12 | 12 | Identical |
-| Scripts | 4 | 4 | Identical |
+| Protocols | 14 | 14 | Identical |
+| Scripts | 6 | 6 | Identical |
 | Hooks (shell) | 3 | 3 | Identical |
+| **Rules (NEW)** | 8 | 8 | Identical |
 
 ---
 
 ## Components
+
+### Rules (8) - NEW: Modular Documentation
+
+The `.claude/rules/` directory contains modular documentation extracted from the monolithic CLAUDE.md:
+
+- architecture.md - FRIDAY pipeline, atomic notes, dual embeddings
+- anti-debt.md - Gardener agent, code reduction strategies
+- friday-pipeline.md - 6-stage content processing workflow
+- orchestration.md - Portfolio Manager, TPM Orchestrator, multi-plan execution
+- patterns.md - Error handling, async patterns, Qdrant queries
+- product-management.md - Discovery flow, PM/UX/TPM agents
+- production-hardening.md - Major change protocol, UAT gates
+- testing.md - Test pyramid, pytest, Playwright, F2 scoring
+
+**Purpose:** Reduced root CLAUDE.md by 72% (1210 → 335 lines) while preserving all functionality through hierarchical context inheritance.
 
 ### Agents (15)
 
@@ -31,7 +47,7 @@
 - tpm-orchestrator.md
 - risk-manager.md
 
-**Product Management Team (NEW):**
+**Product Management Team:**
 - product-manager.md
 - ux-researcher.md
 - technical-pm.md
@@ -67,7 +83,7 @@
 - show-conflicts.md
 - sync-state.md
 
-**Discovery (NEW):**
+**Discovery:**
 - discovery.md
 - intake.md
 - spike.md
@@ -79,7 +95,7 @@
 **Execution:**
 - create-plan
 - queue-fix
-- janitor (NEW)
+- janitor
 
 **Quality & Security:**
 - run-test-suite
@@ -88,13 +104,13 @@
 - dependency-vetting
 - integration-testing
 
-**Discovery (NEW):**
+**Discovery:**
 - technical-spike
 - user-feedback-intake
 - prioritization-framework
 - write-adr
 
-### Protocols (12)
+### Protocols (14)
 
 **Quality Gates:**
 - code-standards.md
@@ -103,13 +119,15 @@
 - quality-check.md
 - risk-assessment-required.md
 - tpm-completion-checklist.md
+- schema-migration-checklist.md (NEW)
+- user-request-closure.md (NEW)
 
-**Enhanced Standards (NEW):**
+**Enhanced Standards:**
 - strict-code-standards.md
 - major-change-detection.md
 - component-library-restriction.md
 
-**Product Management (NEW):**
+**Product Management:**
 - user-centricity.md
 - technical-translation.md
 - architectural-documentation.md
@@ -119,11 +137,13 @@
 - detect-production-review.sh
 - pre-push-build-check.sh
 
-### Scripts (4)
+### Scripts (6)
 - derive-state-from-audit.py
 - scan-secrets.py
-- detect-major-changes.sh (NEW)
-- check-component-usage.sh (NEW)
+- detect-major-changes.sh
+- check-component-usage.sh
+- detect-schema-changes.sh (NEW)
+- wait-for-ci.sh (NEW)
 
 ---
 
@@ -157,6 +177,11 @@ The following files exist in production but are intentionally excluded from the 
 |            | +5 skills: technical-spike, user-feedback-intake, prioritization-framework, write-adr, janitor |
 |            | +6 protocols: strict-code-standards, major-change-detection, component-library-restriction, technical-translation, architectural-documentation, user-centricity |
 |            | +2 scripts: detect-major-changes.sh, check-component-usage.sh |
+| 2026-01-01 | **Major Update:** Modular CLAUDE.md Migration |
+|            | +8 rule files: architecture.md, anti-debt.md, friday-pipeline.md, orchestration.md, patterns.md, product-management.md, production-hardening.md, testing.md |
+|            | +2 protocols: schema-migration-checklist.md, user-request-closure.md |
+|            | +2 scripts: detect-schema-changes.sh, wait-for-ci.sh |
+|            | Updated settings.json with new hook configurations |
 
 ---
 

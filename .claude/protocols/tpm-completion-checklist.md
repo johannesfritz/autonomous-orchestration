@@ -48,6 +48,27 @@ Before updating `.state.json` to EXECUTING status:
    - Valid transitions: QUEUED → READY → EXECUTING → SHIPPED
    - Do not skip states (e.g., cannot go QUEUED → SHIPPED directly)
 
+4. **Verify CI/GitHub Actions Passed:**
+
+   **IMPORTANT:** CI verification is NON-BLOCKING. After `git push`, you'll see a status message.
+   You CAN proceed to the next plan while CI runs. However, you MUST verify CI passed before marking SHIPPED.
+
+   ```bash
+   # Quick status check (non-blocking, runs automatically after push)
+   $CLAUDE_PROJECT_DIR/.claude/scripts/wait-for-ci.sh
+
+   # Full blocking wait (use when ready to mark SHIPPED)
+   $CLAUDE_PROJECT_DIR/.claude/scripts/wait-for-ci.sh --wait --timeout 300
+
+   # Manual check
+   gh run list --commit $(git rev-parse HEAD) --json status,conclusion,name
+   ```
+
+   **Requirements before marking SHIPPED:**
+   - ALL workflows must show `conclusion: "success"`
+   - If any workflow failed, DO NOT mark as SHIPPED - fix the issue first
+   - Use `gh run watch <run-id>` to monitor a specific run if needed
+
 ---
 
 ## Atomic State Update Order
@@ -64,6 +85,43 @@ If any step fails, do not proceed to the next. Investigate and fix the issue.
 ---
 
 ## Completion Checklist
+
+### 0. Notify Users and Close Tickets (MANDATORY IF APPLICABLE)
+
+**CRITICAL:** If the plan file contains a "User Requests" section with feedback IDs, you MUST complete this step BEFORE any other completion steps.
+
+**Check for User Requests section:**
+```bash
+grep -A 5 "## User Requests" "00 Inbox/plans/$PLAN_ID.md"
+```
+
+If the section exists AND contains feedback IDs, complete the user notification protocol:
+
+1. **Read the protocol:**
+   ```bash
+   cat .claude/protocols/user-request-closure.md
+   ```
+
+2. **Notify users and close tickets:**
+   - Preferred: Use Stellaris Admin MCP tools (`mcp__stellaris-admin__respond_to_feedback`, `mcp__stellaris-admin__update_feedback_status`)
+   - Fallback: Use SSH to update production database directly (`ssh village "sqlite3 /var/lib/stellaris/data/stellaris.db ..."`)
+
+3. **Verify closure succeeded:**
+   ```bash
+   # Via MCP
+   mcp__stellaris-admin__get_feedback_details(feedback_id=42)
+
+   # Via SSH
+   ssh village "sqlite3 /var/lib/stellaris/data/stellaris.db 'SELECT status FROM feedback WHERE id=42;'"
+   ```
+
+4. **Use COPPA-compliant response templates** (see protocol for templates)
+
+**If this step fails, DO NOT proceed to Step 1.** User notification is MANDATORY when applicable.
+
+**If plan has NO "User Requests" section or section is blank, skip to Step 1.**
+
+---
 
 ### 1. Update Plan Status in `.state.json`
 
@@ -133,6 +191,7 @@ Before returning, verify:
 - [ ] `PORTFOLIO_STATUS.md` reflects current state
 - [ ] No stale entries remain
 - [ ] **All state changes are committed and pushed to Git**
+- [ ] **CI/GitHub Actions passed** (all workflows green)
 
 ---
 
