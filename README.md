@@ -167,11 +167,13 @@ Every plan goes through:
 
 ## Important Limitation
 
-**Background execution is session-scoped.**
+**All execution is session-scoped.**
 
-- `run_in_background=true` runs async within the current Claude session
+- The Task tool is SYNCHRONOUS - it waits for subagents to complete
+- The Bash tool has `run_in_background=true`, but the Task tool does NOT
 - If you close the terminal, all agents stop
 - Keep your session open until plans complete
+- For parallel execution, use multiple Task calls in ONE message
 
 **For true persistence:** Use tmux/screen, or run Claude Code as a daemon.
 

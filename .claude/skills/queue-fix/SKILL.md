@@ -163,9 +163,10 @@ Generate a minimal HOTFIX plan:
 ```
 Use the Task tool with subagent_type='portfolio-manager' and prompt:
 'Add hotfix HOTFIX-YYYY-NNN.md to the portfolio. This is a CRITICAL priority hotfix.
-IMPORTANT: You MUST invoke Risk Manager and spawn TPM orchestrators for this hotfix
-BEFORE returning. Hotfixes should be fast-tracked. Do not ask for confirmation -
-execute autonomously. Use run_in_background=true for TPM orchestrators.'
+IMPORTANT: You MUST invoke Risk Manager (using Task tool with subagent_type="risk-manager")
+and spawn TPM orchestrators (using Task tool with subagent_type="tpm-orchestrator") for this
+hotfix BEFORE returning. Hotfixes should be fast-tracked. Do not ask for confirmation -
+execute autonomously. Note: Task tool is synchronous, use multiple calls in one message for parallelism.'
 ```
 
 ---

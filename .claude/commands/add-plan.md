@@ -105,15 +105,16 @@ Steps:
    - Between new plans themselves (INTRA-BATCH CONFLICTS)
 4. Update state file (.state.json) and dashboard (PORTFOLIO_STATUS.md)
 5. For ALL READY plans (risk < 7, no blocking dependencies):
-   - Spawn TPM orchestrators with run_in_background=true
-   - Launch multiple in SINGLE message for parallelism
+   - Spawn TPM orchestrators using Task tool (subagent_type="tpm-orchestrator")
+   - Launch ALL ready plans in a SINGLE message with multiple Task calls for parallelism
    - Update plan status to EXECUTING
 6. Return batch analysis summary
 
 IMPORTANT:
 - Process ALL plans before returning
 - Spawn TPM orchestrators for ready plans BEFORE returning
-- Use run_in_background=true so execution continues while command line returns
+- Use multiple Task tool calls in ONE message for parallel execution
+- The Task tool is SYNCHRONOUS - it waits for completion, but parallel calls execute together
 - Report any intra-batch conflicts found'
 
 ### Error Handling
