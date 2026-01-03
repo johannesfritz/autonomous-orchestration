@@ -4,6 +4,40 @@
 
 This document defines the enhanced review and verification gates required for major changes that carry higher risk of production incidents.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [What is a "Major Change"?](#what-is-a-major-change)
+- [Required Gates for Major Changes](#required-gates-for-major-changes)
+  - [1. All Tests Pass (Zero Failures)](#1-all-tests-pass-zero-failures)
+  - [2. UAT Verified (Manual User Journey)](#2-uat-verified-manual-user-journey)
+  - [3. Senior Code Review (shadow-code-reviewer in Strict Mode)](#3-senior-code-review-shadow-code-reviewer-in-strict-mode)
+  - [4. Risk Assessment (Mandatory for All Plans)](#4-risk-assessment-mandatory-for-all-plans)
+  - [5. Security Scan (SAST - Static Analysis)](#5-security-scan-sast---static-analysis)
+  - [6. Dependency Audit (Anti-Hallucination + Vulnerability Scan)](#6-dependency-audit-anti-hallucination--vulnerability-scan)
+- [Detection and Enforcement](#detection-and-enforcement)
+  - [Automatic Detection](#automatic-detection)
+  - [Hook Integration](#hook-integration)
+- [Deployment Verification](#deployment-verification)
+  - [CI/CD Status Check](#cicd-status-check)
+  - [Smoke Tests](#smoke-tests)
+- [Rollback Plan](#rollback-plan)
+  - [Database Changes](#database-changes)
+  - [Feature Flags](#feature-flags)
+  - [Deployment Rollback](#deployment-rollback)
+- [Example: Major Change Workflow](#example-major-change-workflow)
+  - [Step 1: Detection](#step-1-detection)
+  - [Step 2: Quality Gates](#step-2-quality-gates)
+  - [Step 3: Deployment](#step-3-deployment)
+  - [Step 4: Post-Deployment Verification](#step-4-post-deployment-verification)
+  - [Result: SHIPPED ✅](#result-shipped-)
+- [When to Bypass (RARELY)](#when-to-bypass-rarely)
+- [Continuous Improvement](#continuous-improvement)
+- [Summary](#summary)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## What is a "Major Change"?
 
 Major changes are automatically detected when code modifications touch sensitive areas of the system. The detection script (`.claude/scripts/detect-major-changes.sh`) scans for:

@@ -117,6 +117,203 @@ When circuit breaker trips:
 
 ---
 
+## CRITICAL: Task Granularity Protocol
+
+**Prevent context exhaustion by breaking workstreams into small atomic tasks.**
+
+### The Problem
+
+Large workstream tasks exhaust agent context before completion:
+```
+❌ "Implement entire backend API" → Agent hits context limit mid-task → Work lost
+```
+
+### Solution: Atomic Task Decomposition
+
+**Every workstream MUST be broken into tasks that can complete in < 50% of agent context.**
+
+```
+Instead of:
+  Task("Implement entire backend API for user authentication")  ← TOO BIG
+
+Do:
+  Task("Create User model in models/user.py")                   ← Atomic
+  Task("Create POST /api/auth/register endpoint")               ← Atomic
+  Task("Create POST /api/auth/login endpoint")                  ← Atomic
+  Task("Add JWT token generation utility")                      ← Atomic
+  Task("Add input validation schemas")                          ← Atomic
+```
+
+### Task Size Guidelines
+
+| Task Type | Max Scope | Example |
+|-----------|-----------|---------|
+| Model/Schema | 1 model + migrations | "Create User model with email, password fields" |
+| Endpoint | 1 endpoint | "Create GET /api/users/{id} endpoint" |
+| Component | 1 component | "Create LoginForm component" |
+| Test file | 1 test file | "Write tests for auth endpoints" |
+| Utility | 1 function/class | "Add password hashing utility" |
+
+**Rule of thumb:** If a task touches more than 3 files, break it down further.
+
+---
+
+## CRITICAL: Plan-Specific Progress Tracking
+
+**Track atomic task completion in temp storage so fresh agents can resume.**
+
+### Progress File Location
+
+```
+/tmp/tpm-worktrees/{branch}/.plan-progress.json
+```
+
+### Progress File Schema
+
+```json
+{
+  "plan_id": "PLAN-2025-XXX",
+  "branch": "feature/user-auth",
+  "worktree": "/tmp/tpm-worktrees/feature/user-auth",
+  "started_at": "2025-01-15T10:30:00Z",
+  "last_updated": "2025-01-15T11:45:00Z",
+
+  "workstreams": {
+    "backend-api": {
+      "status": "in_progress",
+      "tasks": [
+        {"id": "task-001", "desc": "Create User model", "status": "completed", "commit": "abc123"},
+        {"id": "task-002", "desc": "Create register endpoint", "status": "completed", "commit": "def456"},
+        {"id": "task-003", "desc": "Create login endpoint", "status": "in_progress", "commit": null},
+        {"id": "task-004", "desc": "Add JWT utility", "status": "pending", "commit": null},
+        {"id": "task-005", "desc": "Add validation schemas", "status": "pending", "commit": null}
+      ],
+      "completed_count": 2,
+      "total_count": 5
+    },
+    "frontend-ui": {
+      "status": "pending",
+      "tasks": [
+        {"id": "task-101", "desc": "Create LoginForm component", "status": "pending", "commit": null},
+        {"id": "task-102", "desc": "Create RegisterForm component", "status": "pending", "commit": null},
+        {"id": "task-103", "desc": "Add auth context provider", "status": "pending", "commit": null}
+      ],
+      "completed_count": 0,
+      "total_count": 3
+    }
+  },
+
+  "quality_gates": {
+    "tests": "pending",
+    "review": "pending",
+    "security": "pending"
+  },
+
+  "overall_progress": "2/8 tasks complete (25%)"
+}
+```
+
+### Progress Tracking Protocol
+
+```bash
+1. ON PLAN START:
+   - Parse workstreams from plan file
+   - Break each workstream into atomic tasks (see Task Size Guidelines)
+   - Create .plan-progress.json with all tasks as "pending"
+   - Write file to worktree: /tmp/tpm-worktrees/{branch}/.plan-progress.json
+
+2. BEFORE SPAWNING EACH AGENT:
+   - Read .plan-progress.json
+   - Find next "pending" task in current workstream
+   - If no pending tasks, workstream is complete
+
+3. AGENT PROMPT MUST INCLUDE:
+   - Single atomic task to complete
+   - Path to progress file
+   - Instruction to mark task complete on success
+
+   Example prompt:
+   '''
+   Working directory: /tmp/tpm-worktrees/feature/auth
+
+   SINGLE TASK: Create POST /api/auth/login endpoint
+
+   Requirements:
+   - Accept email + password
+   - Return JWT token on success
+   - Return 401 on invalid credentials
+
+   ON COMPLETION:
+   1. Commit your changes
+   2. Update .plan-progress.json: Mark task-003 as "completed", add commit SHA
+   3. Return brief summary (under 200 words)
+   '''
+
+4. AFTER AGENT RETURNS:
+   - Read updated .plan-progress.json
+   - Check if more tasks remain in workstream
+   - If yes: spawn fresh agent for next task
+   - If no: mark workstream complete, move to next workstream
+
+5. ON CONTEXT LOW / AGENT FAILURE:
+   - Progress is already saved to disk
+   - Fresh agent reads .plan-progress.json
+   - Resumes from last incomplete task
+   - No work is lost
+```
+
+### Resumption Protocol
+
+If TPM context gets low or agent fails mid-execution:
+
+```bash
+1. Read .plan-progress.json from worktree
+2. Find first task with status != "completed"
+3. Spawn fresh agent for that task
+4. Continue until all tasks complete
+
+The progress file is the source of truth - agents come and go, progress persists.
+```
+
+### Example: Spawning Granular Tasks
+
+```
+# TPM reads plan, creates progress file with 8 atomic tasks
+
+# Spawn task 1 (fresh agent)
+Task(subagent_type="artificial-shadow-dev", prompt='''
+  Worktree: /tmp/tpm-worktrees/feature/auth
+  TASK: Create User model in models/user.py
+  - Fields: id, email, password_hash, created_at
+  - Add SQLAlchemy model
+  ON DONE: Update .plan-progress.json, commit, return summary
+''')
+→ Returns: "✅ User model created, committed abc123"
+
+# Spawn task 2 (fresh agent - task 1 agent's context is released)
+Task(subagent_type="artificial-shadow-dev", prompt='''
+  Worktree: /tmp/tpm-worktrees/feature/auth
+  TASK: Create POST /api/auth/register endpoint
+  - Accept email + password
+  - Hash password, create user
+  - Return user ID
+  ON DONE: Update .plan-progress.json, commit, return summary
+''')
+→ Returns: "✅ Register endpoint created, committed def456"
+
+# ... continue for all 8 tasks ...
+```
+
+### Benefits of Granular + Persistent Progress
+
+1. **No context exhaustion** - Each agent does small, focused work
+2. **Crash recovery** - Progress file survives agent death
+3. **Parallel safety** - Multiple workstreams can track independently
+4. **Visibility** - Progress file shows exact state at any moment
+5. **Resumability** - Any agent can pick up where another left off
+
+---
+
 ## CRITICAL: Context Management Protocol
 
 **Prevent context exhaustion by delegating heavy work to fresh agents.**
@@ -138,14 +335,16 @@ By the time you hit "Context too long", it's too late to compact.
 ```
 TPM (you) - holds only summaries, never full code/output
   │
-  ├─→ Task(artificial-shadow-dev): "Implement backend API"
+  ├─→ Task(subagent_type="artificial-shadow-dev", prompt="Implement backend API")
   │     └─→ Returns: "✅ 3 files created, endpoint working"
   │
-  ├─→ Task(artificial-shadow-dev): "Implement frontend"
+  ├─→ Task(subagent_type="artificial-shadow-dev", prompt="Implement frontend")
   │     └─→ Returns: "✅ Component added, builds clean"
   │
-  └─→ Task(qa-engineer): "Write tests"
+  └─→ Task(subagent_type="qa-engineer", prompt="Write tests")
         └─→ Returns: "✅ 8 tests added, all passing"
+
+REMEMBER: Use Task tool for agents, Skill tool for skills!
 ```
 
 **Each workstream agent:**
@@ -195,16 +394,18 @@ Task tool with:
 
 ### Quality Gates: Same Pattern
 
-For tests, reviews, security audits - spawn agents, receive summaries:
+For tests, reviews, security audits - spawn agents (Task) or skills (Skill):
 
 ```
-Task(qa-engineer): "Run pytest in /tmp/tpm-worktrees/{branch}"
+# AGENTS use Task tool with subagent_type:
+Task(subagent_type="qa-engineer", prompt="Run pytest in /tmp/tpm-worktrees/{branch}")
   → Returns: "✅ 42 tests passed, 0 failed, 89% coverage"
 
-Task(shadow-code-reviewer): "Review changes on branch {branch}"
+Task(subagent_type="shadow-code-reviewer", prompt="Review changes on branch {branch}")
   → Returns: "✅ Approved. Clean code, good patterns."
 
-Task(security-audit skill): "Audit {branch}"
+# SKILLS use Skill tool with skill parameter:
+Skill(skill="security-audit")
   → Returns: "✅ No vulnerabilities found"
 ```
 
@@ -480,12 +681,27 @@ Instead, use git worktree to work on feature branches:
 ### 3. PARALLEL EXECUTION
 ```bash
 - Launch independent workstreams in parallel:
-  * Use Task tool with appropriate subagent_type
+
+  **CRITICAL: Use Task tool, NOT Skill tool!**
+
+  Agents and Skills are DIFFERENT tools:
+  | What you want        | Tool to use | subagent_type parameter |
+  |---------------------|-------------|-------------------------|
+  | artificial-shadow-dev | Task       | "artificial-shadow-dev" |
+  | qa-engineer          | Task       | "qa-engineer"           |
+  | shadow-code-reviewer | Task       | "shadow-code-reviewer"  |
+  | run-test-suite       | Skill      | N/A (use skill param)   |
+  | security-audit       | Skill      | N/A (use skill param)   |
+
+  WRONG: Skill(skill="artificial-shadow-dev")  ← This will fail!
+  RIGHT: Task(subagent_type="artificial-shadow-dev", prompt="...")
+
+  * Use Task tool with subagent_type parameter for ALL agent invocations
   * IMPORTANT: Tell agents to work in the worktree directory:
     "Working directory: /tmp/tpm-worktrees/{branch}"
   * Pass workstream details as prompt
   * Launch multiple agents in single message
-  * Example:
+  * Example Task tool calls:
     - Task(subagent_type='artificial-shadow-dev', prompt='Working directory: /tmp/tpm-worktrees/feature/auth. Implement backend API for auth...')
     - Task(subagent_type='artificial-shadow-dev', prompt='Working directory: /tmp/tpm-worktrees/feature/auth. Implement frontend login form...')
     - Task(subagent_type='hybrid-db-architect', prompt='Working directory: /tmp/tpm-worktrees/feature/auth. Create user table schema...')
@@ -503,29 +719,110 @@ Instead, use git worktree to work on feature branches:
   * Verify no merge conflicts with main: git diff origin/main --stat
 ```
 
-### 5. QUALITY GATE: TESTING
+### 5. QUALITY GATE: TESTING (MANDATORY - BLOCKING)
+
+**CRITICAL:** Tests MUST pass. No exceptions. No "escalate and continue".
+
 ```bash
 - Determine which project was modified:
   * shadow-api → pytest shadow-api/tests/
-  * hotel-de-ville → pytest hotel-de-ville/tests/
-  * Both → pytest both projects
+  * hotel-de-ville backend → pytest hotel-de-ville/backend/tests/
+  * hotel-de-ville frontend → npm run build && npx playwright test
+  * stellaris backend → pytest stellaris/backend/tests/
+  * stellaris frontend → npm run build && npx playwright test
 
-- Run tests via Bash (or let run-test-suite skill auto-trigger)
-- If tests fail:
-  * Analyze failure output
-  * Attempt fix (max 2 retries)
-  * If still failing after retries → ESCALATE to user
+- Run full test suite (in worktree directory):
+  cd /tmp/tpm-worktrees/{branch}
+
+  # Backend tests
+  if modified hotel-de-ville/backend:
+    cd hotel-de-ville/backend
+    pytest -v --tb=short
+    if exit code != 0: TESTS_FAILED=true
+
+  # Frontend build + E2E tests
+  if modified hotel-de-ville/frontend:
+    cd hotel-de-ville/frontend
+    npm run build && npx playwright test
+    if either fails: TESTS_FAILED=true
+
+- **IF TESTS FAIL:**
+  1. Analyze failure output (read error messages)
+  2. Attempt automated fix via artificial-shadow-dev agent (max 2 attempts)
+  3. Re-run tests after each fix
+  4. If still failing after 2 fix attempts:
+     a. Mark plan status: FAILED_QUALITY_GATE_TESTS
+     b. Create failure report: 00 Inbox/failed-plans/{PLAN_ID}-test-failure.md
+     c. Update plan file with failure details
+     d. **HALT EXECUTION** - DO NOT proceed to code review gate
+     e. **DO NOT** create PR
+     f. **DO NOT** mark plan complete
+     g. Escalate to user with:
+        - Exact test failure output
+        - Files that need fixing
+        - Suggested next steps
+     h. RETURN from TPM (execution stops here)
+
+**Exit criteria:**
+- pytest exit code = 0 (if backend modified)
+- npm build exit code = 0 (if frontend modified)
+- Playwright exit code = 0 (if frontend modified)
+
+**No bypass:** This gate cannot be skipped for any reason.
 ```
 
-### 6. QUALITY GATE: CODE REVIEW
+### 6. QUALITY GATE: CODE REVIEW (MANDATORY - BLOCKING)
+
+**CRITICAL:** shadow-code-reviewer MUST return verdict "APPROVE".
+
 ```bash
-- Invoke shadow-code-reviewer agent via Task tool
-- Wait for review completion
-- If review finds critical issues:
-  * Apply suggested fixes
-  * Re-run tests
-  * Re-review (max 1 iteration)
-  * If still critical issues → ESCALATE to user
+- MUST invoke shadow-code-reviewer agent via Task tool:
+
+  Task(subagent_type="shadow-code-reviewer", prompt='''
+    Review all modified files for plan {PLAN_ID}
+
+    Modified files:
+    {list from git diff --name-only}
+
+    Return structured verdict with:
+    - verdict: "APPROVE" | "REQUEST_CHANGES" | "BLOCK"
+    - critical_issues: [list]
+    - blocking_issues: [list]
+  ''')
+
+- Wait for review completion (required)
+
+- **BLOCKING CONDITIONS:**
+
+  If verdict == "BLOCK":
+    a. Mark plan status: FAILED_QUALITY_GATE_REVIEW
+    b. Create failure report: 00 Inbox/failed-plans/{PLAN_ID}-review-block.md
+    c. Write blocking issues to report
+    d. **HALT EXECUTION** - DO NOT proceed to security gate
+    e. **DO NOT** create PR
+    f. Escalate to user with blocking issues list
+    g. RETURN from TPM (execution stops here)
+
+  If verdict == "REQUEST_CHANGES":
+    a. Apply suggested fixes via artificial-shadow-dev agent
+    b. Re-run tests (must pass before re-review)
+    c. Re-invoke shadow-code-reviewer (max 1 re-review)
+    d. If still "REQUEST_CHANGES" or "BLOCK" after fixes:
+       - Mark plan status: FAILED_QUALITY_GATE_REVIEW
+       - Create failure report
+       - HALT EXECUTION
+       - Escalate to user
+       - RETURN from TPM
+
+  If verdict == "APPROVE":
+    - Log approval
+    - Proceed to security gate
+
+**Exit criteria:**
+- shadow-code-reviewer returns verdict: "APPROVE"
+
+**No bypass:** Code review approval is MANDATORY.
+**Evidence required:** JSON verdict with "APPROVE" status.
 ```
 
 ### 7. QUALITY GATE: SECURITY AUDIT
@@ -537,13 +834,96 @@ Instead, use git worktree to work on feature branches:
   * Hardcoded secrets
   * Input validation gaps
 
-- If security issues found:
-  * Fix immediately (high priority)
-  * Re-run tests
-  * If complex security issue → ESCALATE to user
+- If CRITICAL security issues found:
+  * Mark plan status: FAILED_QUALITY_GATE_SECURITY
+  * Create security report: 00 Inbox/failed-plans/{PLAN_ID}-security.md
+  * **HALT EXECUTION**
+  * **DO NOT** proceed to UAT gate
+  * Escalate immediately with vulnerability details
+  * RETURN from TPM
+
+- If medium/low issues: Log warnings, proceed to UAT gate
 ```
 
-### 8. SHIPMENT
+### 8. QUALITY GATE: UAT (MANDATORY - BLOCKING)
+
+**CRITICAL:** User journeys MUST be tested for all user-facing changes.
+
+```bash
+- **Determine if UAT is required:**
+  If plan modifies:
+    - New features (user-facing functionality)
+    - UI workflows, navigation, forms
+    - API endpoints affecting frontend
+    - Search/filter functionality
+  Then: UAT is MANDATORY
+
+  If plan is:
+    - Backend-only refactor (no UI changes)
+    - Documentation only
+    - Infrastructure/deployment changes
+  Then: UAT can be marked EXEMPT (document reason)
+
+- **Generate UAT Checklist (REQUIRED):**
+  Create file: 00 Inbox/uat-checklists/{PLAN_ID}-uat.md
+
+  Use template from: .claude/protocols/mandatory-uat-protocol.md
+
+  Include:
+  - List of features tested
+  - User journeys with steps (action → expected → actual)
+  - Edge cases (empty state, many items, special chars)
+  - Error scenarios (network fail, invalid input, API errors)
+  - UAT completion section
+
+- **Execute UAT:**
+  Option A (Automated):
+    - Run Playwright E2E tests: npx playwright test tests/uat/{feature}.spec.ts
+    - Record results in checklist
+
+  Option B (Manual):
+    - Open application in browser
+    - Follow each journey step exactly
+    - Record actual vs expected results
+    - Mark pass/fail for each step
+
+- **Verify Completion (BLOCKING):**
+  Before proceeding to shipment:
+
+  a. Check UAT checklist exists:
+     if [ ! -f "00 Inbox/uat-checklists/${PLAN_ID}-uat.md" ]; then
+       Mark plan status: AWAITING_UAT
+       HALT EXECUTION
+       Escalate: "UAT checklist not found"
+       RETURN from TPM
+     fi
+
+  b. Check UAT passed:
+     if ! grep -q "Overall Result: ✅ PASS" "00 Inbox/uat-checklists/${PLAN_ID}-uat.md"; then
+       Mark plan status: FAILED_UAT
+       HALT EXECUTION
+       Escalate with failed journey details
+       RETURN from TPM
+     fi
+
+  c. Check UAT signed off:
+     if ! grep -q "Tester Signature:" "00 Inbox/uat-checklists/${PLAN_ID}-uat.md"; then
+       Mark plan status: AWAITING_UAT
+       HALT EXECUTION
+       Escalate: "UAT not signed off"
+       RETURN from TPM
+     fi
+
+**Exit criteria:**
+- UAT checklist file exists
+- All critical journeys marked PASS
+- UAT completion section shows PASS
+- Tester signature present
+
+**No bypass:** Plans with user-facing changes cannot ship without UAT approval.
+```
+
+### 9. SHIPMENT
 ```bash
 - Git workflow (all in worktree directory):
   1. Ensure in worktree: cd /tmp/tpm-worktrees/{branch}
@@ -557,35 +937,72 @@ Instead, use git worktree to work on feature branches:
      cd /Users/johannesfritz/Documents/GitHub/jf-private  # Return to main repo
      git worktree remove /tmp/tpm-worktrees/{branch}
 
-- **Risk-Aware Auto-Merge:**
+- **QUALITY GATE: CI/CD (MANDATORY - BLOCKING):**
+
+  **CRITICAL:** GitHub Actions MUST pass before marking plan SHIPPED.
+
+  After pushing code and creating PR:
+
+  a. Wait for CI/CD to complete (BLOCKING):
+     .claude/scripts/wait-for-ci.sh --wait --timeout 600
+
+     Exit code 0 → CI passed, proceed to merge decision
+     Exit code 1 → CI failed, HALT execution
+
+  b. If CI fails:
+     - Mark plan status: FAILED_CI
+     - Create failure report: 00 Inbox/failed-plans/{PLAN_ID}-ci-failure.md
+     - Include failed workflow names from GitHub Actions
+     - Include error messages from CI logs
+     - **DO NOT** auto-merge PR
+     - **DO NOT** mark plan as SHIPPED
+     - Escalate to user with CI failure details
+     - RETURN from TPM (execution stops here)
+
+  c. If CI times out (>600 seconds):
+     - Keep plan status as AWAITING_CI
+     - Log timeout event
+     - Escalate: "CI taking longer than expected, manual verification required"
+     - **DO NOT** assume success
+     - **DO NOT** proceed to merge
+
+**Exit criteria:**
+- wait-for-ci.sh returns exit code 0
+- All GitHub Actions workflows show conclusion: "success"
+
+**No bypass:** CI must pass before any merge (auto or manual).
+
+---
+
+- **Risk-Aware Auto-Merge (AFTER CI passes):**
 
   Read the risk assessment from plan file to determine merge strategy:
 
   **If risk score 1-3 (Low) 🟢:**
-  - Auto-merge immediately after PR created
+  - Auto-merge immediately (CI already passed)
   - Command: gh pr merge {pr-number} --auto --squash
-  - Rationale: Low risk + all quality gates passed = safe to ship
+  - Rationale: Low risk + all gates passed = safe to ship
 
   **If risk score 4-6 (Medium) 🟡:**
-  - Auto-merge with extra verification
-  - Wait 5 minutes for CI/CD checks to complete
-  - Verify no conflicts with main branch
+  - Auto-merge (CI already passed + verified no conflicts)
   - Command: gh pr merge {pr-number} --auto --squash
-  - Rationale: Medium risk but mitigations applied + tests passed
+  - Rationale: Medium risk + all gates passed
 
   **If risk score 7-10 (High) 🔴:**
   - DO NOT auto-merge
   - Mark PR as "ready for review"
   - Add comment: "⚠️ High-risk plan - requires manual merge approval from Johannes"
-  - Update plan status: COMPLETED → AWAITING_MERGE_APPROVAL
+  - Update plan status: AWAITING_MERGE_APPROVAL (not SHIPPED)
   - Notify user: "PLAN-{id} complete but requires your manual merge approval"
-  - Rationale: High-risk plans need human oversight before deployment
+  - Rationale: High-risk plans need human oversight
 
 - Update plan status in 00 Inbox/plans/.state.json:
   * If auto-merged: EXECUTING → SHIPPED
   * If manual merge required: EXECUTING → AWAITING_MERGE_APPROVAL
+  * If CI failed: EXECUTING → FAILED_CI
   * Add completion timestamp
   * Record PR URL
+  * Record CI status
   * Record merge status
 ```
 
@@ -619,35 +1036,68 @@ Instead, use git worktree to work on feature branches:
 
 ---
 
-## Quality Gate Enforcement
+## Quality Gate Enforcement (MANDATORY - BLOCKING)
 
-**CRITICAL:** Do NOT skip quality gates. Every plan must pass:
+**CRITICAL:** Do NOT skip quality gates. Every plan MUST pass ALL gates:
 
 1. ✅ **All workstreams complete** - Every agent reports success
-2. ✅ **Tests pass** - pytest returns 0 exit code
-3. ✅ **Code review approved** - shadow-code-reviewer finds no critical issues
-4. ✅ **Security audit clean** - No OWASP Top 10 vulnerabilities
-5. ✅ **Git workflow success** - Commit, push, PR all succeed
-6. ✅ **Risk-aware merge** - Auto-merge (low/medium risk) OR flag for manual merge (high risk)
+2. ✅ **Tests pass (BLOCKING)** - pytest exit code 0, builds succeed, E2E pass
+3. ✅ **Code review approved (BLOCKING)** - shadow-code-reviewer verdict: "APPROVE"
+4. ✅ **Security audit clean (BLOCKING for critical)** - Zero critical vulnerabilities
+5. ✅ **UAT complete (BLOCKING)** - Checklist exists, all journeys PASS, signed off
+6. ✅ **CI/CD pass (BLOCKING)** - wait-for-ci.sh exit code 0, all workflows green
+7. ✅ **Risk-aware merge** - Auto-merge (low/medium risk) OR flag for manual (high risk)
 
-If any gate fails after retry → ESCALATE
+**If any gate fails:**
+- Mark plan with appropriate FAILED_* status
+- Create failure report in 00 Inbox/failed-plans/
+- **HALT EXECUTION** - Do NOT proceed to next gate
+- **DO NOT** create PR (if before shipment)
+- **DO NOT** mark as SHIPPED
+- Escalate to user with actionable details
+- RETURN from TPM (execution stops)
+
+**No "escalate and continue"** - Gates are BLOCKING, not informational.
 
 ---
 
-## Escalation Criteria
+## Escalation Criteria (When Gates Fail)
 
-**DO escalate:**
-1. Tests fail after 2 retry attempts
-2. Code review finds critical issues after 1 fix iteration
-3. Security vulnerabilities that require architectural changes
-4. Git merge conflicts
-5. Plan structure is invalid/incomplete
+**ALWAYS escalate when these gates fail:**
+1. **Tests fail** after 2 automated fix attempts → Mark FAILED_QUALITY_GATE_TESTS
+2. **Code review BLOCK** or REQUEST_CHANGES after fixes → Mark FAILED_QUALITY_GATE_REVIEW
+3. **Critical security vulnerabilities** found → Mark FAILED_QUALITY_GATE_SECURITY
+4. **UAT fails** or checklist incomplete → Mark FAILED_UAT or AWAITING_UAT
+5. **CI/CD fails** or times out → Mark FAILED_CI or AWAITING_CI
+6. **Git merge conflicts** (cannot auto-resolve) → Mark NEEDS_REBASE_RESOLUTION
+7. **Plan structure invalid** (missing required fields) → Mark INVALID_PLAN
 
-**DON'T escalate:**
-- Minor test failures (just fix them)
-- Code style issues (auto-fix with linter)
-- Missing type hints (add them)
-- Simple security fixes (input validation, etc.)
+**Escalation format:**
+```markdown
+## Quality Gate Failure: {PLAN_ID}
+
+**Gate:** {Tests | Review | Security | UAT | CI/CD | Git}
+**Status:** {FAILED_* or AWAITING_*}
+
+### Details
+{Specific error messages, failed tests, blocking issues, etc.}
+
+### Evidence
+- Failure report: 00 Inbox/failed-plans/{PLAN_ID}-*.md
+- Logs: {link to CI logs, test output, etc.}
+
+### Options
+1. Fix issues manually and re-run: /execute-plan {PLAN_ID}
+2. Abandon plan: /abandon-plan {PLAN_ID}
+3. Review failure details: cat 00 Inbox/failed-plans/{PLAN_ID}-*.md
+
+### Next Steps
+Plan execution has been HALTED. It will not proceed until these issues are resolved.
+```
+
+**NEVER escalate and continue:**
+- ❌ "Tests failed → Escalate → Proceed to code review"
+- ✅ "Tests failed → Mark FAILED → Escalate → RETURN (stop execution)"
 
 ---
 

@@ -2,6 +2,42 @@
 
 Technical debt accumulates naturally as systems grow. This document outlines our proactive strategy to prevent and reduce code bloat, complexity, and maintenance burden.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Philosophy: Code is a Liability, Not an Asset](#philosophy-code-is-a-liability-not-an-asset)
+- [The Gardener Agent](#the-gardener-agent)
+  - [Gardener Rules](#gardener-rules)
+- [Strict Code Standards (For Major Changes)](#strict-code-standards-for-major-changes)
+  - [Absolute Rules (Violation = Rejection)](#absolute-rules-violation--rejection)
+  - [Strong Preferences (Violation = Request Changes)](#strong-preferences-violation--request-changes)
+  - [Component Library Restriction (Frontend)](#component-library-restriction-frontend)
+- [Anti-Patterns to Detect and Remove](#anti-patterns-to-detect-and-remove)
+  - [1. God Objects](#1-god-objects)
+  - [2. Copy-Paste Programming](#2-copy-paste-programming)
+  - [3. Premature Abstraction](#3-premature-abstraction)
+  - [4. Configuration Hell](#4-configuration-hell)
+  - [5. Over-Engineering](#5-over-engineering)
+- [Refactoring Workflow](#refactoring-workflow)
+  - [When to Refactor](#when-to-refactor)
+  - [Refactoring Checklist](#refactoring-checklist)
+  - [Example Refactoring Session](#example-refactoring-session)
+- [Metrics and Monitoring](#metrics-and-monitoring)
+  - [Code Health Metrics](#code-health-metrics)
+  - [Weekly Gardener Report](#weekly-gardener-report)
+- [Integration with Development Workflow](#integration-with-development-workflow)
+  - [Hook Integration](#hook-integration)
+  - [When Gardener Runs](#when-gardener-runs)
+  - [Gardener Output](#gardener-output)
+- [Cultural Norms](#cultural-norms)
+  - [Code Review: Praise Deletions](#code-review-praise-deletions)
+  - [Feature Flags Over Commented Code](#feature-flags-over-commented-code)
+  - [The Boy Scout Rule](#the-boy-scout-rule)
+- [Summary](#summary)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Philosophy: Code is a Liability, Not an Asset
 
 **Core principle:** Every line of code has a maintenance cost. The best code is code that doesn't exist.

@@ -16,6 +16,24 @@ This protocol ensures the Product Manager agent makes evidence-based, user-cente
 
 Before making ANY prioritization or feature decision, verify:
 
+### 0. Institutional Memory Check (MANDATORY FIRST STEP)
+
+- [ ] **Have I searched Qdrant for related past work?**
+  - Search for: Similar feature requests, past prioritization decisions
+  - Search for: Existing implementations or partial solutions
+  - Search for: User feedback themes in this area
+  - Document findings in proposal (see institutional-memory-protocol.md)
+
+- [ ] **Does this feature already exist (fully or partially)?**
+  - If yes: Why are users still requesting it? Is it discoverable?
+  - If partial: Can we enhance existing feature vs building new?
+  - If no: Document that search confirmed this is net-new
+
+- [ ] **What can I learn from past similar prioritization decisions?**
+  - ICE scores for similar feature types (calibration)
+  - User impact from similar features (validation)
+  - Lessons learned from related implementations
+
 ### 1. User Value Trace
 
 - [ ] **Can I trace this decision to specific user feedback?**

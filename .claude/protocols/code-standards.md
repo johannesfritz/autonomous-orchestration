@@ -1,5 +1,28 @@
 # Code Standards Protocol
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Python (PEP-8 + Project Conventions)](#python-pep-8--project-conventions)
+  - [Required for ALL Python code:](#required-for-all-python-code)
+  - [Error Handling:](#error-handling)
+  - [Qdrant Queries - CRITICAL:](#qdrant-queries---critical)
+- [TypeScript/React](#typescriptreact)
+  - [Required:](#required)
+- [Security Checklist (OWASP Top 10)](#security-checklist-owasp-top-10)
+- [Avoid Over-Engineering](#avoid-over-engineering)
+- [Claude Model Selection](#claude-model-selection)
+- [Git Discipline](#git-discipline)
+- [Database Changes (CRITICAL)](#database-changes-critical)
+  - [When This Applies](#when-this-applies)
+  - [Mandatory Requirements](#mandatory-requirements)
+  - [NULL Handling Pattern](#null-handling-pattern)
+  - [Helper Function Pattern](#helper-function-pattern)
+  - [Checklist Reference](#checklist-reference)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Python (PEP-8 + Project Conventions)
 
 ### Required for ALL Python code:

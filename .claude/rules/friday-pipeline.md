@@ -1,5 +1,15 @@
 # FRIDAY Pipeline (6-Stage Content Processing)
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Atomic Note Schema](#atomic-note-schema)
+- [Dual Embedding Strategy](#dual-embedding-strategy)
+- [Versioning Payload Schema](#versioning-payload-schema)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Both systems use the FRIDAY pipeline to transform raw content into atomic notes:
 
 1. **Stage 1: Cleanup** - Whisper transcription → structured text (new intake only)

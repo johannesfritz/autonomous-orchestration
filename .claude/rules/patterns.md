@@ -2,6 +2,33 @@
 
 This document captures reusable code patterns used across both shadow-api and hotel-de-ville projects.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Error Handling](#error-handling)
+- [Async Patterns](#async-patterns)
+  - [Batch Operations](#batch-operations)
+  - [Async Context Managers](#async-context-managers)
+- [Qdrant Query Patterns](#qdrant-query-patterns)
+  - [Always Filter for Current, Non-Deleted Notes](#always-filter-for-current-non-deleted-notes)
+- [Database Query Patterns](#database-query-patterns)
+  - [NULL Handling](#null-handling)
+  - [Explicit Value Setting](#explicit-value-setting)
+- [Logging Patterns](#logging-patterns)
+  - [Structured Logging](#structured-logging)
+- [Import Organization](#import-organization)
+- [Type Safety Patterns](#type-safety-patterns)
+  - [Complete Type Hints](#complete-type-hints)
+  - [Pydantic Validation](#pydantic-validation)
+- [Performance Patterns](#performance-patterns)
+  - [Lazy Loading](#lazy-loading)
+- [Security Patterns](#security-patterns)
+  - [Input Validation](#input-validation)
+- [When to Use These Patterns](#when-to-use-these-patterns)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Error Handling
 
 Always wrap LLM and embedding calls with proper error handling:

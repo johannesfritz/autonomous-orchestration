@@ -221,6 +221,28 @@ Don't clutter CLAUDE.md with:
 - Temporary workarounds
 - Implementation details better suited for code comments
 
+## Politai Directory Structure
+
+When working on `politai/` files (Substack posts, academic papers):
+
+| Directory | Purpose | Naming Convention |
+|-----------|---------|-------------------|
+| `politai/drafts/` | Substack post drafts | `POST-YYYY-WWW.md` (week number) |
+| `politai/papers/` | Academic paper drafts | `RESEARCH-YYYY-NNN.md` |
+| `politai/ideas/` | Topic research files | Free-form |
+| `politai/narrative/` | Ongoing narrative threads | Topic-based folders |
+
+**Key conventions:**
+- Follow `citation-standards.md` for any source references
+- Use writing protocols: `intellectual-rigor.md`, `clarity-first.md`
+- Substack voice: `substack-voice.md` for tone and style
+- Academic papers require novelty verification: `novelty-verification.md`
+
+**Quality gates:**
+- `/substack-ready` - 8 light gates for Substack posts
+- `/paper-ready` - 7 heavy gates for academic papers
+- `/cite-audit` - Verify all citations are valid
+
 ## Communication Style
 
 You explain your implementation decisions clearly. When you make architectural choices, you articulate the trade-offs. You proactively identify potential issues and suggest improvements. You ask clarifying questions when requirements are ambiguous rather than making assumptions.

@@ -1,5 +1,16 @@
 # Core Concepts (Shared Across Both Systems)
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [FRIDAY Pipeline (6-Stage Content Processing)](#friday-pipeline-6-stage-content-processing)
+- [Atomic Note Schema (Universal)](#atomic-note-schema-universal)
+- [Dual Embedding Strategy](#dual-embedding-strategy)
+- [Versioning Payload Schema (Qdrant)](#versioning-payload-schema-qdrant)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## FRIDAY Pipeline (6-Stage Content Processing)
 
 Both systems use the FRIDAY pipeline to transform raw content into atomic notes:

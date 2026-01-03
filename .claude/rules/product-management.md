@@ -2,6 +2,24 @@
 
 **New capability as of 2025-12-31:** Claude Code now includes a Product Management Team that bridges user needs to technical implementation, completing the discovery-to-delivery pipeline.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Architecture Overview](#architecture-overview)
+- [New Agents](#new-agents)
+- [New Skills](#new-skills)
+- [New Slash Commands](#new-slash-commands)
+- [Workflow: Discovery-to-Delivery](#workflow-discovery-to-delivery)
+- [When to Use What](#when-to-use-what)
+- [Protocol Files (Injected via Hooks)](#protocol-files-injected-via-hooks)
+- [File Locations](#file-locations)
+- [Integration with Existing Pipeline](#integration-with-existing-pipeline)
+- [Benefits](#benefits)
+- [Example: Full Discovery Flow](#example-full-discovery-flow)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Architecture Overview
 
 ```

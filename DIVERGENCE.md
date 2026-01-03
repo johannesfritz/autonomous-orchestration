@@ -1,25 +1,28 @@
 # Template vs. Production Divergence Report
 
-**Last Verified:** 2026-01-01
+**Last Verified:** 2026-01-03
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/.claude/`
 
 ## Summary
 
-**IN SYNC** - Template matches the production implementation.
+**IN SYNC** - Template matches the production implementation (software dev elements only).
+
+**Note:** Analytical writing elements (writing-lead, fact-checker, etc.) are intentionally excluded from this template.
 
 ## Current Status
 
 | Category | Template | Production | Status |
 |----------|----------|------------|--------|
-| settings.json | Yes | Yes | Identical |
-| Agents | 15 | 15 | Identical |
-| Commands | 19 | 19 | Identical |
-| Skills | 12 | 12 | Identical |
-| Protocols | 14 | 14 | Identical |
-| Scripts | 6 | 6 | Identical |
+| settings.json | 518 lines | 641 lines | Synced (filtered) |
+| Agents | 14 | 25+ | Synced (sw dev only) |
+| Commands | 19 | 19+ | Synced (sw dev only) |
+| Skills | 12 | 12+ | Synced (sw dev only) |
+| Protocols | 10 | 14+ | Synced (sw dev only) |
+| Scripts | 8 | 10+ | Synced (sw dev only) |
 | Hooks (shell) | 3 | 3 | Identical |
-| **Rules (NEW)** | 8 | 8 | Identical |
+| **Rules** | 9 | 10 | Synced (sw dev only) |
+| **Docs** | 6 | - | Template-specific |
 
 ---
 
@@ -182,6 +185,16 @@ The following files exist in production but are intentionally excluded from the 
 |            | +2 protocols: schema-migration-checklist.md, user-request-closure.md |
 |            | +2 scripts: detect-schema-changes.sh, wait-for-ci.sh |
 |            | Updated settings.json with new hook configurations |
+| 2026-01-03 | **Major Update:** 12-Gap Fix Sync + Documentation |
+|            | Synced 14 agent files with updated versions |
+|            | Added 8 new scripts: index-documentation.py, search-documentation.py, detect-architectural-decision.sh, verify-migration-tests.sh, generate-toc.sh, detect-doc-changes.sh, spawn-tpm-background.sh, verify-cleanup-complete.sh |
+|            | Updated settings.json (518 lines) - filtered analytical writing hooks |
+|            | Synced 10 protocols (added mandatory-quality-gates.md, mandatory-uat-protocol.md) |
+|            | Synced 9 rules (added product-philosophy.md) |
+|            | Created docs/QDRANT-INTEGRATION.md - Institutional memory patterns |
+|            | Created docs/PRODUCT-PHILOSOPHY.md - Philosophy alignment mechanisms |
+|            | Updated docs/ARCHITECTURE.md, README.md, SETUP.md |
+|            | **Scope:** Software development only (excluded analytical writing) |
 
 ---
 

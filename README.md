@@ -51,12 +51,13 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 
 | Component | Count | Purpose |
 |-----------|-------|---------|
-| **Agents** | 15 | Custom AI agents for orchestration, development, review, product management |
+| **Agents** | 14 | Custom AI agents for orchestration, development, review, product management |
 | **Skills** | 12 | Auto-triggered workflows (plan creation, tests, security, discovery) |
 | **Commands** | 19 | Slash commands for portfolio and discovery management |
-| **Protocols** | 12 | Quality gates, safety enforcement, and PM protocols |
+| **Protocols** | 10 | Quality gates, safety enforcement, and PM protocols |
 | **Hooks** | 3 | Lifecycle automation scripts (plus inline hooks in settings.json) |
-| **Scripts** | 4 | Shell/Python utilities (secrets, major change detection, component validation) |
+| **Scripts** | 8 | Shell/Python utilities (indexing, search, secrets, change detection) |
+| **Rules** | 9 | Modular documentation (architecture, patterns, testing, etc.) |
 | **Templates** | 3 | Plan and hotfix templates with example |
 
 ---
@@ -165,6 +166,42 @@ Every plan goes through:
 
 ---
 
+## Qdrant Integration (Institutional Memory)
+
+The system supports optional Qdrant vector database integration for:
+
+- **Semantic search** across documentation, plans, and decisions
+- **Institutional memory** - agents search past work before making decisions
+- **Consistency enforcement** - verify alignment with established patterns
+
+**Key features:**
+- Dual embeddings (BLUF + content) for high-quality retrieval
+- Versioning schema (is_current, is_deleted, file_exists)
+- Three-layer sync automation (git hook, CI/CD, weekly cron)
+- Mandatory search protocol for PM/TPM/SA agents
+
+See [docs/QDRANT-INTEGRATION.md](docs/QDRANT-INTEGRATION.md) for setup.
+
+---
+
+## Product Philosophy Alignment
+
+Agents follow product values through automated protocol injection:
+
+- **Journey over destination** - Progress metaphors, not fixed ability
+- **Input metrics** - Measure effort (controllable), not outcomes
+- **Honest feedback** - Safe to fail, encouraging language
+- **Adaptive difficulty** - Prevent losing the learner
+
+**Enforcement:**
+- `SubagentStart` hooks inject philosophy into relevant agents
+- Code review checks for anti-patterns (ability scores, harsh feedback)
+- Philosophy indexed in Qdrant for semantic search
+
+See [docs/PRODUCT-PHILOSOPHY.md](docs/PRODUCT-PHILOSOPHY.md) for details.
+
+---
+
 ## Important Limitation
 
 **All execution is session-scoped.**
@@ -183,6 +220,8 @@ Every plan goes through:
 
 - [SETUP.md](SETUP.md) - Detailed installation guide
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design
+- [docs/QDRANT-INTEGRATION.md](docs/QDRANT-INTEGRATION.md) - Vector database setup
+- [docs/PRODUCT-PHILOSOPHY.md](docs/PRODUCT-PHILOSOPHY.md) - Philosophy alignment
 - [docs/AGENTS.md](docs/AGENTS.md) - Agent descriptions
 - [docs/WORKFLOWS.md](docs/WORKFLOWS.md) - Common patterns
 - [docs/CUSTOMIZATION.md](docs/CUSTOMIZATION.md) - Adaptation guide

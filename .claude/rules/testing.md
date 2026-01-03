@@ -2,6 +2,47 @@
 
 This document outlines the testing philosophy and approach used across both shadow-api and hotel-de-ville projects.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Testing Pyramid](#testing-pyramid)
+- [Unit Testing](#unit-testing)
+  - [Framework: pytest with pytest-asyncio](#framework-pytest-with-pytest-asyncio)
+  - [Mocking Guidelines](#mocking-guidelines)
+- [Integration Testing](#integration-testing)
+  - [Test Component Interactions](#test-component-interactions)
+  - [Database Integration Tests](#database-integration-tests)
+- [E2E Testing](#e2e-testing)
+  - [Framework: Playwright (for hotel-de-ville frontend)](#framework-playwright-for-hotel-de-ville-frontend)
+- [Test Organization](#test-organization)
+  - [Directory Structure](#directory-structure)
+  - [Naming Conventions](#naming-conventions)
+- [Test Coverage](#test-coverage)
+  - [Primary Metric: F2 Score (Retrieval Quality)](#primary-metric-f2-score-retrieval-quality)
+  - [Code Coverage](#code-coverage)
+- [Running Tests](#running-tests)
+  - [Local Development](#local-development)
+  - [CI/CD (GitHub Actions)](#cicd-github-actions)
+- [Test Data Management](#test-data-management)
+  - [Use Fixtures for Reusable Test Data](#use-fixtures-for-reusable-test-data)
+  - [Factory Pattern for Complex Objects](#factory-pattern-for-complex-objects)
+- [Best Practices](#best-practices)
+  - [1. Test Behavior, Not Implementation](#1-test-behavior-not-implementation)
+  - [2. Each Test Should Test One Thing](#2-each-test-should-test-one-thing)
+  - [3. Use Descriptive Assertions](#3-use-descriptive-assertions)
+- [When Tests Fail](#when-tests-fail)
+  - [Test-Driven Bug Fixes](#test-driven-bug-fixes)
+  - [Flaky Tests](#flaky-tests)
+- [Integration with Development Workflow](#integration-with-development-workflow)
+  - [Pre-Commit Testing](#pre-commit-testing)
+  - [Quality Gates](#quality-gates)
+- [Documentation Testing](#documentation-testing)
+  - [TOC Generation Tests](#toc-generation-tests)
+- [Further Reading](#further-reading)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Testing Pyramid
 
 Our testing strategy follows the standard testing pyramid:
@@ -418,9 +459,73 @@ Tests are enforced at multiple stages:
 
 **No test failures reach production.**
 
+## Documentation Testing
+
+### TOC Generation Tests
+
+**Purpose:** Ensure Table of Contents (TOC) remain up-to-date as documentation evolves.
+
+**Test file:** `tests/test_toc_generation.py`
+
+**What we test:**
+
+1. **TOC Creation:**
+   - Verify doctoc generates correct TOC for files with markers
+   - Test that content outside markers is preserved
+   - Validate anchor link generation (GitHub style)
+
+2. **TOC Updates:**
+   - Verify TOC updates when headers added
+   - Verify TOC updates when headers removed
+   - Verify TOC updates when headers renamed
+
+3. **Edge Cases:**
+   - Duplicate headers get numbered anchors (#setup, #setup-1, #setup-2)
+   - Special characters handled correctly (!, @, %, :, etc.)
+   - Max depth respected (--maxlevel 3 excludes H4/H5)
+
+4. **Real-World Validation:**
+   - All major docs have TOC markers
+   - Actual project files pass TOC validation
+
+**CI/CD Integration:**
+
+`.github/workflows/toc-verification.yml` runs on every PR that modifies markdown files:
+
+```yaml
+- name: Check for TOC changes
+  run: |
+    if ! git diff --exit-code; then
+      echo "❌ TOCs are out of date!"
+      echo "Run: npx doctoc . --update-only"
+      exit 1
+    fi
+```
+
+**Why this matters:**
+- Documentation drift is common (headers change, TOC doesn't)
+- CI/CD catches stale TOCs before merge
+- Pre-commit hook auto-updates TOCs locally
+
+**Test execution:**
+
+```bash
+# Run TOC tests only
+pytest tests/test_toc_generation.py -v
+
+# Run in CI
+npx doctoc . --update-only && git diff --exit-code
+```
+
+**Coverage targets:**
+- TOC creation: 100% (critical path)
+- TOC updates: 100% (core functionality)
+- Edge cases: 90%+ (duplicates, special chars)
+
 ## Further Reading
 
 - pytest documentation: https://docs.pytest.org/
 - pytest-asyncio: https://pytest-asyncio.readthedocs.io/
 - Playwright: https://playwright.dev/
 - F-Score: https://en.wikipedia.org/wiki/F-score
+- doctoc: https://github.com/thlorenz/doctoc

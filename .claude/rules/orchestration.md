@@ -2,6 +2,32 @@
 
 **New capability as of 2025-12-28:** Claude Code can now autonomously manage multiple development plans in parallel using a two-layer orchestration system.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Architecture Overview](#architecture-overview)
+- [Layer 1: Portfolio Manager](#layer-1-portfolio-manager)
+- [Layer 2: TPM Orchestrator](#layer-2-tpm-orchestrator)
+- [Layer 0: Risk Manager (MANDATORY SAFETY GATE)](#layer-0-risk-manager-mandatory-safety-gate)
+- [Development Plan Structure](#development-plan-structure)
+- [Resource Management](#resource-management)
+  - [1. File Contention (Primary Constraint)](#1-file-contention-primary-constraint)
+  - [2. Dependency Sequencing](#2-dependency-sequencing)
+  - [3. API Rate Limits](#3-api-rate-limits)
+- [Workflow: User Perspective](#workflow-user-perspective)
+- [Cost/Benefit Analysis](#costbenefit-analysis)
+- [Learning System](#learning-system)
+- [Dashboard Monitoring](#dashboard-monitoring)
+- [Slash Commands](#slash-commands)
+- [Escalation Criteria](#escalation-criteria)
+- [Getting Started](#getting-started)
+- [Example Plan](#example-plan)
+- [State Files](#state-files)
+- [Multi-Plan Benefits](#multi-plan-benefits)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Architecture Overview
 
 ```
@@ -39,7 +65,7 @@ Portfolio Manager (VP Engineering role)
 - **NO TRACKING:** Does NOT use TodoWrite (that blocks the command line)
 - **PARALLEL:** All ready plans spawn in ONE message for max parallelism
 
-**Known limitation:** The Claude Agent SDK's Task tool is synchronous, so command line WILL be occupied while TPMs execute. However, all TPMs run in parallel, minimizing total execution time.
+**Execution timing:** The Task tool is synchronous (waits for completion), so command line is occupied while TPMs execute. However, multiple Task calls in ONE message run IN PARALLEL, minimizing total execution time. **The Task tool CAN and MUST be used to spawn TPM orchestrators - this capability is proven and working.**
 
 ## Layer 2: TPM Orchestrator
 

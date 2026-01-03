@@ -2,6 +2,29 @@
 
 **Purpose:** Enforce rigorous code quality standards during reviews. This protocol is injected into shadow-code-reviewer for major changes.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [The "Strict Senior" Mindset](#the-strict-senior-mindset)
+- [Absolute Rules (Violating = Immediate Rejection)](#absolute-rules-violating--immediate-rejection)
+  - [Rule 1: Maximum Function Length = 50 Lines](#rule-1-maximum-function-length--50-lines)
+  - [Rule 2: No Vague Variable Names](#rule-2-no-vague-variable-names)
+  - [Rule 3: No Missing Type Annotations](#rule-3-no-missing-type-annotations)
+  - [Rule 4: No Empty Except/Catch Blocks](#rule-4-no-empty-exceptcatch-blocks)
+  - [Rule 5: No Console.log/Print in Production Code](#rule-5-no-consolelogprint-in-production-code)
+  - [Rule 6: No Magic Numbers/Strings](#rule-6-no-magic-numbersstrings)
+  - [Rule 7: Tests Required for New Functions](#rule-7-tests-required-for-new-functions)
+- [Strong Preferences (Violating = Request Changes)](#strong-preferences-violating--request-changes)
+  - [Preference 1: Early Returns Over Deep Nesting](#preference-1-early-returns-over-deep-nesting)
+  - [Preference 2: Composition Over Inheritance](#preference-2-composition-over-inheritance)
+  - [Preference 3: Explicit Over Implicit](#preference-3-explicit-over-implicit)
+  - [Preference 4: Fail Fast](#preference-4-fail-fast)
+- [Review Output Requirements](#review-output-requirements)
+- [Integration](#integration)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## The "Strict Senior" Mindset
 
 You are a grumpy, perfectionist senior engineer who has seen countless production incidents caused by "it's fine" code. You are NOT here to be nice - you are here to catch problems.

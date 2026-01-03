@@ -165,6 +165,77 @@ If you attempt to skip Risk Manager invocation:
 
 ---
 
+## Escalation Process for High-Risk Plans (≥7/10)
+
+This section documents the complete escalation workflow when risk assessment returns a score of 7 or higher.
+
+### Step 1: Mark for Approval
+
+When Risk Manager determines overall risk ≥ 7/10, it MUST:
+
+1. Set plan status to `AWAITING_APPROVAL` in `00 Inbox/plans/.state.json`
+2. Update plan file header with escalation metadata
+
+```bash
+# Risk Manager updates .state.json
+{
+  "PLAN-XXXX": {
+    "status": "AWAITING_APPROVAL",
+    "risk_score": X,
+    "escalation_timestamp": "2025-01-XX..."
+  }
+}
+```
+
+### Step 2: Notify Johannes
+
+The plan file header is updated with:
+
+```markdown
+---
+**Status:** AWAITING_APPROVAL
+**Risk Score:** [X]/10
+**Escalation Reason:** [dimension(s) that triggered escalation]
+**Approval Required By:** @johannes
+**Escalated At:** [ISO timestamp]
+---
+```
+
+Portfolio Manager MUST NOT schedule this plan until approval is received.
+
+### Step 3: Approval Mechanism
+
+**How Johannes approves:**
+
+1. Johannes reviews the plan file and risk assessment section
+2. Johannes adds an approval comment directly in the plan file:
+
+```markdown
+## Manual Approval
+
+**Decision:** APPROVED | CHANGES_REQUESTED | REJECTED
+
+**Approved by:** Johannes Fritz
+**Approved at:** 2025-01-XX HH:MM UTC
+**Approval notes:** [any constraints, conditions, or required modifications]
+```
+
+**If CHANGES_REQUESTED:**
+- Plan must be modified according to feedback
+- Risk Manager re-assesses after changes
+- Process repeats until APPROVED or REJECTED
+
+### Step 4: Execution After Approval
+
+Once approved:
+
+1. Portfolio Manager detects `## Manual Approval` section with `APPROVED` decision
+2. Portfolio Manager updates `.state.json` status from `AWAITING_APPROVAL` to `QUEUED`
+3. Normal execution proceeds with the noted conditions/constraints
+4. TPM Orchestrator must honor any approval conditions
+
+---
+
 ## How to Check for Johannes Approval
 
 If a plan shows `REQUIRES APPROVAL`, check for approval:
@@ -174,6 +245,7 @@ If a plan shows `REQUIRES APPROVAL`, check for approval:
 grep -q "## Manual Approval" "00 Inbox/plans/PLAN-XXXX.md"
 
 # If found, check for:
+# **Decision:** APPROVED
 # **Approved by:** Johannes Fritz
 # **Approved at:** [timestamp]
 # **Approval notes:** [any constraints or conditions]

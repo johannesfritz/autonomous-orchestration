@@ -264,3 +264,82 @@ Human-readable markdown dashboard showing portfolio health.
 10. TPM updates state, moves plan to completed/
 11. Dashboard auto-updates
 ```
+
+---
+
+## Qdrant Integration (Institutional Memory)
+
+**Purpose:** Use vector database as institutional memory to maintain consistency and build on past work.
+
+### Architecture
+
+```
+Documentation/Plans/Notes
+         ↓
+    FRIDAY Pipeline
+         ↓
+   Dual Embeddings
+   (BLUF + Content)
+         ↓
+      Qdrant
+         ↓
+  Semantic Search
+         ↓
+   Agent Decisions
+```
+
+### Key Components
+
+| Component | Purpose |
+|-----------|---------|
+| **Dual Embeddings** | BLUF (precision) + Content (recall), 3072 dimensions |
+| **Versioning Schema** | is_current, is_deleted, file_exists flags |
+| **Collections** | jf_private (knowledge), jf_docs (references), documentation (rules) |
+| **Sync Automation** | Git hook → CI/CD → Weekly cron (3-layer) |
+
+### Agent Integration
+
+Product Management agents MUST search Qdrant before decisions:
+- **Product Manager** → Search for related features, past prioritization
+- **Solutions Architect** → Search for related ADRs, patterns
+- **Technical PM** → Search for similar plans, complexity estimates
+
+Enforced via `SubagentStart` and `SubagentStop` hooks.
+
+**Full documentation:** [QDRANT-INTEGRATION.md](QDRANT-INTEGRATION.md)
+
+---
+
+## Product Philosophy Alignment
+
+**Purpose:** Ensure AI agents operate according to product values, not just technical requirements.
+
+### Injection Mechanism
+
+Philosophy is injected via `SubagentStart` hooks:
+
+| Agent | Protocol | Purpose |
+|-------|----------|---------|
+| product-manager | product-philosophy.md | User-facing decisions |
+| technical-pm | product-philosophy.md | Requirement translation |
+| ux-researcher | product-philosophy.md | User journey design |
+| artificial-shadow-dev | product-philosophy.md | UI/UX implementation |
+| qa-engineer | product-philosophy.md | User-facing testing |
+
+### Core Principles
+
+- **Journey Over Destination** - Progress, not fixed ability
+- **Input Metrics** - Effort (controllable) over outcomes
+- **Honest Feedback** - Safe to fail, encouraging language
+- **Adaptive Difficulty** - Prevent losing the learner
+- **Independence** - No mandatory parental involvement
+- **Bauhaus Aesthetics** - Clean, functional design
+
+### Enforcement Layers
+
+1. **SubagentStart hooks** - Automatic protocol injection
+2. **Code review** - shadow-code-reviewer checks anti-patterns
+3. **SubagentStop hooks** - Verify philosophy alignment
+4. **Semantic search** - Philosophy indexed in Qdrant
+
+**Full documentation:** [PRODUCT-PHILOSOPHY.md](PRODUCT-PHILOSOPHY.md)

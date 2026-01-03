@@ -233,6 +233,10 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/detect-major-changes.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-migration-tests.sh"
           }
         ]
       },
@@ -241,7 +245,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-push-build-check.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-on-test-failure.sh"
           }
         ]
       },
@@ -262,6 +266,16 @@
             "command": "echo '⚠️ PERMISSION CHANGE: Verify file permissions are intentional.'"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "path": "*/frontend/src/components/*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🧩 COMPONENT LIBRARY RESTRICTION' && echo '' && echo 'Use shadcn/ui components exclusively. Forbidden:' && echo '  ❌ Custom Button, Input, Select, Dialog, Card' && echo '  ❌ Inline modal patterns without Dialog' && echo '  ❌ Card-like styling without Card component' && echo '' && echo 'Import from: @/components/ui/[component]' && echo ''"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -271,6 +285,24 @@
           {
             "type": "command",
             "command": "echo '--- Reminder: Run tests to verify this change works as expected ---'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git commit *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-commit-sync-docs.sh 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git add *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/detect-architectural-decision.sh 2>/dev/null || true"
           }
         ]
       },
@@ -320,6 +352,10 @@
           {
             "type": "command",
             "command": "echo '⚠️ CRITICAL: Verify risk assessment exists in plan file before execution. Risk Manager invocation is MANDATORY. See .claude/protocols/risk-assessment-required.md for details.'"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '⚠️ MANDATORY QUALITY GATES ENFORCEMENT ACTIVE' && echo '' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/mandatory-quality-gates.md"
           }
         ]
       },
@@ -360,6 +396,14 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/user-centricity.md"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY PROTOCOL ACTIVE' && echo 'You MUST search Qdrant before making decisions. See institutional-memory-protocol.md' && echo ''"
           }
         ]
       },
@@ -369,6 +413,14 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/technical-translation.md"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY PROTOCOL ACTIVE' && echo 'You MUST search Qdrant for similar past plans before scoping. See institutional-memory-protocol.md' && echo ''"
           }
         ]
       },
@@ -378,6 +430,14 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/architectural-documentation.md"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY PROTOCOL ACTIVE' && echo 'You MUST search Qdrant for related ADRs before making architectural decisions. See institutional-memory-protocol.md' && echo ''"
           }
         ]
       },
@@ -386,7 +446,38 @@
         "hooks": [
           {
             "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
+          },
+          {
+            "type": "command",
             "command": "echo '🔍 UX RESEARCHER ACTIVE: Focus on user journeys, accessibility (WCAG 2.1 AA), and evidence-based recommendations.'"
+          }
+        ]
+      },
+      {
+        "matcher": "artificial-shadow-dev",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '## PRODUCT PHILOSOPHY ACTIVE' && head -80 $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
+          }
+        ]
+      },
+      {
+        "matcher": "qa-engineer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '## PRODUCT PHILOSOPHY ACTIVE' && head -80 $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
+          }
+        ]
+      },
+      {
+        "matcher": "database-engineer|hybrid-db-architect",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🎯 STELLARIS PHILOSOPHY CHECK' && echo '' && echo 'When working on Stellaris schemas, remember:' && head -100 $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
           }
         ]
       }
@@ -398,6 +489,28 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md && echo '' && echo '⚠️ REMINDER: Check for User Requests section in plan file. If present, complete user notification protocol FIRST.' && echo '' && echo '🧹 JANITOR PROTOCOL: Clean up temp files, archive plan, commit and push.' && echo 'See .claude/skills/janitor/prompt.md for cleanup checklist.'"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '═══════════════════════════════════════' && echo '🔍 MANDATORY CLEANUP VERIFICATION' && echo '═══════════════════════════════════════' && echo '' && echo 'CRITICAL: Before returning, you MUST run cleanup verification:' && echo '' && echo '  $CLAUDE_PROJECT_DIR/.claude/scripts/verify-cleanup-complete.sh PLAN-ID' && echo '' && echo 'This script verifies:' && echo '  ✓ Plan file moved to completed/' && echo '  ✓ .state.json updated with SHIPPED status' && echo '  ✓ PORTFOLIO_STATUS.md updated' && echo '  ✓ All state changes committed to git' && echo '  ✓ Audit log contains completion event' && echo '  ✓ PR exists and is merged (or awaiting manual merge)' && echo '' && echo 'If verification fails, complete missing steps before returning.' && echo '═══════════════════════════════════════' && echo ''"
+          }
+        ]
+      },
+      {
+        "matcher": "shadow-code-reviewer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '' && echo '📝 CLAUDE.md UPDATE CHECK' && echo '' && echo 'If this change introduced any of the following, verify CLAUDE.md is updated:' && echo '  □ New patterns or conventions' && echo '  □ Environment variables' && echo '  □ Architectural changes' && echo '  □ New agents, skills, or commands' && echo '  □ Database schema changes' && echo '' && echo 'CLAUDE.md must reflect current implementation state.' && echo ''"
+          }
+        ]
+      },
+      {
+        "matcher": "product-manager|technical-pm|solutions-architect",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY VERIFICATION' && echo '' && echo 'Confirm you documented:' && echo '  □ Search queries executed against Qdrant' && echo '  □ Key findings from search results summarized' && echo '  □ Alignment analysis with past decisions completed' && echo '' && echo 'If any item is unchecked, your proposal/plan is INCOMPLETE.' && echo ''"
           }
         ]
       }

@@ -8,7 +8,9 @@ This guide covers complete installation and configuration of the autonomous orch
 
 - Claude Code CLI installed and configured
 - Git repository for your project
-- API keys: `ANTHROPIC_API_KEY` (required), `OPENAI_API_KEY` (optional, for embeddings)
+- API keys:
+  - `ANTHROPIC_API_KEY` (required)
+  - `OPENAI_API_KEY` (optional, for embeddings and Qdrant integration)
 
 ---
 
@@ -188,9 +190,62 @@ cp inbox/plans/.state.json.example inbox/plans/.state.json
 
 ---
 
+## Optional: Qdrant Integration (Institutional Memory)
+
+Qdrant enables semantic search across documentation, plans, and past decisions. This is optional but recommended for maintaining consistency.
+
+### Setup
+
+**1. Run Qdrant locally:**
+```bash
+docker run -p 6333:6333 qdrant/qdrant
+```
+
+**2. Set environment variables:**
+```bash
+export QDRANT_URL=http://localhost:6333
+export OPENAI_API_KEY=sk-...  # For embeddings
+```
+
+**3. Index documentation:**
+```bash
+python3 .claude/scripts/index-documentation.py
+```
+
+**4. Verify with search:**
+```bash
+python3 .claude/scripts/search-documentation.py "query here"
+```
+
+### Production Setup
+
+For production, use Qdrant Cloud or self-hosted:
+
+```bash
+# GitHub Secrets (for CI/CD)
+QDRANT_URL=https://your-cluster.cloud.qdrant.io:6333
+QDRANT_API_KEY=your-api-key
+OPENAI_API_KEY=sk-...
+```
+
+The CI/CD workflow (`.github/workflows/sync-docs.yml`) handles automatic indexing.
+
+### Collections
+
+| Collection | Content |
+|------------|---------|
+| `jf_private` | Knowledge base, projects, decisions |
+| `jf_docs` | Technical documentation, references |
+| `documentation` | CLAUDE.md files, rules, completed plans |
+
+See [docs/QDRANT-INTEGRATION.md](docs/QDRANT-INTEGRATION.md) for full details.
+
+---
+
 ## Next Steps
 
 1. Read [ARCHITECTURE.md](docs/ARCHITECTURE.md) to understand the system
 2. Review [AGENTS.md](docs/AGENTS.md) to see agent capabilities
 3. Check [WORKFLOWS.md](docs/WORKFLOWS.md) for common patterns
 4. See [CUSTOMIZATION.md](docs/CUSTOMIZATION.md) to adapt for your project
+5. Set up [Qdrant](docs/QDRANT-INTEGRATION.md) for institutional memory (optional)
