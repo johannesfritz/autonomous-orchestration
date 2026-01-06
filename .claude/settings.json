@@ -294,6 +294,10 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-commit-sync-docs.sh 2>/dev/null || true"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '═══════════════════════════════════════' && echo '📋 CODE REVIEW AVAILABLE' && echo '═══════════════════════════════════════' && echo '' && echo 'For code review before push, run: /code-review' && echo '' && echo 'Options:' && echo '  /code-review           - Terminal output (baseline + strict if major)' && echo '  /code-review --comment - Post review to GitHub PR' && echo '  /code-review --strict  - Force strict mode (custom protocols)' && echo '' && echo 'This is RECOMMENDED for significant changes.' && echo '═══════════════════════════════════════' && echo ''"
           }
         ]
       },
@@ -489,6 +493,10 @@
           {
             "type": "command",
             "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md && echo '' && echo '⚠️ REMINDER: Check for User Requests section in plan file. If present, complete user notification protocol FIRST.' && echo '' && echo '🧹 JANITOR PROTOCOL: Clean up temp files, archive plan, commit and push.' && echo 'See .claude/skills/janitor/prompt.md for cleanup checklist.'"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '═══════════════════════════════════════' && echo '🎭 MANDATORY UAT EXECUTION VERIFICATION' && echo '═══════════════════════════════════════' && echo '' && echo 'BLOCKING: UAT must have been EXECUTED, not just documented.' && echo '' && echo 'Verification script checks for:' && echo '  ✓ Evidence directory exists: 00 Inbox/uat-evidence/PLAN-ID/' && echo '  ✓ Playwright report exists: playwright-report.json' && echo '  ✓ Tests actually ran (count > 0)' && echo '  ✓ All tests passed (failures = 0)' && echo '' && echo 'Run: $CLAUDE_PROJECT_DIR/.claude/scripts/verify-uat-executed.sh PLAN-ID' && echo '' && echo 'Checklist-only UAT is INSUFFICIENT. Actual execution required.' && echo '═══════════════════════════════════════' && echo ''"
           },
           {
             "type": "command",

@@ -1,6 +1,6 @@
 # Template vs. Production Divergence Report
 
-**Last Verified:** 2026-01-03
+**Last Verified:** 2026-01-07
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/.claude/`
 
@@ -14,12 +14,12 @@
 
 | Category | Template | Production | Status |
 |----------|----------|------------|--------|
-| settings.json | 518 lines | 641 lines | Synced (filtered) |
-| Agents | 14 | 25+ | Synced (sw dev only) |
-| Commands | 19 | 19+ | Synced (sw dev only) |
+| settings.json | 530 lines | 650+ lines | Synced (filtered) |
+| Agents | 15 | 25+ | Synced (sw dev only) |
+| Commands | 20 | 20+ | Synced (sw dev only) |
 | Skills | 12 | 12+ | Synced (sw dev only) |
-| Protocols | 10 | 14+ | Synced (sw dev only) |
-| Scripts | 8 | 10+ | Synced (sw dev only) |
+| Protocols | 15 | 18+ | Synced (sw dev only) |
+| Scripts | 9 | 12+ | Synced (sw dev only) |
 | Hooks (shell) | 3 | 3 | Identical |
 | **Rules** | 9 | 10 | Synced (sw dev only) |
 | **Docs** | 6 | - | Template-specific |
@@ -68,7 +68,7 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - qa-lead.md
 - shadow-code-reviewer.md
 
-### Commands (19)
+### Commands (20)
 
 **Portfolio Management:**
 - add-plan.md
@@ -85,6 +85,9 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - rollback.md
 - show-conflicts.md
 - sync-state.md
+
+**Quality:**
+- code-review.md (NEW)
 
 **Discovery:**
 - discovery.md
@@ -113,17 +116,18 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - prioritization-framework
 - write-adr
 
-### Protocols (14)
+### Protocols (15)
 
 **Quality Gates:**
 - code-standards.md
 - functional-verification.md
+- mandatory-playwright-execution.md (NEW)
 - production-ready-checklist.md
 - quality-check.md
 - risk-assessment-required.md
 - tpm-completion-checklist.md
-- schema-migration-checklist.md (NEW)
-- user-request-closure.md (NEW)
+- schema-migration-checklist.md
+- user-request-closure.md
 
 **Enhanced Standards:**
 - strict-code-standards.md
@@ -140,13 +144,16 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - detect-production-review.sh
 - pre-push-build-check.sh
 
-### Scripts (6)
+### Scripts (9)
 - derive-state-from-audit.py
 - scan-secrets.py
 - detect-major-changes.sh
 - check-component-usage.sh
-- detect-schema-changes.sh (NEW)
-- wait-for-ci.sh (NEW)
+- detect-schema-changes.sh
+- wait-for-ci.sh
+- verify-cleanup-complete.sh
+- index-documentation.py
+- verify-uat-executed.sh (NEW)
 
 ---
 
@@ -195,6 +202,13 @@ The following files exist in production but are intentionally excluded from the 
 |            | Created docs/PRODUCT-PHILOSOPHY.md - Philosophy alignment mechanisms |
 |            | Updated docs/ARCHITECTURE.md, README.md, SETUP.md |
 |            | **Scope:** Software development only (excluded analytical writing) |
+| 2026-01-07 | **UAT Enforcement + Code Review Integration** |
+|            | +1 protocol: mandatory-playwright-execution.md |
+|            | +1 script: verify-uat-executed.sh |
+|            | +1 command: code-review.md |
+|            | Updated settings.json with UAT verification hook (SubagentStop[tpm-orchestrator]) |
+|            | Updated settings.json with code review hook (PostToolUse[git commit]) |
+|            | **Purpose:** Ensure UAT tests are EXECUTED (not just documented) and integrate /code-review command |
 
 ---
 
