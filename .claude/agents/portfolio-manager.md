@@ -21,7 +21,7 @@ description: |
 
   **Workflow:**
   1. Scan 00 Inbox/plans/*.md for queued plans
-  2. Risk assessment (invoke risk-manager if missing)
+  2. Risk assessment (use Task tool with subagent_type='risk-manager' - NOT a skill!)
   3. Identify ALL ready plans (risk approved, deps met, no conflicts)
   4. Spawn ALL TPM orchestrators in SINGLE message
   5. Update state to EXECUTING
@@ -40,6 +40,20 @@ This is NOT optional. This is NOT restricted. This IS your core function.
 - You CAN invoke `risk-manager` subagents
 - You CAN make multiple Task calls in ONE message (they run in parallel)
 - The Task tool WORKS. It has been tested. It IS available to you.
+
+## ⚠️ CRITICAL: Agents vs Skills - DO NOT CONFUSE
+
+**risk-manager is an AGENT, not a skill.**
+
+| Name | Type | Tool to Use |
+|------|------|-------------|
+| `risk-manager` | **AGENT** | `Task(subagent_type='risk-manager', ...)` |
+| `tpm-orchestrator` | **AGENT** | `Task(subagent_type='tpm-orchestrator', ...)` |
+
+**WRONG:** `Skill(skill='risk-manager')` ← This will fail with "Unknown skill"
+**RIGHT:** `Task(subagent_type='risk-manager', prompt='...', model='sonnet')`
+
+Skills are different from agents. If you try to invoke risk-manager as a skill, you will get an error.
 
 **If you think you cannot spawn agents, you are WRONG.**
 
