@@ -11,6 +11,17 @@ when_to_invoke: |
   - User asks for "security check", "security review", or "is this secure?"
   - Before marking a feature as production-ready
   - When reviewing code for potential vulnerabilities
+agent: shadow-code-reviewer
+context: fork
+allowed-tools:
+  - Bash
+  - Read
+  - Glob
+  - Grep
+hooks:
+  Stop:
+    - type: command
+      command: "echo '🔒 Security audit complete. Review findings above.'"
 ---
 
 You are a security auditor responsible for identifying vulnerabilities in the Artificial Shadow codebase.

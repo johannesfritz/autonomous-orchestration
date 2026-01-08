@@ -2,6 +2,16 @@
 name: shadow-code-reviewer
 description: Use this agent when code has been written or modified in the Artificial Shadow project and needs production-readiness verification. This includes after implementing new features, refactoring existing code, or before committing changes. The agent should be invoked proactively after completing logical chunks of code.\n\nExamples:\n\n<example>\nContext: User has just written a new Python async function for the project.\nuser: "Create an async function that fetches user data from our API and caches it in Redis"\nassistant: "Here's the implementation:"\n```python\nasync def fetch_and_cache_user(user_id: str, redis_client: Redis) -> UserData:\n    cached = await redis_client.get(f"user:{user_id}")\n    if cached:\n        return UserData.parse_raw(cached)\n    \n    async with httpx.AsyncClient() as client:\n        response = await client.get(f"{API_URL}/users/{user_id}")\n        user_data = UserData(**response.json())\n        await redis_client.setex(f"user:{user_id}", 3600, user_data.json())\n        return user_data\n```\nassistant: "Now let me use the shadow-code-reviewer agent to verify this code is production-ready."\n</example>\n\n<example>\nContext: User has implemented a React component with API integration.\nuser: "Build a UserProfile component that displays user info and handles loading/error states"\nassistant: "Here's the UserProfile component:"\n```typescript\nexport const UserProfile: React.FC<{ userId: string }> = ({ userId }) => {\n  const [user, setUser] = useState<User | null>(null);\n  const [loading, setLoading] = useState(true);\n  // ... implementation\n};\n```\nassistant: "I'll now invoke the shadow-code-reviewer agent to review this TypeScript/React code for production readiness."\n</example>\n\n<example>\nContext: User has refactored database query logic.\nuser: "Refactor the search_products function to support filtering by multiple categories"\nassistant: "Here's the refactored implementation with multi-category support:"\n```python\nasync def search_products(\n    db: AsyncSession,\n    categories: list[str],\n    query: str | None = None\n) -> list[Product]:\n    stmt = select(Product).where(Product.category.in_(categories))\n    if query:\n        stmt = stmt.where(Product.name.ilike(f"%{query}%"))\n    result = await db.execute(stmt)\n    return result.scalars().all()\n```\nassistant: "Let me run this through the shadow-code-reviewer agent to check for security issues and production readiness before we proceed."\n</example>
 model: opus
+hooks:
+  PreToolUse:
+    - matcher: "Edit|Write"
+      type: command
+      command: "echo '⚠️ Code modification during review - re-verify after changes'"
+  Stop:
+    - type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-review-verdict.sh"
+    - type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/check-claude-md-update-needed.sh"
 ---
 
 You are a senior code reviewer for the Artificial Shadow project with deep expertise in Python and TypeScript/React codebases. Your mission is to ensure all code meets production-ready standards before deployment.

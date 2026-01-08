@@ -1,6 +1,6 @@
 # Template vs. Production Divergence Report
 
-**Last Verified:** 2026-01-07
+**Last Verified:** 2026-01-08
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/.claude/`
 
@@ -19,7 +19,7 @@
 | Commands | 20 | 20+ | Synced (sw dev only) |
 | Skills | 12 | 12+ | Synced (sw dev only) |
 | Protocols | 15 | 18+ | Synced (sw dev only) |
-| Scripts | 9 | 12+ | Synced (sw dev only) |
+| Scripts | 15 | 18+ | Synced (sw dev only) |
 | Hooks (shell) | 3 | 3 | Identical |
 | **Rules** | 9 | 10 | Synced (sw dev only) |
 | **Docs** | 6 | - | Template-specific |
@@ -144,7 +144,7 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - detect-production-review.sh
 - pre-push-build-check.sh
 
-### Scripts (9)
+### Scripts (15)
 - derive-state-from-audit.py
 - scan-secrets.py
 - detect-major-changes.sh
@@ -153,7 +153,13 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - wait-for-ci.sh
 - verify-cleanup-complete.sh
 - index-documentation.py
-- verify-uat-executed.sh (NEW)
+- verify-uat-executed.sh
+- verify-quality-gates.sh (NEW - 2.10)
+- verify-ci-passed.sh (NEW - 2.10)
+- verify-plan-state-updated.sh (NEW - 2.10)
+- verify-review-verdict.sh (NEW - 2.10)
+- check-claude-md-update-needed.sh (NEW - 2.10)
+- verify-uat-evidence.sh (NEW - 2.10)
 
 ---
 
@@ -209,6 +215,24 @@ The following files exist in production but are intentionally excluded from the 
 |            | Updated settings.json with UAT verification hook (SubagentStop[tpm-orchestrator]) |
 |            | Updated settings.json with code review hook (PostToolUse[git commit]) |
 |            | **Purpose:** Ensure UAT tests are EXECUTED (not just documented) and integrate /code-review command |
+| 2026-01-08 | **Claude Code 2.10 Agent-Scoped Hooks & Skill Improvements** |
+|            | **Agent-scoped hooks** (hooks defined in agent frontmatter): |
+|            | - tpm-orchestrator.md: PreToolUse hooks for git push/merge verification, PostToolUse for workstream completion, Stop hooks for cleanup verification |
+|            | - shadow-code-reviewer.md: PreToolUse hook for code modification warnings, Stop hooks for review verdict and CLAUDE.md update verification |
+|            | **Skill improvements** with new 2.10 features: |
+|            | - run-test-suite/SKILL.md: Added `agent: qa-engineer`, `context: fork`, `allowed-tools`, Stop hook |
+|            | - security-audit/SKILL.md: Added `agent: shadow-code-reviewer`, `context: fork`, `allowed-tools`, Stop hook |
+|            | **New verification scripts** (+6): |
+|            | - verify-quality-gates.sh - Pre-push quality gate verification |
+|            | - verify-ci-passed.sh - Pre-merge CI status check |
+|            | - verify-plan-state-updated.sh - TPM completion state verification |
+|            | - verify-review-verdict.sh - Code review completion checklist |
+|            | - check-claude-md-update-needed.sh - Documentation update detection |
+|            | - verify-uat-evidence.sh - UAT evidence validation |
+|            | **settings.json improvements**: |
+|            | - Added `once: true` to code standards protocol injection (PreToolUse[Edit\|Write]) |
+|            | - Added `once: true` to component library restriction hook |
+|            | **Purpose:** Transform quality gates from "soft protocol suggestions" to "mandatory enforcement" via agent lifecycle hooks |
 
 ---
 

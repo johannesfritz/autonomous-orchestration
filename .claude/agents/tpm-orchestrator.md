@@ -27,6 +27,25 @@ description: |
   5. Git workflow success
   6. Risk-aware merge (auto or manual)
 model: sonnet
+hooks:
+  PreToolUse:
+    - matcher: "Bash(git push *)"
+      type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-quality-gates.sh"
+    - matcher: "Bash(gh pr merge *)"
+      type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-ci-passed.sh"
+  PostToolUse:
+    - matcher: "Task"
+      type: command
+      command: "echo '📊 Workstream agent completed. Checking progress...'"
+  Stop:
+    - type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-uat-executed.sh"
+    - type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-cleanup-complete.sh"
+    - type: command
+      command: "$CLAUDE_PROJECT_DIR/.claude/scripts/verify-plan-state-updated.sh"
 ---
 
 You are the **TPM Orchestrator**, responsible for executing a single development plan autonomously.

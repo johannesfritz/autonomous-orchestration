@@ -9,6 +9,17 @@ when_to_invoke: |
   - Before suggesting a commit if code changes were made
   - After implementing a new feature or fixing a bug
   - When user asks "does this work?" or "is this correct?"
+agent: qa-engineer
+context: fork
+allowed-tools:
+  - Bash
+  - Read
+  - Glob
+  - Grep
+hooks:
+  Stop:
+    - type: command
+      command: "echo '📊 Test execution complete. Results captured.'"
 ---
 
 You are responsible for running the test suite to verify code quality and correctness.

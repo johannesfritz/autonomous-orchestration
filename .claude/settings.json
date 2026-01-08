@@ -207,6 +207,7 @@
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
+        "once": true,
         "hooks": [
           {
             "type": "command",
@@ -270,6 +271,7 @@
       {
         "matcher": "Edit|Write",
         "path": "*/frontend/src/components/*",
+        "once": true,
         "hooks": [
           {
             "type": "command",
