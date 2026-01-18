@@ -48,7 +48,8 @@ Dispatch sequentially when ANY condition applies:
 | Research → Planning → Implementation | Understanding before execution |
 | Schema → API → Frontend | Data structure must exist first |
 | Implementation → Testing → Review | Build, validate, then audit |
-| Product Manager → Technical PM → create-plan | Requirements before specs |
+| Product Manager → Technical PM → UAT Protocol Designer → create-plan | Requirements → specs → test design → plan |
+| Product Manager → UX Researcher → Technical PM → UAT Protocol Designer → create-plan | Full discovery flow with UI |
 
 **Dispatch pattern:**
 ```
@@ -144,10 +145,18 @@ Task tool → portfolio-manager agent → run_in_background=true
 
 Background execution does NOT mean lower quality. TPM orchestrators enforce:
 
+0. **Pre-Development Gates (Discovery Phase)**
+   - UAT Protocol Designer creates acceptance criteria BEFORE coding
+   - User journeys defined with step-by-step verification
+   - Backend test specs written (API contracts)
+   - Edge case matrix completed
+   - Regression checklist identifies existing features to protect
+
 1. **Pre-Execution Gates**
    - Risk assessment completed
    - Dependencies resolved
    - No blocking conflicts
+   - UAT protocol embedded in plan
 
 2. **Development Gates**
    - Tests written for new code

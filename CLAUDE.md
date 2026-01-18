@@ -10,7 +10,7 @@
 
 | Content Type | Count | Description |
 |--------------|-------|-------------|
-| Agents | 15 | portfolio-manager, tpm-orchestrator, risk-manager, etc. |
+| Agents | 16 | portfolio-manager, tpm-orchestrator, risk-manager, uat-protocol-designer, etc. |
 | Commands | 16 | /portfolio, /add-plan, /execute-plan, etc. |
 | Protocols | 12+ | code-standards, risk-assessment, quality gates |
 | Rules | 10 | orchestration, product-management, routing, testing, etc. |
@@ -54,12 +54,13 @@ mv inbox/PORTFOLIO_STATUS.md.example inbox/PORTFOLIO_STATUS.md
 ```
 autonomous-orchestration/
 ├── .claude/
-│   ├── agents/              # 15 agent definitions
+│   ├── agents/              # 16 agent definitions
 │   │   ├── portfolio-manager.md
 │   │   ├── tpm-orchestrator.md
 │   │   ├── risk-manager.md
 │   │   ├── product-manager.md
 │   │   ├── technical-pm.md
+│   │   ├── uat-protocol-designer.md  # NEW: Test design before development
 │   │   ├── solutions-architect.md
 │   │   ├── ux-researcher.md
 │   │   ├── artificial-shadow-dev.md
@@ -143,6 +144,7 @@ autonomous-orchestration/
 | **risk-manager** | CRO | Assesses risk, gates high-risk changes |
 | **product-manager** | PM | Validates user needs, ICE/RICE scoring |
 | **technical-pm** | Technical PM | Translates business → technical |
+| **uat-protocol-designer** | QA Architect | Designs tests BEFORE development |
 | **solutions-architect** | SA | Architecture decisions, ADRs |
 
 ---
@@ -154,7 +156,7 @@ autonomous-orchestration/
 | `/portfolio` | Show dashboard with all plans |
 | `/add-plan <file>` | Submit plan for execution |
 | `/prioritize <id> <level>` | Override priority |
-| `/discovery <idea>` | Full PM → UX → TPM flow |
+| `/discovery <idea>` | Full PM → UX → TPM → UAT flow |
 | `/queue-fix <description>` | Queue background bug fix |
 
 ---
