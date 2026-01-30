@@ -127,6 +127,10 @@ autonomous-orchestration/
 │   └── PORTFOLIO_STATUS.md.example
 │
 ├── docs/                    # Additional documentation
+├── scripts/                 # Git helper scripts for nested repos
+│   ├── pull-all.sh          # Pull all repos
+│   ├── push-all.sh          # Push repos with commits
+│   └── git-status-all.sh    # Status of all repos
 ├── README.md                # Quick start guide
 ├── SETUP.md                 # Detailed setup
 ├── DIVERGENCE.md            # Tracking config changes
@@ -191,6 +195,28 @@ When you customize this template for a specific project, track your changes in `
 - Removed unused components
 
 This enables easier updates when the template evolves.
+
+---
+
+## Git Discipline for Nested Repos
+
+When this template is used in a project with nested git repositories (common in monorepos), the TPM orchestrator enforces:
+
+1. **Pre-Development Pull:** Always sync target repo before spawning agents
+2. **Per-Workstream Commits:** Agents commit after each atomic task
+3. **Post-Plan Push:** Verify all changes pushed before creating PR
+
+### Helper Scripts
+
+The `scripts/` directory contains utilities for managing multiple nested repos:
+
+| Script | Purpose |
+|--------|---------|
+| `pull-all.sh` | Pull all repos (auto-discovers, handles divergent branches) |
+| `push-all.sh` | Push repos with unpushed commits |
+| `git-status-all.sh` | Show dirty/clean/unpushed status for all repos |
+
+These scripts auto-discover git repos in the project tree - no hardcoded list needed.
 
 ---
 
