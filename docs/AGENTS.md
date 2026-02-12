@@ -1,6 +1,6 @@
 # Agent Descriptions
 
-This system includes 15 custom agents, each with a specific role.
+This system includes 17 custom agents, each with a specific role.
 
 ---
 
@@ -37,12 +37,17 @@ Task(subagent_type="portfolio-manager", prompt="...")
 
 **Role:** Technical Program Manager (per-plan)
 
-**Purpose:** Single plan execution from start to finish
+**Purpose:** Single plan execution from start to finish, with research-informed patterns
 
 **Capabilities:**
 - Parse plan workstreams
+- **Feature list verification** - Read `feature_list.json`, verify all features start "failing", update status only when `test_command` succeeds (P1, P3)
+- **Workstream file protocol** - Write workstream instructions to disk before spawning agents; if session crashes, context persists (P8)
+- **Session initialization** - Dev agents receive ground truth via `init-session.sh` (P4)
 - Spawn agents in parallel
-- Enforce quality gates
+- **Attention management** - Rewrite progress files at every checkpoint to combat lost-in-the-middle degradation (P6)
+- **AI-optimized test output** - Use `pytest --tb=short --no-header -q` showing only failures (P5)
+- Enforce quality gates (feature list bookends: all "failing" at start, all "passing" at end)
 - Handle git workflow
 - Risk-aware merge decisions
 - Update state on completion
@@ -53,12 +58,16 @@ Task(subagent_type="tpm-orchestrator", prompt="Execute PLAN-2025-001...")
 ```
 
 **Quality gates enforced:**
+0. Feature list exists with all features "failing" (P1)
 1. All workstreams complete
-2. Tests pass
-3. Code review approved
-4. Security audit clean
-5. Git workflow success
-6. Appropriate merge decision
+2. Tests pass (`pytest --tb=short --no-header -q`)
+3. UAT verified (Playwright, not checklist)
+4. Code review approved
+5. Security audit clean
+6. Git workflow success
+7. CI/CD passes
+8. ALL features in feature_list.json are "passing" (P3)
+9. Appropriate merge decision (risk-aware)
 
 ---
 
@@ -93,6 +102,53 @@ Task(subagent_type="risk-manager", prompt="Assess risk for PLAN-2025-001...")
 
 ---
 
+## Pre-Development Agents
+
+### uat-protocol-designer
+
+**Role:** Test Architect
+
+**Purpose:** Design acceptance tests BEFORE development begins, ensuring specs produce their own checking harness (P1, P12)
+
+**Capabilities:**
+- Map acceptance criteria to testable feature list entries
+- Create user journey verification steps
+- Design backend test specifications (API contracts)
+- Build edge case matrices
+- Create regression checklists to protect existing features
+- **Feature list mapping** - Each AC-N maps to F-N in `feature_list.json` with a concrete `test_command`
+
+**Invocation:**
+```
+Task(subagent_type="uat-protocol-designer", prompt="Design UAT protocol for PLAN-2025-001...")
+```
+
+**Key principle:** Tests are designed BEFORE code is written. Each acceptance criterion must have a machine-verifiable test command, not a subjective checklist.
+
+---
+
+### requirements-analyst
+
+**Role:** Requirements Engineer
+
+**Purpose:** Extract detailed requirements before development, preventing scope ambiguity
+
+**Capabilities:**
+- Create feature inventories from user descriptions
+- Build verification checklists with testable criteria
+- Flag ambiguities and missing requirements
+- Identify implicit dependencies
+- Produce structured requirement documents
+
+**Invocation:**
+```
+Task(subagent_type="requirements-analyst", prompt="Extract requirements for...")
+```
+
+**When invoked:** After Technical PM and before TPM execution. Catches requirement gaps that would otherwise surface during development.
+
+---
+
 ## Development Agents
 
 ### artificial-shadow-dev
@@ -111,6 +167,8 @@ Task(subagent_type="risk-manager", prompt="Assess risk for PLAN-2025-001...")
 ```
 Task(subagent_type="artificial-shadow-dev", prompt="Implement...")
 ```
+
+**Session initialization (P4):** Receives ground truth via `init-session.sh` at startup (git status, feature progress, quick test check). Reads workstream file from `inbox/plans/.workstreams/` for assignment context (P8).
 
 ---
 
@@ -356,6 +414,8 @@ Task(subagent_type="qa-lead", prompt="Review PR for...")
 | Multi-plan coordination | portfolio-manager |
 | Single plan execution | tpm-orchestrator |
 | Risk assessment | risk-manager |
+| Pre-dev test design | uat-protocol-designer |
+| Requirements extraction | requirements-analyst |
 | Feature prioritization | product-manager |
 | User journey mapping | ux-researcher |
 | Requirements translation | technical-pm |

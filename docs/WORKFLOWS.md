@@ -4,7 +4,7 @@ This guide covers typical usage patterns for the orchestration system.
 
 ---
 
-## Workflow 0: Full Discovery Flow (NEW)
+## Workflow 0: Full Discovery Flow
 
 ### When to Use
 
@@ -26,7 +26,10 @@ This triggers the full pipeline:
 3. **Technical PM** - Translates to technical specs, assesses complexity
 4. **Spike** (if needed) - Resolves technical unknowns
 5. **Solutions Architect** (if needed) - Creates ADR for major decisions
-6. **create-plan** - Generates development plan with all context
+6. **UAT Protocol Designer** - Designs acceptance tests BEFORE development (P1, P12)
+   - Maps each acceptance criterion to a `feature_list.json` entry
+   - Requires a `test_command` per criterion
+7. **create-plan** - Generates development plan + `feature_list.json`
 
 ### Shortcuts
 
@@ -82,10 +85,11 @@ cp inbox/plans/PLAN-TEMPLATE.md inbox/plans/PLAN-2025-001.md
 - src/api/users.ts
 - src/components/LoginForm.tsx
 
-## Objectives
-- [ ] Implement login endpoint
-- [ ] Create login form component
-- [ ] Add session management
+## Definition of Done
+- [ ] Login endpoint returns JWT on valid credentials
+- [ ] Invalid credentials return 401 with error message
+- [ ] Login form submits and stores token
+- [ ] Session persists across page reloads
 
 ## Workstreams
 
@@ -105,6 +109,12 @@ cp inbox/plans/PLAN-TEMPLATE.md inbox/plans/PLAN-2025-001.md
 ```
 /add-plan PLAN-2025-001.md
 ```
+
+This triggers:
+1. Risk assessment (mandatory)
+2. **Feature list generation** - Each "Definition of Done" item becomes a feature in `feature_list.json` with status `"failing"` and a `test_command` (P1)
+3. Prioritization and queue placement
+4. Auto-execution when ready
 
 ### Step 4: Monitor
 
@@ -189,7 +199,7 @@ Shows:
 
 Shows:
 - Executive summary (plans, shipped, failed, cost)
-- Currently executing plans
+- Currently executing plans (with feature list progress)
 - Queue with priorities
 - Recently shipped
 - Dependency graph
@@ -211,7 +221,8 @@ The `create-plan` skill auto-triggers:
 2. Identifies file touchpoints
 3. Suggests agents
 4. Creates formatted plan
-5. Optionally submits to portfolio
+5. **Generates `feature_list.json`** with all acceptance criteria as `"failing"` (P1)
+6. Optionally submits to portfolio
 
 ---
 
@@ -225,7 +236,7 @@ When risk >= 7/10:
 4. Asks for approval
 
 ```
-⚠️ PLAN-2025-005 requires your approval
+PLAN-2025-005 requires your approval
 
 Risk Score: 8/10 (High)
 - User Disruption: 6/10
@@ -255,6 +266,7 @@ ls inbox/plans/completed/
 Each completed plan contains:
 - Original requirements
 - Risk assessment
+- Feature list (all `"passing"`)
 - Execution metadata
 - PR link
 - Cost breakdown
@@ -286,6 +298,33 @@ Check parallel execution:
 
 ---
 
+## Workflow 11: Monitor Feature Progress
+
+Track how a plan's features are progressing:
+
+```bash
+# Read the feature list directly
+cat inbox/plans/.feature-lists/PLAN-2025-001-features.json
+
+# Or check the progress file (rewritten at each checkpoint)
+cat inbox/plans/.progress/PLAN-2025-001-progress.md
+```
+
+The feature list shows machine-verifiable status:
+```json
+{
+  "features": [
+    { "id": "F1", "description": "Login endpoint returns JWT", "status": "passing" },
+    { "id": "F2", "description": "Invalid credentials return 401", "status": "failing" },
+    { "id": "F3", "description": "Login form stores token", "status": "failing" }
+  ]
+}
+```
+
+A plan ships only when ALL features are `"passing"` (P3).
+
+---
+
 ## Tips
 
 1. **Be specific in plans** - More detail = better execution
@@ -293,3 +332,5 @@ Check parallel execution:
 3. **Set realistic priorities** - Not everything is critical
 4. **Check dashboard regularly** - Catch issues early
 5. **Review completed plans** - Learn from past executions
+6. **Write testable acceptance criteria** - Each criterion needs a `test_command` (P1)
+7. **Trust the feature list** - JSON status is the source of truth, not Markdown checklists (P3)
