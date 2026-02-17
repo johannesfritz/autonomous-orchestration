@@ -1,3 +1,13 @@
+---
+paths:
+  - inbox/plans/**
+  - inbox/feedback/**
+  - inbox/backlog/**
+  - .claude/agents/product-manager.md
+  - .claude/agents/technical-pm.md
+  - .claude/agents/ux-researcher.md
+---
+
 # Product Management Team
 
 **New capability as of 2025-12-31:** Claude Code now includes a Product Management Team that bridges user needs to technical implementation, completing the discovery-to-delivery pipeline.
@@ -148,11 +158,11 @@ These protocols ensure consistent, high-quality decision-making across all produ
 
 | Content Type | Location |
 |--------------|----------|
-| Feedback intake records | `00 Inbox/feedback/` |
-| Prioritized backlog | `00 Inbox/backlog/` |
-| Technical spikes | `00 Inbox/spikes/` |
+| Feedback intake records | `inbox/feedback/` |
+| Prioritized backlog | `inbox/backlog/` |
+| Technical spikes | `inbox/spikes/` |
 | Architecture Decision Records | `[project]/docs/adr/` (project-specific) or `docs/adr/` (cross-project) |
-| Development plans (from discovery) | `00 Inbox/plans/` |
+| Development plans (from discovery) | `inbox/plans/` |
 
 ## Integration with Existing Pipeline
 

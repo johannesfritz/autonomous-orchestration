@@ -1,3 +1,13 @@
+---
+paths:
+  - "**/*test*"
+  - "**/tests/**"
+  - "**/pytest.ini"
+  - "**/pyproject.toml"
+  - "**/playwright*"
+  - "**/*.spec.ts"
+---
+
 # Testing Strategy
 
 This document outlines the testing philosophy and approach used across both shadow-api and hotel-de-ville projects.

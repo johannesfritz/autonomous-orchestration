@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Session-Level Reflection",
+  "description": "High-level reflection on entire Claude Code session (only for sessions with >5 tool calls or >3 files modified)",
+  "type": "object",
+  "required": ["session_id", "timestamp", "summary", "efficiency", "configuration_suggestions"],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Unique session identifier"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When session ended"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["primary_task", "outcome", "tool_calls", "files_modified"],
+      "properties": {
+        "primary_task": {
+          "type": "string",
+          "description": "One-sentence description of what was accomplished"
+        },
+        "outcome": {
+          "enum": ["SUCCESS", "PARTIAL", "FAILED"],
+          "description": "Overall session outcome"
+        },
+        "tool_calls": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tool calls in session"
+        },
+        "files_modified": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of files modified"
+        },
+        "agents_spawned": {
+          "type": "array",
+          "description": "List of agents spawned during session",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "efficiency": {
+      "type": "object",
+      "description": "Session efficiency analysis",
+      "properties": {
+        "context_load_kb": {
+          "type": "number",
+          "description": "Estimated context load in KB"
+        },
+        "repetitive_operations": {
+          "type": "array",
+          "description": "Operations that repeated multiple times (automation candidates)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operation": {"type": "string"},
+              "count": {"type": "integer"},
+              "automation_suggestion": {"type": "string"}
+            }
+          }
+        },
+        "slow_operations": {
+          "type": "array",
+          "description": "Operations that took unusually long",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operation": {"type": "string"},
+              "duration_estimate": {"type": "string"},
+              "optimization_suggestion": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "configuration_suggestions": {
+      "type": "array",
+      "description": "Proposed improvements to .claude/settings.json based on session patterns",
+      "items": {
+        "type": "object",
+        "required": ["category", "suggestion", "rationale"],
+        "properties": {
+          "category": {
+            "enum": [
+              "hook_addition",
+              "hook_modification",
+              "agent_protocol",
+              "skill_trigger",
+              "context_optimization"
+            ]
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "What configuration change to make"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Why this would improve future sessions"
+          },
+          "priority": {
+            "enum": ["high", "medium", "low"],
+            "default": "medium"
+          }
+        }
+      }
+    },
+    "patterns_encountered": {
+      "type": "array",
+      "description": "Patterns observed during session (for pattern database)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "learning_opportunities": {
+      "type": "array",
+      "description": "What could be learned from this session for future improvement",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

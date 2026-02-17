@@ -1,3 +1,12 @@
+---
+paths:
+  - inbox/plans/**
+  - inbox/PORTFOLIO_STATUS.md
+  - .claude/agents/portfolio-manager.md
+  - .claude/agents/tpm-orchestrator.md
+  - .claude/agents/risk-manager.md
+---
+
 # Autonomous Multi-Plan Orchestration
 
 **New capability as of 2025-12-28:** Claude Code can now autonomously manage multiple development plans in parallel using a two-layer orchestration system.
@@ -10,6 +19,8 @@
 - [Layer 1: Portfolio Manager](#layer-1-portfolio-manager)
 - [Layer 2: TPM Orchestrator](#layer-2-tpm-orchestrator)
 - [Layer 0: Risk Manager (MANDATORY SAFETY GATE)](#layer-0-risk-manager-mandatory-safety-gate)
+- [Layer 1.5: Requirements Analyst (MANDATORY FOR MEDIUM+ COMPLEXITY)](#layer-15-requirements-analyst-mandatory-for-medium-complexity)
+  - [Two-Loop Clarification System](#two-loop-clarification-system)
 - [Development Plan Structure](#development-plan-structure)
 - [Resource Management](#resource-management)
   - [1. File Contention (Primary Constraint)](#1-file-contention-primary-constraint)
@@ -34,6 +45,13 @@
 User (Plan Creator)
     ↓
 Portfolio Manager (VP Engineering role)
+    │
+    ├─→ [For medium+ complexity plans]
+    │     Requirements Analyst (detailed specs)
+    │           ↕ (clarification loop)
+    │     Portfolio Manager resolves OR escalates to User
+    │           ↓
+    │
     ├─→ TPM Orchestrator #1 (PLAN-001)
     │     ├─→ artificial-shadow-dev (backend)
     │     ├─→ artificial-shadow-dev (frontend)
@@ -50,14 +68,14 @@ Portfolio Manager (VP Engineering role)
 **Location:** `.claude/agents/portfolio-manager.md`
 
 **Responsibilities:**
-- Intake multiple plans simultaneously from `00 Inbox/plans/*.md`
+- Intake multiple plans simultaneously from `inbox/plans/*.md`
 - Build dependency graphs (which plans block which)
 - Detect resource contention (file conflicts, branch conflicts)
 - Estimate costs and benefits (API costs, build time, ROI)
 - Prioritize plan execution intelligently
 - Auto-execute ready plans (no manual approval needed)
 - Learn conflict resolution patterns from user overrides
-- Generate real-time dashboard at `00 Inbox/PORTFOLIO_STATUS.md`
+- Generate real-time dashboard at `inbox/PORTFOLIO_STATUS.md`
 
 **Key behaviors:**
 - **FIRE-AND-FORGET:** Spawns ALL ready TPMs at once, returns immediately
@@ -135,9 +153,90 @@ Portfolio Manager (VP Engineering role)
 Conditions: WCAG compliance, licensing verification, feature flag
 ```
 
+## Layer 1.5: Requirements Analyst (MANDATORY FOR MEDIUM+ COMPLEXITY)
+
+**Real-world role:** Business Analyst / Requirements Engineer
+**Location:** `.claude/agents/requirements-analyst.md`
+
+**CRITICAL:** Requirements Analyst invocation is **MANDATORY** for all plans with complexity ≥ medium. Enforced via hooks.
+
+**Responsibilities:**
+- Extract detailed, granular requirements BEFORE any development begins
+- Create comprehensive inventories of existing code (for modifications/migrations)
+- Document every component, API endpoint, UI element at granular level
+- Produce verification checklists for QA
+- Identify and flag ambiguities (never assume or guess)
+- Participate in the Two-Loop Clarification System
+
+**Key behaviors:**
+- **EXHAUSTIVE:** Documents every detail, nothing assumed
+- **SYSTEMATIC:** Uses structured inventory methodology
+- **CLARIFICATION-SEEKING:** Flags ambiguities, does not guess
+- **VERIFICATION-ORIENTED:** Produces checklists for post-development QA
+
+### Two-Loop Clarification System
+
+The Requirements Analyst participates in a two-loop clarification system to resolve ambiguities without always bothering the user:
+
+```
+                    ┌────────────────────────────┐
+                    │   Requirements Analyst     │
+                    │   (identifies ambiguities) │
+                    └─────────────┬──────────────┘
+                                  │
+                    ┌─────────────▼──────────────┐
+         Loop 1     │    Portfolio Manager       │
+                    │   (decides: can resolve?)  │
+                    └─────────────┬──────────────┘
+                          ┌───────┴───────┐
+                          │               │
+                    ┌─────▼─────┐   ┌─────▼─────┐
+                    │  YES:     │   │  NO:      │
+                    │  Resolve  │   │  Escalate │
+                    │  directly │   │  to Loop 2│
+                    └───────────┘   └─────┬─────┘
+                                          │
+                    ┌─────────────────────▼──────┐
+         Loop 2     │        User (Johannes)     │
+                    │   (final decision maker)   │
+                    └────────────────────────────┘
+```
+
+**Loop 1: Requirements Analyst ↔ Portfolio Manager**
+- PM can resolve: Technical defaults, naming conventions, non-breaking details
+- PM must escalate: Breaking changes, UX decisions, architectural impact, cost trade-offs
+
+**Loop 2: Portfolio Manager ↔ User**
+- For decisions requiring human judgment
+- PM formats options with recommendations and defaults
+- Records decision for future reference
+
+**Artifacts produced:**
+- `inbox/plans/.requirements/{PLAN_ID}.md` - Requirements document
+- `inbox/plans/.requirements/{PLAN_ID}-checklist.md` - Verification checklist
+- `inbox/plans/.requirements/{PLAN_ID}-clarifications.md` - Clarification requests (if needed)
+
+**Workflow position:**
+```
+Product Manager (what/why)
+        ↓
+Technical PM (how/complexity)
+        ↓
+[Requirements Analyst] (detailed specs) ←→ Portfolio Manager (clarifications)
+        ↓
+TPM Orchestrator (execution)
+        ↓
+QA Engineer (verification against checklist)
+```
+
+**Blocking behavior:**
+- TPM Orchestrator CANNOT start if requirements status is "incomplete"
+- TPM Orchestrator CANNOT start if clarifications are "pending-user-response"
+- TPM Orchestrator CAN start if clarifications are "pending-portfolio-manager" (non-blocking items only)
+
 ## Development Plan Structure
 
-Plans are stored in `00 Inbox/plans/PLAN-YYYY-NNN.md` with this structure:
+Plans are stored in `inbox/plans/PLAN-YYYY-NNN.md` with this structure:
 
 ```markdown
 # Plan: [Feature Name]
@@ -161,7 +260,7 @@ What must be true for plan to be complete
 API costs, build time, user benefit, ROI
 ```
 
-See `00 Inbox/plans/PLAN-TEMPLATE.md` for full template.
+See `inbox/plans/PLAN-TEMPLATE.md` for full template.
 
 ## Resource Management
 
@@ -245,11 +344,11 @@ Portfolio Manager learns conflict resolution patterns from user overrides:
 4. Portfolio Manager records: "User prioritizes customer-facing over internal tools"
 5. Future conflicts: Portfolio Manager applies learned pattern automatically
 
-**Learning data stored in:** `00 Inbox/plans/.conflict_history.json`
+**Learning data stored in:** `inbox/plans/.conflict_history.json`
 
 ## Dashboard Monitoring
 
-Real-time dashboard at `00 Inbox/PORTFOLIO_STATUS.md` shows:
+Real-time dashboard at `inbox/PORTFOLIO_STATUS.md` shows:
 
 - **Pipeline overview:** All plans, status, progress, cost, ROI, ETA
 - **Dependency graph:** Visual representation of blocking relationships
@@ -291,7 +390,7 @@ Real-time dashboard at `00 Inbox/PORTFOLIO_STATUS.md` shows:
 
 1. **Copy the template:**
    ```bash
-   cp "00 Inbox/plans/PLAN-TEMPLATE.md" "00 Inbox/plans/PLAN-2025-001.md"
+   cp "inbox/plans/PLAN-TEMPLATE.md" "inbox/plans/PLAN-2025-001.md"
    ```
 
 2. **Fill in plan details:**
@@ -312,16 +411,16 @@ Real-time dashboard at `00 Inbox/PORTFOLIO_STATUS.md` shows:
 
 ## Example Plan
 
-See `00 Inbox/plans/PLAN-2025-001-EXAMPLE.md` for a complete example (audio pronunciation training for Stellaris app).
+See `inbox/plans/PLAN-2025-001-EXAMPLE.md` for a complete example (audio pronunciation training for Stellaris app).
 
 ## State Files
 
 Portfolio Manager uses these files for tracking:
 
-- `00 Inbox/plans/.state.json` - Plan states (queued, executing, completed)
-- `00 Inbox/plans/.conflict_history.json` - Conflict resolution learning
-- `00 Inbox/PORTFOLIO_STATUS.md` - Real-time dashboard (auto-updated)
-- `00 Inbox/plans/completed/` - Completed plans (auto-moved)
+- `inbox/plans/.state.json` - Plan states (queued, executing, completed)
+- `inbox/plans/.conflict_history.json` - Conflict resolution learning
+- `inbox/PORTFOLIO_STATUS.md` - Real-time dashboard (auto-updated)
+- `inbox/plans/completed/` - Completed plans (auto-moved)
 
 **All state files are auto-generated.** No manual editing required.
 

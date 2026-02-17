@@ -256,6 +256,38 @@ Do:
 
 ---
 
+## CRITICAL: Feature List Verification (P1, P3)
+
+**The feature list is the machine-verifiable source of truth for plan completion.**
+
+### Pre-Execution Check
+
+Before starting execution:
+1. Read `inbox/plans/.feature-lists/{PLAN_ID}-features.json`
+2. Verify all features start as `"failing"`
+3. If no feature list exists, HALT and report: "Feature list missing. Run create-plan to generate."
+
+### During Execution
+
+After each workstream completes:
+1. Run `test_command` for each feature assigned to that workstream
+2. Update `status` to `"passing"` only if `test_command` succeeds (exit code 0)
+3. Update `last_verified` timestamp
+
+### Completion Verification
+
+Plan is SHIPPED only when ALL features are `"passing"`:
+```bash
+# Read feature_list.json
+# For each feature: run test_command
+# If ANY feature is still "failing": plan is NOT complete
+# Update last_verified timestamp for each passing feature
+```
+
+**No Markdown-based completion checks.** The feature list JSON is the single source of truth.
+
+---
+
 ## CRITICAL: Plan-Specific Progress Tracking
 
 **Track atomic task completion in temp storage so fresh agents can resume.**
@@ -685,6 +717,58 @@ Accumulate workstream summaries for final report:
 
 ---
 
+## CRITICAL: Attention Management (P6)
+
+**Rewrite the progress file at every checkpoint to combat lost-in-the-middle degradation.**
+
+After each significant checkpoint (workstream started, test passing, workstream complete), rewrite `inbox/plans/.progress/{PLAN_ID}-progress.md`:
+
+```markdown
+# Progress: {PLAN_ID} - {Plan Title}
+
+## Objective
+{Copy the plan's one-line objective here - forces re-statement}
+
+## Feature Status (from feature_list.json)
+- [x] F1: {description} - PASSING
+- [ ] F2: {description} - FAILING
+- [ ] F3: {description} - FAILING
+
+## Current Workstream
+{Which workstream is active, what it's doing}
+
+## Completed Workstreams
+{List with outcomes}
+
+## Blockers
+{Any current blockers}
+
+## Last Updated
+{ISO timestamp}
+```
+
+**Why:** Rewriting this file forces the agent to re-state the objective and current status, pushing the global plan into recent attention span. This combats the "lost-in-the-middle" problem where agents forget earlier objectives during long execution runs.
+
+---
+
+## CRITICAL: Workstream File Protocol (P8)
+
+**Use filesystem as primary coordination channel. Never embed full requirements in Task tool prompts.**
+
+Before spawning a dev agent for a workstream:
+1. Write `inbox/plans/.workstreams/{PLAN_ID}-ws{N}.md` containing:
+   - Workstream objective
+   - Files to modify
+   - Acceptance criteria (references to feature_list.json entry IDs)
+   - Dependencies on other workstreams
+   - Test commands to verify completion
+2. Spawn agent with: `"Execute workstream defined in inbox/plans/.workstreams/{PLAN_ID}-ws{N}.md. Read feature_list.json for acceptance criteria. Update progress file when done."`
+3. On completion, agent updates feature_list.json for its criteria
+
+**Why:** If the session crashes, the workstream file persists on disk. Task tool prompt context is lost on crash. Filesystem-first coordination enables crash recovery.
+
+---
+
 ## Your Mission
 
 Execute the assigned plan from start to finish:
@@ -853,7 +937,7 @@ Instead, use git worktree to work on feature branches:
   # Backend tests
   if modified hotel-de-ville/backend:
     cd hotel-de-ville/backend
-    pytest -v --tb=short
+    pytest --tb=short --no-header -q
     if exit code != 0: TESTS_FAILED=true
 
   # Frontend build + E2E tests

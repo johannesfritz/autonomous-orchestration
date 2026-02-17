@@ -1,49 +1,108 @@
 # Template vs. Production Divergence Report
 
-**Last Verified:** 2026-01-08
+**Last Verified:** 2026-02-17
 **Template Location:** `claude-setup/autonomous-orchestration/`
-**Production Location:** `jf-private/.claude/`
+**Production Location:** `jf-private/jf-dev/.claude/`
 
 ## Summary
 
 **IN SYNC** - Template matches the production implementation (software dev elements only).
 
-**Note:** Analytical writing elements (writing-lead, fact-checker, etc.) are intentionally excluded from this template.
+**Note:** Analytical writing elements (writing-lead, fact-checker, etc.) are intentionally excluded from this template. SGEPT-specific integrations (Qdrant, Stellaris admin MCP) are also excluded.
 
 ## Current Status
 
 | Category | Template | Production | Status |
 |----------|----------|------------|--------|
-| settings.json | 530 lines | 650+ lines | Synced (filtered) |
-| Agents | 15 | 25+ | Synced (sw dev only) |
-| Commands | 20 | 20+ | Synced (sw dev only) |
-| Skills | 12 | 12+ | Synced (sw dev only) |
-| Protocols | 15 | 18+ | Synced (sw dev only) |
-| Scripts | 15 | 18+ | Synced (sw dev only) |
-| Hooks (shell) | 3 | 3 | Identical |
-| **Rules** | 9 | 10 | Synced (sw dev only) |
-| **Docs** | 6 | - | Template-specific |
+| settings.json | 596 lines | 612 lines | Synced (filtered: no Qdrant hooks, no stellaris-admin MCP) |
+| Agents | 17 | 17+ | Synced (sw dev only) |
+| Commands | 22 | 27+ | Synced (sw dev only; excludes inbox, search-docs, sync-docs) |
+| Skills | 12 | 16+ | Synced (sw dev only; excludes deploy-stellaris, local-uat, roam-sync, sancho-review) |
+| Protocols | 24 | 32+ | Synced (sw dev only; excludes stellaris-specific UATs) |
+| Scripts | 24 | 29+ | Synced (sw dev only; excludes Qdrant-dependent scripts) |
+| Hooks (shell) | 4 | 5 | Synced (excludes post-commit-sync-docs.sh - Qdrant dependent) |
+| Rules | 10 | 10 | Identical |
+| Schemas | 6 | 6 | Identical |
+| Docs | 6 | - | Template-specific |
+
+---
+
+## Intentional Exclusions
+
+### Commands (excluded from template)
+| File | Reason |
+|------|--------|
+| `inbox.md` | SGEPT email triage |
+| `search-docs.md` | Depends on SGEPT Qdrant instance |
+| `sync-docs.md` | Depends on SGEPT Qdrant instance |
+
+### Skills (excluded from template)
+| Skill | Reason |
+|-------|--------|
+| `deploy-stellaris/` | Project-specific deployment |
+| `local-uat/` | Stellaris-specific local testing |
+| `roam-sync/` | Project-specific integration |
+| `sancho-review/` | Project-specific review process |
+
+### Protocols (excluded from template)
+| Protocol | Reason |
+|----------|--------|
+| `stellaris-frontend-uat.md` | Project-specific |
+| `stellaris-ui-checklist.md` | Project-specific |
+| `uat-bcg-stability-news.md` | Feature-specific UAT |
+| `uat-gta-counts-cross-validation.md` | Feature-specific UAT |
+| `uat-gta-mnt-mcp-server.md` | Feature-specific UAT |
+| `uat-pin-verification.md` | Feature-specific UAT |
+| `uat-protokoll-incident-response.md` | Feature-specific UAT |
+| `uat-unified-learning-experience.md` | Feature-specific UAT |
+| `semantic-search-protocol.md` | Depends on Qdrant |
+| `institutional-memory-protocol.md` | Depends on Qdrant |
+
+### Scripts (excluded from template)
+| Script | Reason |
+|--------|--------|
+| `inject-similar-patterns.py` | Depends on Qdrant |
+| `index-philosophy.py` | Depends on Qdrant |
+| `sync-docs-local.sh` | Depends on Qdrant |
+| `search-documentation.py` | Depends on Qdrant |
+| `check-mcp-release-needed.sh` | Project-specific |
+| `validate-stellaris-schema.sh` | Project-specific |
+
+### Hooks (settings.json differences)
+| Hook | Reason |
+|------|--------|
+| `inject-similar-patterns.py` (SubagentStart) | Depends on Qdrant |
+| `sync-docs-local.sh` (PostToolUse git push) | Depends on Qdrant |
+| `check-mcp-release-needed.sh` (PostToolUse git push) | Project-specific |
+| `validate-stellaris-schema.sh` (PreToolUse git push) | Project-specific |
+| `post-commit-sync-docs.sh` (PostToolUse git commit) | Depends on Qdrant |
+| Stellaris-admin MCP permissions | Project-specific |
 
 ---
 
 ## Components
 
-### Rules (8) - NEW: Modular Documentation
+### Rules (10) - Modular Documentation
 
-The `.claude/rules/` directory contains modular documentation extracted from the monolithic CLAUDE.md:
+```
+rules/
+├── architecture.md                    # Architecture patterns
+├── core-patterns.md                   # Cross-cutting patterns
+├── development/
+│   └── patterns.md                    # paths: **/*.py, **/*.ts, **/*.tsx
+├── orchestration/
+│   ├── orchestration.md               # Portfolio Manager, TPM execution
+│   ├── product-management.md          # Discovery flow, PM/UX/TPM agents
+│   └── routing.md                     # paths: inbox/plans/**, .claude/agents/**
+├── quality/
+│   ├── anti-debt.md                   # Gardener agent, code reduction
+│   ├── production-hardening.md        # Major change protocol, UAT gates
+│   └── testing.md                     # paths: **/*test*, **/tests/**
+└── stellaris/
+    └── product-philosophy.md          # Product philosophy alignment
+```
 
-- architecture.md - FRIDAY pipeline, atomic notes, dual embeddings
-- anti-debt.md - Gardener agent, code reduction strategies
-- friday-pipeline.md - 6-stage content processing workflow
-- orchestration.md - Portfolio Manager, TPM Orchestrator, multi-plan execution
-- patterns.md - Error handling, async patterns, Qdrant queries
-- product-management.md - Discovery flow, PM/UX/TPM agents
-- production-hardening.md - Major change protocol, UAT gates
-- testing.md - Test pyramid, pytest, Playwright, F2 scoring
-
-**Purpose:** Reduced root CLAUDE.md by 72% (1210 → 335 lines) while preserving all functionality through hierarchical context inheritance.
-
-### Agents (15)
+### Agents (17)
 
 **Core Orchestration:**
 - portfolio-manager.md
@@ -55,6 +114,7 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - ux-researcher.md
 - technical-pm.md
 - solutions-architect.md
+- requirements-analyst.md
 - gardener.md
 
 **Development:**
@@ -67,116 +127,84 @@ The `.claude/rules/` directory contains modular documentation extracted from the
 - qa-engineer.md
 - qa-lead.md
 - shadow-code-reviewer.md
+- uat-protocol-designer.md
 
-### Commands (20)
+### Commands (22)
 
 **Portfolio Management:**
-- add-plan.md
-- audit.md
-- budget-override.md
-- costs.md
-- execute-plan.md
-- force-git.md
-- learning.md
-- plan-status.md
-- portfolio.md
-- prioritize.md
-- queue-fix.md
-- rollback.md
-- show-conflicts.md
-- sync-state.md
+- add-plan.md, audit.md, budget-override.md, costs.md, execute-plan.md
+- force-git.md, learning.md, plan-status.md, portfolio.md, prioritize.md
+- queue-fix.md, rollback.md, show-conflicts.md, sync-state.md
 
 **Quality:**
-- code-review.md (NEW)
+- code-review.md
 
 **Discovery:**
-- discovery.md
-- intake.md
-- spike.md
-- adr.md
-- prioritize-backlog.md
+- discovery.md, intake.md, spike.md, adr.md, prioritize-backlog.md
 
-### Skills (12)
+**Utilities:**
+- setup-gitignore.md, README.md
 
-**Execution:**
-- create-plan
-- queue-fix
-- janitor
-
-**Quality & Security:**
-- run-test-suite
-- security-audit
-- static-analysis
-- dependency-vetting
-- integration-testing
-
-**Discovery:**
-- technical-spike
-- user-feedback-intake
-- prioritization-framework
-- write-adr
-
-### Protocols (15)
+### Protocols (24)
 
 **Quality Gates:**
-- code-standards.md
-- functional-verification.md
-- mandatory-playwright-execution.md (NEW)
-- production-ready-checklist.md
-- quality-check.md
-- risk-assessment-required.md
-- tpm-completion-checklist.md
-- schema-migration-checklist.md
-- user-request-closure.md
+- code-standards.md, functional-verification.md, mandatory-playwright-execution.md
+- mandatory-quality-gates.md, mandatory-uat-protocol.md, production-ready-checklist.md
+- quality-check.md, risk-assessment-required.md, tpm-completion-checklist.md
+- schema-migration-checklist.md, user-request-closure.md
 
 **Enhanced Standards:**
-- strict-code-standards.md
-- major-change-detection.md
-- component-library-restriction.md
+- strict-code-standards.md, major-change-detection.md, component-library-restriction.md
 
 **Product Management:**
-- user-centricity.md
-- technical-translation.md
-- architectural-documentation.md
+- user-centricity.md, technical-translation.md, architectural-documentation.md
+- navigation-flow.md
 
-### Hooks (3)
+**Operational:**
+- audit-logging.md, requirements-extraction-protocol.md
+- server-operation-safeguards.md, portfolio-manager-fixes.md
+
+### Schemas (6)
+- feature-list.json, tpm-reflection.json, session-reflection.json
+- handoff-checklist.json, data-science-audit.json, writing-audit.json
+
+### Hooks (4 shell scripts)
 - detect-fix-request.sh
 - detect-production-review.sh
 - pre-push-build-check.sh
+- block-on-test-failure.sh
 
-### Scripts (15)
-- derive-state-from-audit.py
-- scan-secrets.py
-- detect-major-changes.sh
-- check-component-usage.sh
-- detect-schema-changes.sh
-- wait-for-ci.sh
-- verify-cleanup-complete.sh
-- index-documentation.py
-- verify-uat-executed.sh
-- verify-quality-gates.sh (NEW - 2.10)
-- verify-ci-passed.sh (NEW - 2.10)
-- verify-plan-state-updated.sh (NEW - 2.10)
-- verify-review-verdict.sh (NEW - 2.10)
-- check-claude-md-update-needed.sh (NEW - 2.10)
-- verify-uat-evidence.sh (NEW - 2.10)
+### Scripts (24)
+- check-claude-md-update-needed.sh, check-component-usage.sh
+- derive-state-from-audit.py, detect-architectural-decision.sh
+- detect-doc-changes.sh, detect-major-changes.sh, detect-schema-changes.sh
+- generate-toc.sh, index-documentation.py, init-session.sh
+- run-uat.py, scan-secrets.py, spawn-tpm-background.sh
+- start-local-stack.sh, verify-ci-passed.sh, verify-cleanup-complete.sh
+- verify-migration-tests.sh, verify-plan-state-updated.sh
+- verify-quality-gates.sh, verify-review-verdict.sh
+- verify-uat-evidence.sh, verify-uat-executed.sh, wait-for-ci.sh
+- search-documentation.py
+
+### Skills (12)
+- create-plan, queue-fix, janitor
+- run-test-suite, security-audit, static-analysis, dependency-vetting, integration-testing
+- technical-spike, user-feedback-intake, prioritization-framework, write-adr
 
 ---
 
 ## Project-Specific Files (Not in Template)
 
-The following files exist in production but are intentionally excluded from the template:
-
 | File | Reason |
 |------|--------|
 | `settings.local.json` | Machine-specific permissions (gitignored) |
-| `00 Inbox/plans/*.md` | Actual development plans |
-| `00 Inbox/plans/.state.json` | Runtime state |
-| `00 Inbox/audit_log.jsonl` | Event history |
-| `00 Inbox/PORTFOLIO_STATUS.md` | Generated dashboard |
-| `00 Inbox/feedback/` | Processed user feedback |
-| `00 Inbox/backlog/` | Prioritized backlog items |
-| `00 Inbox/spikes/` | Technical spike reports |
+| `inbox/plans/*.md` | Actual development plans |
+| `inbox/plans/.state.json` | Runtime state |
+| `inbox/audit_log.jsonl` | Event history |
+| `inbox/PORTFOLIO_STATUS.md` | Generated dashboard |
+| `inbox/feedback/` | Processed user feedback |
+| `inbox/backlog/` | Prioritized backlog items |
+| `inbox/spikes/` | Technical spike reports |
 
 ---
 
@@ -185,54 +213,25 @@ The following files exist in production but are intentionally excluded from the 
 | Date | Change |
 |------|--------|
 | 2025-12-28 | Initial template created |
-| 2025-12-30 | Full backport from production - all components synchronized |
-| 2025-12-30 | Updated settings.local.json.example with all skill permissions |
-| 2025-12-31 | **Major Update:** Added Product Management Team |
-|            | +5 agents: gardener, product-manager, ux-researcher, technical-pm, solutions-architect |
-|            | +5 commands: discovery, intake, spike, adr, prioritize-backlog |
-|            | +5 skills: technical-spike, user-feedback-intake, prioritization-framework, write-adr, janitor |
-|            | +6 protocols: strict-code-standards, major-change-detection, component-library-restriction, technical-translation, architectural-documentation, user-centricity |
-|            | +2 scripts: detect-major-changes.sh, check-component-usage.sh |
-| 2026-01-01 | **Major Update:** Modular CLAUDE.md Migration |
-|            | +8 rule files: architecture.md, anti-debt.md, friday-pipeline.md, orchestration.md, patterns.md, product-management.md, production-hardening.md, testing.md |
-|            | +2 protocols: schema-migration-checklist.md, user-request-closure.md |
-|            | +2 scripts: detect-schema-changes.sh, wait-for-ci.sh |
-|            | Updated settings.json with new hook configurations |
-| 2026-01-03 | **Major Update:** 12-Gap Fix Sync + Documentation |
-|            | Synced 14 agent files with updated versions |
-|            | Added 8 new scripts: index-documentation.py, search-documentation.py, detect-architectural-decision.sh, verify-migration-tests.sh, generate-toc.sh, detect-doc-changes.sh, spawn-tpm-background.sh, verify-cleanup-complete.sh |
-|            | Updated settings.json (518 lines) - filtered analytical writing hooks |
-|            | Synced 10 protocols (added mandatory-quality-gates.md, mandatory-uat-protocol.md) |
-|            | Synced 9 rules (added product-philosophy.md) |
-|            | Created docs/QDRANT-INTEGRATION.md - Institutional memory patterns |
-|            | Created docs/PRODUCT-PHILOSOPHY.md - Philosophy alignment mechanisms |
-|            | Updated docs/ARCHITECTURE.md, README.md, SETUP.md |
-|            | **Scope:** Software development only (excluded analytical writing) |
-| 2026-01-07 | **UAT Enforcement + Code Review Integration** |
-|            | +1 protocol: mandatory-playwright-execution.md |
-|            | +1 script: verify-uat-executed.sh |
-|            | +1 command: code-review.md |
-|            | Updated settings.json with UAT verification hook (SubagentStop[tpm-orchestrator]) |
-|            | Updated settings.json with code review hook (PostToolUse[git commit]) |
-|            | **Purpose:** Ensure UAT tests are EXECUTED (not just documented) and integrate /code-review command |
-| 2026-01-08 | **Claude Code 2.10 Agent-Scoped Hooks & Skill Improvements** |
-|            | **Agent-scoped hooks** (hooks defined in agent frontmatter): |
-|            | - tpm-orchestrator.md: PreToolUse hooks for git push/merge verification, PostToolUse for workstream completion, Stop hooks for cleanup verification |
-|            | - shadow-code-reviewer.md: PreToolUse hook for code modification warnings, Stop hooks for review verdict and CLAUDE.md update verification |
-|            | **Skill improvements** with new 2.10 features: |
-|            | - run-test-suite/SKILL.md: Added `agent: qa-engineer`, `context: fork`, `allowed-tools`, Stop hook |
-|            | - security-audit/SKILL.md: Added `agent: shadow-code-reviewer`, `context: fork`, `allowed-tools`, Stop hook |
-|            | **New verification scripts** (+6): |
-|            | - verify-quality-gates.sh - Pre-push quality gate verification |
-|            | - verify-ci-passed.sh - Pre-merge CI status check |
-|            | - verify-plan-state-updated.sh - TPM completion state verification |
-|            | - verify-review-verdict.sh - Code review completion checklist |
-|            | - check-claude-md-update-needed.sh - Documentation update detection |
-|            | - verify-uat-evidence.sh - UAT evidence validation |
-|            | **settings.json improvements**: |
-|            | - Added `once: true` to code standards protocol injection (PreToolUse[Edit\|Write]) |
-|            | - Added `once: true` to component library restriction hook |
-|            | **Purpose:** Transform quality gates from "soft protocol suggestions" to "mandatory enforcement" via agent lifecycle hooks |
+| 2025-12-30 | Full backport from production |
+| 2025-12-31 | Product Management Team (+5 agents, +5 commands, +5 skills, +6 protocols) |
+| 2026-01-01 | Modular CLAUDE.md Migration (+8 rules, +2 protocols, +2 scripts) |
+| 2026-01-03 | 12-Gap Fix Sync (+8 scripts, updated settings.json) |
+| 2026-01-07 | UAT Enforcement + Code Review Integration |
+| 2026-01-08 | Agent-Scoped Hooks & Skill Improvements (+6 verification scripts) |
+| 2026-02-17 | **Major Sync: 5-week catch-up** |
+|            | +1 agent: requirements-analyst.md |
+|            | +6 schemas: feature-list.json, tpm-reflection.json, session-reflection.json, handoff-checklist.json, data-science-audit.json, writing-audit.json |
+|            | +1 hook: block-on-test-failure.sh |
+|            | +4 protocols: audit-logging.md, requirements-extraction-protocol.md, server-operation-safeguards.md, portfolio-manager-fixes.md |
+|            | +2 commands: setup-gitignore.md, README.md |
+|            | +3 scripts: init-session.sh, run-uat.py, start-local-stack.sh |
+|            | Rules restructure: patterns.md → development/, testing.md → quality/, routing.md → orchestration/, +core-patterns.md |
+|            | settings.json: +83 lines (SubagentStart/Stop hooks, build hooks, UI checklist hooks, TPM reflection prompt, handoff checklist prompt) |
+|            | Updated agents: tpm-orchestrator, uat-protocol-designer, portfolio-manager |
+|            | Updated protocols: mandatory-quality-gates, production-ready-checklist, strict-code-standards, schema-migration-checklist, code-standards |
+|            | Removed stellaris-admin MCP permissions from template |
+|            | Fixed product-philosophy.md paths in hooks (now rules/stellaris/product-philosophy.md) |
 
 ---
 
@@ -240,7 +239,5 @@ The following files exist in production but are intentionally excluded from the 
 
 To verify sync status:
 ```bash
-diff -rq .claude/ claude-setup/autonomous-orchestration/.claude/
+diff -rq jf-dev/.claude/ claude-setup/autonomous-orchestration/.claude/ --exclude='*.local.*'
 ```
-
-Expected output: No differences (settings.local.json is gitignored in production).

@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workstream Handoff Checklist",
+  "description": "Brief handoff documentation for development workstream agents (artificial-shadow-dev, hybrid-db-architect, qa-engineer)",
+  "type": "object",
+  "required": ["agent_type", "timestamp", "files_modified", "tests_added", "limitations"],
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "description": "Which agent completed this workstream"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When workstream completed"
+    },
+    "files_modified": {
+      "type": "array",
+      "description": "Specific file paths modified (not just directory names)",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "tests_added": {
+      "type": "array",
+      "description": "Test files created or modified",
+      "items": {
+        "type": "string"
+      }
+    },
+    "testable_claims": {
+      "type": "array",
+      "description": "Claims that can be verified by tests or manual inspection",
+      "items": {
+        "type": "object",
+        "required": ["claim", "verification_method"],
+        "properties": {
+          "claim": {
+            "type": "string",
+            "description": "What should work"
+          },
+          "verification_method": {
+            "type": "string",
+            "description": "How to verify this claim (test name or manual step)"
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Known limitations or edge cases not handled",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_steps": {
+      "type": "array",
+      "description": "Recommended next steps for follow-on workstreams",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

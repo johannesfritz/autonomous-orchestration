@@ -7,7 +7,7 @@ set -e
 
 PLAN_ID="${PLAN_ID:-}"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-/home/user/jf-private}"
-EVIDENCE_BASE="$PROJECT_DIR/00 Inbox/uat-evidence"
+EVIDENCE_BASE="$PROJECT_DIR/inbox/uat-evidence"
 
 echo "🔍 Verifying UAT evidence..."
 
@@ -83,7 +83,7 @@ echo "Before completing UAT, verify:"
 echo ""
 echo "  □ Playwright tests were EXECUTED (not just written)"
 echo "  □ All critical user journeys tested"
-echo "  □ Evidence stored in 00 Inbox/uat-evidence/{PLAN_ID}/"
+echo "  □ Evidence stored in inbox/uat-evidence/{PLAN_ID}/"
 echo "  □ Test results reviewed for failures"
 echo "  □ Screenshots captured for visual verification"
 echo ""

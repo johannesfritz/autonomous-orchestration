@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Writing Protocol Audit",
+  "description": "Self-assessment scores for writing-lead protocol adherence (low-detail reflection for style agents)",
+  "type": "object",
+  "required": ["draft_file", "timestamp", "protocol_scores", "steelman_invoked"],
+  "properties": {
+    "draft_file": {
+      "type": "string",
+      "description": "Path to draft file being audited"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "protocol_scores": {
+      "type": "object",
+      "description": "1-5 scores for each writing protocol",
+      "required": ["pyramid_principle", "paragraph_discipline", "zinsser_clarity", "british_english"],
+      "properties": {
+        "pyramid_principle": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Conclusion first, evidence second (descending structure)"
+        },
+        "paragraph_discipline": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "One point per paragraph, topic sentences as summaries"
+        },
+        "zinsser_clarity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Bracket method applied, clutter reduced, active voice"
+        },
+        "british_english": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "British spelling, punctuation, conventions"
+        }
+      }
+    },
+    "steelman_invoked": {
+      "type": "boolean",
+      "description": "Was steelman agent used to articulate opposing arguments?"
+    },
+    "word_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Final word count"
+    },
+    "flesch_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Flesch reading ease score (target ≥ 65)"
+    },
+    "issues_flagged": {
+      "type": "array",
+      "description": "Any specific issues that need attention",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

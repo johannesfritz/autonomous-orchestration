@@ -15,6 +15,9 @@
   - [Rule 5: No Console.log/Print in Production Code](#rule-5-no-consolelogprint-in-production-code)
   - [Rule 6: No Magic Numbers/Strings](#rule-6-no-magic-numbersstrings)
   - [Rule 7: Tests Required for New Functions](#rule-7-tests-required-for-new-functions)
+  - [Rule 8: New Page Components Must Have Routes](#rule-8-new-page-components-must-have-routes)
+  - [Rule 9: UI Visibility Verification (Frontend)](#rule-9-ui-visibility-verification-frontend)
+  - [Rule 10: Model Changes Require Migrations (Backend)](#rule-10-model-changes-require-migrations-backend)
 - [Strong Preferences (Violating = Request Changes)](#strong-preferences-violating--request-changes)
   - [Preference 1: Early Returns Over Deep Nesting](#preference-1-early-returns-over-deep-nesting)
   - [Preference 2: Composition Over Inheritance](#preference-2-composition-over-inheritance)
@@ -151,6 +154,84 @@ def test_validate_email_valid():
 def test_validate_email_invalid():
     assert validate_email("invalid") is False
 ```
+
+### Rule 8: New Page Components Must Have Routes
+
+Any new file in `pages/` or `views/` directories MUST have a corresponding route.
+
+```tsx
+// ❌ REJECT: Page component exists but no route
+// File: src/pages/JobDetailPage.tsx exists
+// App.tsx: No route for JobDetailPage
+
+// ✅ ACCEPT: Page component has route
+// File: src/pages/JobDetailPage.tsx exists
+// App.tsx:
+<Route path="/job/:jobId" element={<RequireAuth><JobDetailPage /></RequireAuth>} />
+```
+
+**Detection:** Verify component name appears in router configuration.
+
+**Rationale:** Unreachable components are dead code that wastes effort and confuses developers.
+
+### Rule 9: UI Visibility Verification (Frontend)
+
+Button/text visibility MUST be verified against ACTUAL rendered background.
+
+```tsx
+// ❌ REJECT: Assumes variant handles contrast
+<div className="bg-black/60">  {/* Dark overlay */}
+  <Button variant="destructive">Delete</Button>  {/* May be invisible */}
+</div>
+
+// ✅ ACCEPT: Explicit colors for context
+<div className="bg-black/60">
+  <Button className="bg-white text-red-600">Delete</Button>  {/* Clearly visible */}
+</div>
+```
+
+**Rationale:** Component variants don't know their rendering context. Explicit colors prevent invisible UI.
+
+### Rule 10: Model Changes Require Migrations (Backend)
+
+Any change to database models MUST have a corresponding migration file.
+
+**CRITICAL:** Code using new columns MUST NOT be deployed before migration runs.
+
+```python
+// ❌ REJECT: New column in models.py but no migration
+// File: backend/models.py
+class User(Base):
+    id = Column(Integer, primary_key=True)
+    email = Column(String)
+    locked_until = Column(DateTime)  # NEW COLUMN - where's the migration?
+
+// File: backend/auth/service.py
+if user.locked_until and user.locked_until > datetime.now():  # 500 ERROR if migration not run!
+    raise AccountLockedError()
+
+// ✅ ACCEPT: Migration exists for new column
+// File: backend/migrations/versions/abc123_add_locked_until.py
+def upgrade():
+    op.add_column('users', sa.Column('locked_until', sa.DateTime(), nullable=True))
+
+// File: backend/models.py
+class User(Base):
+    locked_until = Column(DateTime)  # Migration exists
+
+// File: backend/auth/service.py
+if user.locked_until and user.locked_until > datetime.now():
+    raise AccountLockedError()
+```
+
+**Detection checklist:**
+- [ ] Check if `models.py` was modified (new columns, renamed columns, deleted columns)
+- [ ] Verify corresponding migration file exists in `migrations/versions/`
+- [ ] Verify migration includes the exact column changes
+- [ ] Check if service/endpoint code uses the new column
+- [ ] Ensure deployment process verifies migration parity (see schema-migration-checklist.md)
+
+**Rationale:** Deploying code that uses new columns before migrations run causes production 500 errors. This was the root cause of the 2026-01-15 incident.
 
 ## Strong Preferences (Violating = Request Changes)
 

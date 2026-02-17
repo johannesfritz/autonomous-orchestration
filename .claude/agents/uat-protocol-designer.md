@@ -69,20 +69,29 @@ Create step-by-step user flows with expected outcomes:
 
 ### 2. Define Acceptance Criteria
 
-Transform requirements into testable criteria:
+Transform requirements into testable criteria. **Each criterion must map to a `feature_list.json` entry.**
 
 ```markdown
 ## Acceptance Criteria
 
-### AC-1: [Criterion Name]
+### AC-1: [Criterion Name] → F1
 **Given:** [precondition]
 **When:** [action]
 **Then:** [expected result]
 **Verification:** [how to test - API call, UI check, DB query]
+**test_command:** `pytest tests/test_X.py::test_criterion_1 -x`
 
-### AC-2: [Criterion Name]
+### AC-2: [Criterion Name] → F2
 ...
 ```
+
+**Feature List Mapping (MANDATORY - Principle P1):**
+Every acceptance criterion (AC-1, AC-2...) must have:
+1. A corresponding entry ID in `feature_list.json` (F1, F2...)
+2. A concrete `test_command` that returns exit code 0 when the criterion is met
+3. A workstream assignment
+
+This ensures the UAT protocol produces its own checking harness. If you cannot define a `test_command` for a criterion, the criterion is too vague -- make it more specific.
 
 ### 3. Specify Backend Test Requirements
 

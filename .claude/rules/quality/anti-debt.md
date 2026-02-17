@@ -1,3 +1,13 @@
+---
+paths:
+  - personal-dev/**/*.py
+  - personal-dev/**/*.ts
+  - personal-dev/**/*.tsx
+  - personal-dev/**/*.js
+  - personal-dev/**/*.jsx
+  - deployment/**
+---
+
 # Anti-Debt Strategy
 
 Technical debt accumulates naturally as systems grow. This document outlines our proactive strategy to prevent and reduce code bloat, complexity, and maintenance burden.

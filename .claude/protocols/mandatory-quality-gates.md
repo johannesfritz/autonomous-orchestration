@@ -54,7 +54,7 @@ STELLARIS_EXIT=$?
 - ✅ Analyze test output
 - ✅ Attempt automated fix (max 2 attempts)
 - ✅ If fix fails, mark plan status: `FAILED_QUALITY_GATE_TESTS`
-- ✅ Write failure report to `00 Inbox/failed-plans/{PLAN_ID}-test-failure.md`
+- ✅ Write failure report to `inbox/failed-plans/{PLAN_ID}-test-failure.md`
 - ✅ Update plan file with failure details
 - ✅ Escalate with actionable error report
 
@@ -101,7 +101,7 @@ Task(subagent_type="shadow-code-reviewer", prompt='''
 ### On BLOCK
 
 - Mark plan status: `FAILED_QUALITY_GATE_REVIEW`
-- Write detailed report: `00 Inbox/failed-plans/{PLAN_ID}-review-block.md`
+- Write detailed report: `inbox/failed-plans/{PLAN_ID}-review-block.md`
 - Escalate with blocking issues list
 - **DO NOT** proceed to security gate
 
@@ -133,7 +133,7 @@ cd project/backend && bandit -r . -ll --format json > /tmp/security-audit.json
 ### On Critical Issues Found
 
 - Mark plan status: `FAILED_QUALITY_GATE_SECURITY`
-- Write security report: `00 Inbox/failed-plans/{PLAN_ID}-security.md`
+- Write security report: `inbox/failed-plans/{PLAN_ID}-security.md`
 - **DO NOT** create PR
 - **DO NOT** proceed to UAT gate
 - Escalate immediately with vulnerability details
@@ -148,32 +148,55 @@ cd project/backend && bandit -r . -ll --format json > /tmp/security-audit.json
 
 ## Gate 4: UAT (BLOCKING)
 
-**Requirement:** User journeys MUST be tested and documented.
+**Requirement:** User journeys MUST be tested in a RUNNING local environment.
 
 ### Execution Criteria
 
-1. **Generate UAT checklist:**
-   - File: `00 Inbox/uat-checklists/{PLAN_ID}-uat.md`
-   - Template from `.claude/protocols/mandatory-uat-protocol.md`
+**CRITICAL: You MUST spin up the local stack and execute tests in a real browser.**
 
-2. **Execute user journeys:**
-   - Manual verification OR Playwright E2E tests
-   - Record pass/fail for each journey
+```bash
+# 1. Start local servers
+$CLAUDE_PROJECT_DIR/.claude/scripts/start-local-stack.sh hotel-de-ville
+
+# 2. Run automated UAT tests (generates report + screenshots)
+python3 $CLAUDE_PROJECT_DIR/.claude/scripts/run-uat.py --project hotel-de-ville
+
+# 3. Run Playwright E2E tests
+cd hotel-de-ville/frontend && npx playwright test
+
+# 4. Check for UAT report
+ls 00\ Inbox/UAT-REPORT-*.md
+```
+
+### UAT Verification Steps
+
+1. **Start local stack:**
+   - Backend running on port 8000
+   - Frontend running on port 5173
+   - Qdrant running on port 6333
+
+2. **Execute automated UAT:**
+   - Run `run-uat.py` which tests navigation, responsive layout, theme, console errors
+   - Captures screenshots as evidence
+   - Generates report in `inbox/UAT-REPORT-*.md`
+
+3. **Execute Playwright E2E tests:**
+   - Runs existing tests in `hotel-de-ville/frontend/e2e/`
+   - Must pass all tests
+
+4. **Manual journey verification (if UI changed):**
+   - Walk through primary user flow in browser
+   - Verify new features work as expected
    - Test edge cases (empty state, many items, special chars)
-   - Test error scenarios (network fail, invalid input)
-
-3. **Document results:**
-   - Mark all checklist items
-   - Add tester name + timestamp
-   - Overall result: PASS / FAIL
 
 ### Exit Criteria
 
-- UAT checklist file exists
-- All critical user journeys marked PASS
-- All edge cases tested
-- UAT completion section filled
-- Overall result = PASS
+- Local stack started successfully (health checks pass)
+- `run-uat.py` exit code = 0
+- UAT report generated in `inbox/`
+- Screenshots captured in `inbox/uat-screenshots/`
+- All Playwright E2E tests pass
+- No critical failures in UAT report
 
 ### On UAT Failure
 
@@ -212,7 +235,7 @@ Plans cannot be marked SHIPPED without completed UAT checklist showing PASS.
 ### On CI Failure
 
 - Mark plan status: `FAILED_CI` (not SHIPPED)
-- Write CI failure log: `00 Inbox/failed-plans/{PLAN_ID}-ci-failure.md`
+- Write CI failure log: `inbox/failed-plans/{PLAN_ID}-ci-failure.md`
 - Include failed workflow names
 - Include error messages from GitHub Actions
 - **DO NOT** auto-merge PR
@@ -226,6 +249,85 @@ If CI doesn't complete within timeout (default 600s):
 - Keep plan status as `AWAITING_CI`
 - Escalate: "CI taking longer than expected, manual verification required"
 - **DO NOT** assume success
+
+---
+
+## Gate 6: Deployment Verification (BLOCKING)
+
+**Requirement:** Deployment smoke tests MUST pass before marking plan SHIPPED.
+
+### Execution Criteria
+
+After code is deployed to production:
+
+```bash
+# Health check
+curl -s https://jfritz.xyz/protokoll-assistent/api/health
+EXIT_CODE=$?
+
+# Smoke test - verify API responds
+curl -s https://jfritz.xyz/protokoll-assistent/api/status
+
+# Check service status
+ssh root@jfritz.xyz "systemctl status protokoll-assistent --no-pager"
+
+# Check recent logs for errors
+ssh root@jfritz.xyz "journalctl -u protokoll-assistent -n 20 --no-pager"
+```
+
+### Exit Criteria
+
+- Health check returns HTTP 200
+- API endpoint returns expected JSON response
+- Service shows "active (running)" status
+- No critical errors in last 20 log lines
+
+### On Failure
+
+- Mark plan status: `FAILED_DEPLOYMENT`
+- Execute rollback procedure:
+  ```bash
+  ssh root@jfritz.xyz "cd /var/www/protokoll-assistent && git reset --hard HEAD~1"
+  ssh root@jfritz.xyz "systemctl restart protokoll-assistent"
+  ```
+- Write failure report: `inbox/failed-plans/{PLAN_ID}-deployment.md`
+- Log deployment failure to audit log: `inbox/audit_log.jsonl`
+- Escalate with failure details and rollback status
+- **DO NOT** mark plan as SHIPPED
+
+### Audit Trail
+
+Every deployment MUST be logged to `inbox/audit_log.jsonl`:
+
+```json
+{
+  "timestamp": "2026-01-19T15:30:00Z",
+  "event": "deployment",
+  "project": "protokoll-assistent",
+  "plan_id": "PLAN-xxx",
+  "files_deployed": ["backend/src/api/routes.py", "frontend/src/App.tsx"],
+  "smoke_test_result": "pass",
+  "deployed_by": "Claude Code"
+}
+```
+
+If smoke tests fail:
+
+```json
+{
+  "timestamp": "2026-01-19T15:35:00Z",
+  "event": "deployment_failure",
+  "project": "protokoll-assistent",
+  "plan_id": "PLAN-xxx",
+  "error": "Health check returned 502",
+  "rollback_status": "success",
+  "deployed_by": "Claude Code"
+}
+```
+
+### No Bypass
+
+Plans cannot be marked SHIPPED without passing deployment verification. Production must be verified working.
 
 ---
 
@@ -289,6 +391,7 @@ Before marking ANY plan as SHIPPED, verify:
 - [ ] Gate 3 (Security): Zero critical vulnerabilities
 - [ ] Gate 4 (UAT): Checklist complete, all journeys PASS
 - [ ] Gate 5 (CI/CD): wait-for-ci.sh exit 0, all workflows green
+- [ ] Gate 6 (Deployment): Smoke tests pass, service running, audit logged
 
 If ANY gate fails, plan status ≠ SHIPPED.
 
@@ -301,9 +404,9 @@ When escalating failed gates to user:
 ```markdown
 ## Quality Gate Failure: {PLAN_ID}
 
-**Gate:** {Tests | Review | Security | UAT | CI}
+**Gate:** {Tests | Review | Security | UAT | CI | Deployment}
 **Status:** FAILED
-**Plan Status:** {FAILED_QUALITY_GATE_*}
+**Plan Status:** {FAILED_QUALITY_GATE_* | FAILED_DEPLOYMENT}
 
 ### Details
 {Specific error messages, failed test names, blocking issues, etc.}
@@ -311,7 +414,7 @@ When escalating failed gates to user:
 ### Options
 1. Fix the issues manually and re-run: /execute-plan {PLAN_ID}
 2. Abandon plan: /abandon-plan {PLAN_ID}
-3. Review failure details: cat 00 Inbox/failed-plans/{PLAN_ID}-*.md
+3. Review failure details: cat inbox/failed-plans/{PLAN_ID}-*.md
 
 ### Next Steps
 The plan has been halted and will not proceed until these issues are resolved.

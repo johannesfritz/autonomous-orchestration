@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TPM Orchestrator Execution Reflection",
+  "description": "Captures execution details, quality gate results, blockers, and patterns from TPM orchestrator runs",
+  "type": "object",
+  "required": ["plan_id", "timestamp", "outcome", "gates", "blockers", "patterns", "recommendations"],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "pattern": "^PLAN-\\d{4}-\\d{3}$",
+      "description": "Plan identifier in format PLAN-YYYY-NNN"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when reflection was generated"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total execution time in minutes"
+    },
+    "outcome": {
+      "enum": ["SUCCESS", "PARTIAL", "FAILED"],
+      "description": "Overall execution outcome"
+    },
+    "gates": {
+      "type": "object",
+      "description": "Quality gate results - MUST capture ALL gates attempted",
+      "properties": {
+        "tests": {
+          "$ref": "#/definitions/gate_status",
+          "description": "pytest/Playwright test suite results"
+        },
+        "review": {
+          "$ref": "#/definitions/gate_status",
+          "description": "shadow-code-reviewer approval status"
+        },
+        "uat": {
+          "$ref": "#/definitions/gate_status",
+          "description": "User Acceptance Testing manual verification"
+        },
+        "security": {
+          "$ref": "#/definitions/gate_status",
+          "description": "Security audit (SAST, Bandit) results"
+        },
+        "ci": {
+          "$ref": "#/definitions/gate_status",
+          "description": "GitHub Actions CI/CD pipeline status"
+        },
+        "risk_assessment": {
+          "$ref": "#/definitions/gate_status",
+          "description": "Risk Manager approval (mandatory for all plans)"
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "description": "ALL blockers encountered during execution",
+      "items": {
+        "type": "object",
+        "required": ["description", "root_cause", "resolution", "time_lost_minutes"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "What blocked progress"
+          },
+          "root_cause": {
+            "type": "string",
+            "description": "Why this blocker occurred"
+          },
+          "resolution": {
+            "type": "string",
+            "description": "How blocker was resolved (or 'UNRESOLVED')"
+          },
+          "time_lost_minutes": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Estimated time lost to this blocker"
+          },
+          "pattern_id": {
+            "type": "string",
+            "description": "Pattern identifier if this is a known issue"
+          }
+        }
+      }
+    },
+    "patterns": {
+      "type": "array",
+      "description": "Patterns detected during execution (for learning system)",
+      "items": {
+        "type": "object",
+        "required": ["pattern_type", "description"],
+        "properties": {
+          "pattern_type": {
+            "enum": [
+              "test-failure",
+              "import-error",
+              "type-mismatch",
+              "null-handling",
+              "async-sync-mix",
+              "resource-contention",
+              "api-rate-limit",
+              "schema-migration-issue",
+              "dependency-conflict",
+              "configuration-error",
+              "other"
+            ],
+            "description": "Category of pattern"
+          },
+          "description": {
+            "type": "string",
+            "description": "What pattern was observed"
+          },
+          "fix_applied": {
+            "type": "string",
+            "description": "How this was fixed (for pattern database)"
+          },
+          "prevention": {
+            "type": "string",
+            "description": "How to prevent this in future"
+          }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Recommendations for improving future executions",
+      "items": {
+        "type": "object",
+        "required": ["category", "recommendation"],
+        "properties": {
+          "category": {
+            "enum": [
+              "process",
+              "tooling",
+              "documentation",
+              "testing",
+              "automation",
+              "configuration"
+            ]
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "priority": {
+            "enum": ["high", "medium", "low"],
+            "default": "medium"
+          }
+        }
+      }
+    },
+    "workstreams_completed": {
+      "type": "array",
+      "description": "List of workstream agents that completed successfully",
+      "items": {
+        "type": "string"
+      }
+    },
+    "files_modified": {
+      "type": "array",
+      "description": "All files modified during execution",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "definitions": {
+    "gate_status": {
+      "type": "object",
+      "required": ["status", "reason"],
+      "properties": {
+        "status": {
+          "enum": ["PASSED", "FAILED", "SKIPPED"],
+          "description": "Gate result"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why this status occurred - REQUIRED for FAILED/SKIPPED"
+        },
+        "details": {
+          "type": "string",
+          "description": "Additional context (error messages, file paths, etc.)"
+        }
+      }
+    }
+  }
+}

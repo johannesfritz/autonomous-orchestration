@@ -1,3 +1,9 @@
+---
+paths:
+  - personal-dev/stellaris/**
+  - stellaris/**
+---
+
 # Product Philosophy
 
 **Purpose:** Non-negotiable principles guiding all feature development. These are product values, not code standards.

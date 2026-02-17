@@ -59,11 +59,11 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 | Component | Count | Purpose |
 |-----------|-------|---------|
 | **Agents** | 17 | Orchestration, development, review, product management, QA |
-| **Skills** | 16 | Auto-triggered workflows (plan creation, tests, security, discovery) |
-| **Commands** | 25 | Slash commands for portfolio, discovery, and deployment management |
-| **Protocols** | 32 | Quality gates, safety enforcement, PM protocols, server safeguards |
-| **Hooks** | 60+ | Lifecycle automation (PreToolUse, PostToolUse, SubagentStart/Stop) |
-| **Scripts** | 27 | Shell/Python utilities (init, secrets, change detection, CI verification) |
+| **Skills** | 12 | Auto-triggered workflows (plan creation, tests, security, discovery) |
+| **Commands** | 22 | Slash commands for portfolio, discovery, and deployment management |
+| **Protocols** | 24 | Quality gates, safety enforcement, PM protocols, server safeguards |
+| **Hooks** | 47 | Lifecycle automation (PreToolUse, PostToolUse, SubagentStart/Stop) |
+| **Scripts** | 24 | Shell/Python utilities (init, secrets, change detection, CI verification) |
 | **Rules** | 10 | Modular docs with conditional loading via `paths:` frontmatter |
 | **Schemas** | 6 | JSON schemas for feature lists, reflections, handoffs |
 | **Templates** | 3 | Plan and hotfix templates with example |

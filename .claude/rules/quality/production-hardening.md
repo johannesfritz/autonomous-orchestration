@@ -1,3 +1,14 @@
+---
+paths:
+  - personal-dev/**/migrations/**
+  - personal-dev/**/alembic/**
+  - personal-dev/**/models.py
+  - personal-dev/**/schema.py
+  - personal-dev/**/auth/**
+  - personal-dev/**/services/**
+  - deployment/**
+---
+
 # Production Hardening Protocol
 
 **Protocol Name:** `PROTOCOL-HARDENING-L5`

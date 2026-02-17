@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Data Science Sanity Audit",
+  "description": "Statistical sanity checks and reproducibility verification for data analysis projects",
+  "type": "object",
+  "required": ["project_name", "timestamp", "sanity_checks", "reproducibility"],
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "Name of analysis project (folder name in sgept-analytics/data-queries/)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sanity_checks": {
+      "type": "object",
+      "description": "Statistical laugh tests - all MUST be performed",
+      "required": ["magnitude_checks", "direction_checks", "outlier_investigation", "percentage_bounds"],
+      "properties": {
+        "magnitude_checks": {
+          "type": "object",
+          "required": ["performed", "results"],
+          "properties": {
+            "performed": {
+              "type": "boolean",
+              "description": "Were magnitude checks performed?"
+            },
+            "results": {
+              "type": "array",
+              "description": "List of magnitude checks with pass/fail",
+              "items": {
+                "type": "object",
+                "required": ["variable", "value", "expected_order", "status"],
+                "properties": {
+                  "variable": {"type": "string"},
+                  "value": {"type": "number"},
+                  "expected_order": {
+                    "type": "integer",
+                    "description": "Expected order of magnitude (e.g., 9 for billions)"
+                  },
+                  "status": {"enum": ["PASS", "FAIL", "WARNING"]},
+                  "notes": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "direction_checks": {
+          "type": "object",
+          "required": ["performed", "results"],
+          "properties": {
+            "performed": {"type": "boolean"},
+            "results": {
+              "type": "array",
+              "description": "Sign/direction consistency checks",
+              "items": {
+                "type": "object",
+                "required": ["relationship", "expected_direction", "actual_correlation", "status"],
+                "properties": {
+                  "relationship": {
+                    "type": "string",
+                    "description": "e.g., 'tariff increase vs imports'"
+                  },
+                  "expected_direction": {
+                    "enum": ["positive", "negative"],
+                    "description": "Expected relationship direction"
+                  },
+                  "actual_correlation": {
+                    "type": "number",
+                    "minimum": -1,
+                    "maximum": 1
+                  },
+                  "status": {"enum": ["PASS", "FAIL", "WARNING"]}
+                }
+              }
+            }
+          }
+        },
+        "outlier_investigation": {
+          "type": "object",
+          "required": ["performed", "outliers_found", "investigated"],
+          "properties": {
+            "performed": {"type": "boolean"},
+            "outliers_found": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of outliers detected (>3× IQR)"
+            },
+            "investigated": {
+              "type": "boolean",
+              "description": "Were outliers individually reviewed?"
+            },
+            "notes": {
+              "type": "string",
+              "description": "Explanation for outliers (data quality, genuine extreme values, etc.)"
+            }
+          }
+        },
+        "percentage_bounds": {
+          "type": "object",
+          "required": ["performed", "violations"],
+          "properties": {
+            "performed": {"type": "boolean"},
+            "violations": {
+              "type": "array",
+              "description": "Percentages outside 0-100% range",
+              "items": {
+                "type": "object",
+                "required": ["variable", "range", "explanation"],
+                "properties": {
+                  "variable": {"type": "string"},
+                  "range": {"type": "string"},
+                  "explanation": {"type": "string"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "description": "Reproducibility artifacts - all MUST be present",
+      "required": ["random_seed_set", "session_info_logged", "data_provenance"],
+      "properties": {
+        "random_seed_set": {
+          "type": "boolean",
+          "description": "Was set.seed() called?"
+        },
+        "session_info_logged": {
+          "type": "boolean",
+          "description": "Was sessionInfo() output saved?"
+        },
+        "data_provenance": {
+          "type": "object",
+          "required": ["source_documented", "processing_steps_documented", "analyst_recorded"],
+          "properties": {
+            "source_documented": {
+              "type": "boolean",
+              "description": "Is data source clearly documented?"
+            },
+            "processing_steps_documented": {
+              "type": "boolean",
+              "description": "Are transformations documented?"
+            },
+            "analyst_recorded": {
+              "type": "boolean",
+              "description": "Is analyst name in provenance metadata?"
+            }
+          }
+        }
+      }
+    },
+    "data_validation": {
+      "type": "object",
+      "description": "Data quality validation results",
+      "properties": {
+        "row_count_check": {
+          "type": "object",
+          "properties": {
+            "expected": {"type": "integer"},
+            "actual": {"type": "integer"},
+            "deviation_pct": {"type": "number"},
+            "status": {"enum": ["PASS", "FAIL"]}
+          }
+        },
+        "missing_values_flagged": {
+          "type": "boolean",
+          "description": "Were columns with >20% missing values flagged?"
+        },
+        "duplicate_keys_checked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "issues_detected": {
+      "type": "array",
+      "description": "Any sanity check failures or concerns",
+      "items": {
+        "type": "object",
+        "required": ["severity", "description"],
+        "properties": {
+          "severity": {"enum": ["CRITICAL", "WARNING", "INFO"]},
+          "description": {"type": "string"}
+        }
+      }
+    }
+  }
+}

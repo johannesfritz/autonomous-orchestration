@@ -6,8 +6,8 @@
 set -e
 
 PLAN_ID="${PLAN_ID:-}"
-STATE_FILE="${CLAUDE_PROJECT_DIR:-/home/user/jf-private}/00 Inbox/plans/.state.json"
-DASHBOARD_FILE="${CLAUDE_PROJECT_DIR:-/home/user/jf-private}/00 Inbox/PORTFOLIO_STATUS.md"
+STATE_FILE="${CLAUDE_PROJECT_DIR:-/home/user/jf-private}/inbox/plans/.state.json"
+DASHBOARD_FILE="${CLAUDE_PROJECT_DIR:-/home/user/jf-private}/inbox/PORTFOLIO_STATUS.md"
 
 echo "🔍 Verifying plan state updates..."
 

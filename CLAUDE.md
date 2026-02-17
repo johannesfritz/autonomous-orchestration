@@ -3,7 +3,7 @@
 **Purpose:** Reusable Claude Code configuration template for autonomous multi-plan development orchestration.
 **Status:** Active template (full configuration)
 **Type:** Configuration template - copy to target projects
-**Last updated:** 2026-02-12
+**Last updated:** 2026-02-17
 
 ---
 
@@ -12,12 +12,12 @@
 | Content Type | Count | Description |
 |--------------|-------|-------------|
 | Agents | 17 | portfolio-manager, tpm-orchestrator, risk-manager, uat-protocol-designer, requirements-analyst, etc. |
-| Commands | 25 | /portfolio, /add-plan, /execute-plan, /discovery, /code-review, etc. |
-| Protocols | 32 | code-standards, risk-assessment, quality gates, server safeguards |
+| Commands | 22 | /portfolio, /add-plan, /execute-plan, /discovery, /code-review, /setup-gitignore, etc. |
+| Protocols | 24 | code-standards, risk-assessment, quality gates, server safeguards, audit-logging, etc. |
 | Rules | 10 | orchestration, product-management, routing, testing (with `paths:` frontmatter) |
-| Skills | 16 | create-plan, queue-fix, run-test-suite, security-audit, local-uat, etc. |
-| Hooks | 60+ | PreToolUse, PostToolUse, SubagentStart/Stop, UserPromptSubmit |
-| Scripts | 27 | init-session.sh, scan-secrets.py, wait-for-ci.sh, etc. |
+| Skills | 12 | create-plan, queue-fix, run-test-suite, security-audit, etc. |
+| Hooks | 47 | PreToolUse, PostToolUse, SubagentStart/Stop, UserPromptSubmit |
+| Scripts | 24 | init-session.sh, scan-secrets.py, wait-for-ci.sh, run-uat.py, etc. |
 | Schemas | 6 | feature-list.json, tpm-reflection.json, handoff-checklist.json, etc. |
 
 ---
@@ -112,21 +112,25 @@ autonomous-orchestration/
 │   │   ├── detect-fix-request.sh
 │   │   ├── detect-production-review.sh
 │   │   ├── block-on-test-failure.sh    # AI-optimized pytest flags
-│   │   └── post-commit-sync-docs.sh
+│   │   └── pre-push-build-check.sh
 │   │
-│   ├── protocols/           # 32 quality protocols
+│   ├── protocols/           # 24 quality protocols
 │   │   ├── code-standards.md
 │   │   ├── strict-code-standards.md
 │   │   ├── risk-assessment-required.md
 │   │   ├── mandatory-quality-gates.md
 │   │   ├── tpm-completion-checklist.md
 │   │   ├── server-operation-safeguards.md
+│   │   ├── audit-logging.md
+│   │   ├── requirements-extraction-protocol.md
+│   │   ├── portfolio-manager-fixes.md
 │   │   └── ...
 │   │
 │   ├── rules/               # Conditional docs (paths: frontmatter)
 │   │   ├── orchestration/
 │   │   │   ├── orchestration.md
 │   │   │   └── routing.md           # paths: inbox/plans/**, .claude/agents/**
+│   │   ├── core-patterns.md
 │   │   ├── development/
 │   │   │   └── patterns.md          # paths: **/*.py, **/*.ts, **/*.tsx
 │   │   ├── quality/
@@ -139,7 +143,7 @@ autonomous-orchestration/
 │   │   ├── handoff-checklist.json
 │   │   └── ...
 │   │
-│   ├── scripts/             # 27 utilities
+│   ├── scripts/             # 24 utilities
 │   │   ├── init-session.sh           # Session initialization (P4)
 │   │   ├── scan-secrets.py
 │   │   ├── wait-for-ci.sh
@@ -147,7 +151,7 @@ autonomous-orchestration/
 │   │   ├── inject-similar-patterns.py
 │   │   └── ...
 │   │
-│   ├── skills/              # 16 auto-invoked capabilities
+│   ├── skills/              # 12 auto-invoked capabilities
 │   │   ├── create-plan/              # Generates plan + feature_list.json
 │   │   ├── run-test-suite/           # AI-optimized test modes (P5)
 │   │   ├── queue-fix/
@@ -155,7 +159,7 @@ autonomous-orchestration/
 │   │   ├── security-audit/
 │   │   └── ...
 │   │
-│   └── settings.json        # Hook configuration (60+ hooks)
+│   └── settings.json        # Hook configuration (47 hooks)
 │
 ├── inbox/                   # Plan inbox structure
 │   ├── plans/

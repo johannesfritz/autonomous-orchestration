@@ -1,3 +1,10 @@
+---
+paths:
+  - "inbox/plans/**"
+  - ".claude/agents/**"
+  - ".claude/skills/**"
+---
+
 # Sub-Agent Routing Rules
 
 This document defines when to execute directly, delegate to agents, or dispatch to background.
@@ -191,7 +198,7 @@ Check status without blocking terminal:
 
 Read output files:
 ```
-Read tool → 00 Inbox/plans/.logs/PLAN-*.log
+Read tool → inbox/plans/.logs/PLAN-*.log
 ```
 
 ## Routing Examples

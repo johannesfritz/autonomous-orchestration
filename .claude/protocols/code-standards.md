@@ -10,6 +10,8 @@
   - [Qdrant Queries - CRITICAL:](#qdrant-queries---critical)
 - [TypeScript/React](#typescriptreact)
   - [Required:](#required)
+  - [CSS Positioning Rules (CRITICAL for dropdowns/modals):](#css-positioning-rules-critical-for-dropdownsmodals)
+  - [New Page Components Must Have Routes:](#new-page-components-must-have-routes)
 - [Security Checklist (OWASP Top 10)](#security-checklist-owasp-top-10)
 - [Avoid Over-Engineering](#avoid-over-engineering)
 - [Claude Model Selection](#claude-model-selection)
@@ -58,6 +60,32 @@ filter = Filter(must=[
 - Use interfaces over types where appropriate
 - Tailwind CSS for styling (no inline styles)
 - Proper error boundaries for components
+
+### CSS Positioning Rules (CRITICAL for dropdowns/modals):
+
+**Position modes use different coordinate systems:**
+
+| Position | Coordinates | Use |
+|----------|-------------|-----|
+| `fixed` | Viewport | `getBoundingClientRect()` directly |
+| `absolute` | Document | `rect + window.scrollX/Y` |
+
+```tsx
+// ❌ WRONG: Adding scroll offset to fixed positioning
+const top = rect.bottom + window.scrollY;
+<div style={{ position: 'fixed', top }}>...</div>
+
+// ✅ CORRECT: Viewport coords for fixed positioning
+const top = rect.bottom;
+<div style={{ position: 'fixed', top }}>...</div>
+```
+
+### New Page Components Must Have Routes:
+
+When creating a new page component:
+- [ ] Add route to `App.tsx` (or router config)
+- [ ] Wrap in `RequireAuth` if protected
+- [ ] Verify `navigate()` calls use correct path
 
 ## Security Checklist (OWASP Top 10)
 

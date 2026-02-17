@@ -1,3 +1,9 @@
+---
+paths:
+  - "**/shadow-api/**"
+  - "**/hotel-de-ville/**"
+---
+
 # Core Concepts (Shared Across Both Systems)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->

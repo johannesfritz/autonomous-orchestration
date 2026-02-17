@@ -135,13 +135,6 @@
       "mcp__filesystem__get_file_info",
       "mcp__filesystem__list_allowed_directories",
 
-      "// === STELLARIS ADMIN MCP ===",
-      "mcp__stellaris-admin__get_open_feedback",
-      "mcp__stellaris-admin__get_feedback_details",
-      "mcp__stellaris-admin__update_feedback_status",
-      "mcp__stellaris-admin__respond_to_feedback",
-      "mcp__stellaris-admin__get_feedback_stats",
-
       "// === MISC DEV UTILITIES ===",
       "Bash(jq:*)",
       "Bash(yq:*)",
@@ -207,11 +200,11 @@
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
-        "once": true,
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/quality-check.md && echo '' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/code-standards.md"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/quality-check.md && echo '' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/code-standards.md",
+            "once": true
           }
         ]
       },
@@ -271,11 +264,33 @@
       {
         "matcher": "Edit|Write",
         "path": "*/frontend/src/components/*",
-        "once": true,
         "hooks": [
           {
             "type": "command",
-            "command": "echo '🧩 COMPONENT LIBRARY RESTRICTION' && echo '' && echo 'Use shadcn/ui components exclusively. Forbidden:' && echo '  ❌ Custom Button, Input, Select, Dialog, Card' && echo '  ❌ Inline modal patterns without Dialog' && echo '  ❌ Card-like styling without Card component' && echo '' && echo 'Import from: @/components/ui/[component]' && echo ''"
+            "command": "echo '🧩 COMPONENT LIBRARY RESTRICTION' && echo '' && echo 'Use shadcn/ui components exclusively. Forbidden:' && echo '  ❌ Custom Button, Input, Select, Dialog, Card' && echo '  ❌ Inline modal patterns without Dialog' && echo '  ❌ Card-like styling without Card component' && echo '' && echo 'Import from: @/components/ui/[component]' && echo ''",
+            "once": true
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "path": "*/frontend/src/**",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🎨 UI CHECKLIST ACTIVE' && echo '' && echo 'Before committing frontend changes:' && echo '  □ Color contrast verified (text visible on ACTUAL background)' && echo '  □ CSS positioning correct (fixed=viewport, absolute=document coords)' && echo '  □ No layout overlaps (sidebar offsets, z-index)' && echo '  □ Dark theme palette applied' && echo ''",
+            "once": true
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "path": "*/frontend/src/pages/*.tsx",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🚨 NEW PAGE COMPONENT DETECTED' && echo '' && echo 'MANDATORY: Add route to App.tsx!' && echo '' && echo 'Checklist:' && echo '  □ Route added: <Route path=\"/...\" element={<NewPage />} />' && echo '  □ Wrapped in RequireAuth if protected' && echo '  □ Verify navigate() calls use correct path' && echo '' && echo 'FAILURE TO ADD ROUTE = DEAD CODE' && echo ''",
+            "once": true
           }
         ]
       }
@@ -286,7 +301,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '--- Reminder: Run tests to verify this change works as expected ---'"
+            "command": "echo '--- Reminder: Run tests to verify this change works as expected ---'",
+            "once": true
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(npm run build*)",
+        "path": "*/frontend/*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '' && echo '✅ BUILD COMPLETE - UAT GATE REQUIRED' && echo '' && echo 'Before deploying, verify:' && echo '  □ Visual inspection passed (run npm run dev)' && echo '  □ All text readable, buttons visible' && echo '  □ Dropdowns position correctly' && echo '  □ No layout overlaps' && echo '  □ Primary user flow works' && echo '' && echo 'See: .claude/protocols/mandatory-uat-protocol.md' && echo ''",
+            "once": true
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(npx playwright test*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '' && echo '🎭 Playwright tests completed. Check results above.' && echo '   For visual debugging: npx playwright test --headed' && echo '   For step-by-step: npx playwright test --debug' && echo ''",
+            "once": true
           }
         ]
       },
@@ -295,11 +332,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-commit-sync-docs.sh 2>/dev/null || true"
-          },
-          {
-            "type": "command",
-            "command": "echo '' && echo '═══════════════════════════════════════' && echo '📋 CODE REVIEW AVAILABLE' && echo '═══════════════════════════════════════' && echo '' && echo 'For code review before push, run: /code-review' && echo '' && echo 'Options:' && echo '  /code-review           - Terminal output (baseline + strict if major)' && echo '  /code-review --comment - Post review to GitHub PR' && echo '  /code-review --strict  - Force strict mode (custom protocols)' && echo '' && echo 'This is RECOMMENDED for significant changes.' && echo '═══════════════════════════════════════' && echo ''"
+            "command": "echo '' && echo '═══════════════════════════════════════' && echo '📋 CODE REVIEW AVAILABLE' && echo '═══════════════════════════════════════' && echo '' && echo 'For code review before push, run: /code-review' && echo '' && echo 'Options:' && echo '  /code-review           - Terminal output (baseline + strict if major)' && echo '  /code-review --comment - Post review to GitHub PR' && echo '  /code-review --strict  - Force strict mode (custom protocols)' && echo '' && echo 'This is RECOMMENDED for significant changes.' && echo '═══════════════════════════════════════' && echo ''",
+            "once": true
           }
         ]
       },
@@ -348,7 +382,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/risk-assessment-required.md"
+            "command": "echo '🛡️ RISK ASSESSMENT REQUIRED' && echo '' && echo 'You MUST invoke Risk Manager for every plan before execution.' && echo 'Risk ≥7 requires human approval. Any dimension ≥8 requires approval.'"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/orchestration/orchestration.md"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/orchestration/routing.md"
           }
         ]
       },
@@ -357,11 +399,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '⚠️ CRITICAL: Verify risk assessment exists in plan file before execution. Risk Manager invocation is MANDATORY. See .claude/protocols/risk-assessment-required.md for details.'"
+            "command": "echo '⚠️ CRITICAL: Verify risk assessment exists in plan file before execution.' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/risk-assessment-required.md"
           },
           {
             "type": "command",
-            "command": "echo '' && echo '⚠️ MANDATORY QUALITY GATES ENFORCEMENT ACTIVE' && echo '' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/mandatory-quality-gates.md"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/mandatory-quality-gates.md"
           }
         ]
       },
@@ -370,7 +412,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '🛡️ Risk Manager activated - assessing plan risk dimensions...'"
+            "command": "echo '🛡️ Risk Manager activated' && cat $CLAUDE_PROJECT_DIR/.claude/protocols/risk-assessment-required.md"
+          }
+        ]
+      },
+      {
+        "matcher": "qa-lead",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/functional-verification.md"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/strict-code-standards.md"
           }
         ]
       },
@@ -401,15 +456,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/user-centricity.md"
-          },
-          {
-            "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
-          },
-          {
-            "type": "command",
-            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY PROTOCOL ACTIVE' && echo 'You MUST search Qdrant before making decisions. See institutional-memory-protocol.md' && echo ''"
+            "command": "echo '👤 PRODUCT MANAGER PROTOCOLS' && echo '' && echo 'User-Centricity: Evidence-based decisions, RICE/ICE scoring, user value first' && echo 'Product Philosophy: See .claude/rules/stellaris/product-philosophy.md (growth mindset, input metrics)' && echo '' && echo 'Full protocols: .claude/protocols/user-centricity.md, .claude/rules/stellaris/product-philosophy.md'"
           }
         ]
       },
@@ -418,15 +465,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/technical-translation.md"
-          },
-          {
-            "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
-          },
-          {
-            "type": "command",
-            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY PROTOCOL ACTIVE' && echo 'You MUST search Qdrant for similar past plans before scoping. See institutional-memory-protocol.md' && echo ''"
+            "command": "echo '🔧 TECHNICAL PM PROTOCOLS' && echo '' && echo 'Technical Translation: Assess complexity, trigger spikes for unknowns, architecture-aware' && echo 'Product Philosophy: See .claude/rules/stellaris/product-philosophy.md' && echo '' && echo 'Full protocol: .claude/protocols/technical-translation.md'"
           }
         ]
       },
@@ -435,15 +474,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/architectural-documentation.md"
-          },
-          {
-            "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
-          },
-          {
-            "type": "command",
-            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY PROTOCOL ACTIVE' && echo 'You MUST search Qdrant for related ADRs before making architectural decisions. See institutional-memory-protocol.md' && echo ''"
+            "command": "echo '🏗️ SOLUTIONS ARCHITECT PROTOCOLS' && echo '' && echo 'ADR Required: Document all significant decisions in MADR format' && echo 'Reversibility: Prefer reversible decisions, flag irreversible ones' && echo 'Product Philosophy: See .claude/rules/stellaris/product-philosophy.md' && echo '' && echo 'Full protocol: .claude/protocols/architectural-documentation.md'"
           }
         ]
       },
@@ -452,11 +483,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md"
-          },
+            "command": "echo '🔍 UX RESEARCHER ACTIVE' && echo '' && echo 'Focus: User journeys, accessibility (WCAG 2.1 AA), evidence-based recommendations' && echo 'Product Philosophy: See .claude/rules/stellaris/product-philosophy.md (journey metaphors, input metrics)' && echo '' && echo 'Full philosophy: .claude/rules/stellaris/product-philosophy.md'"
+          }
+        ]
+      },
+      {
+        "matcher": "requirements-analyst",
+        "hooks": [
           {
             "type": "command",
-            "command": "echo '🔍 UX RESEARCHER ACTIVE: Focus on user journeys, accessibility (WCAG 2.1 AA), and evidence-based recommendations.'"
+            "command": "echo '' && echo '📋 REQUIREMENTS ANALYST ACTIVE' && echo '' && echo 'Mission: Extract DETAILED requirements before development.' && echo 'Behaviors: EXHAUSTIVE, SYSTEMATIC, CLARIFICATION-SEEKING, VERIFICATION-ORIENTED' && echo '' && echo 'Two-Loop Clarification: RA ↔ PM (loop 1), PM ↔ User (loop 2)' && echo '' && echo 'Outputs: {PLAN_ID}.md, {PLAN_ID}-checklist.md, {PLAN_ID}-clarifications.md' && echo 'Location: inbox/plans/.requirements/' && echo '' && echo 'Full protocol: .claude/protocols/requirements-extraction-protocol.md'"
           }
         ]
       },
@@ -465,7 +501,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '## PRODUCT PHILOSOPHY ACTIVE' && head -80 $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/scripts/init-session.sh"
+          },
+          {
+            "type": "command",
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/development/patterns.md"
+          },
+          {
+            "type": "command",
+            "command": "echo '' && echo '🎨 FRONTEND QUALITY GATES' && echo '' && echo 'When working on frontend:' && echo '  1. New pages MUST have routes in App.tsx' && echo '  2. UI colors MUST be verified against actual backgrounds' && echo '  3. CSS positioning: fixed=viewport, absolute=document coords' && echo '  4. Run visual UAT before deployment' && echo '' && echo 'See: .claude/protocols/mandatory-uat-protocol.md'"
           }
         ]
       },
@@ -474,7 +518,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '## PRODUCT PHILOSOPHY ACTIVE' && head -80 $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/rules/quality/testing.md"
           }
         ]
       },
@@ -483,7 +527,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '🎯 STELLARIS PHILOSOPHY CHECK' && echo '' && echo 'When working on Stellaris schemas, remember:' && head -100 $CLAUDE_PROJECT_DIR/.claude/rules/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
+            "command": "echo '🎯 PRODUCT PHILOSOPHY CHECK' && echo '' && echo 'When working on schemas, remember:' && head -100 $CLAUDE_PROJECT_DIR/.claude/rules/stellaris/product-philosophy.md || echo 'Note: product-philosophy.md not found'"
           }
         ]
       }
@@ -494,15 +538,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md && echo '' && echo '⚠️ REMINDER: Check for User Requests section in plan file. If present, complete user notification protocol FIRST.' && echo '' && echo '🧹 JANITOR PROTOCOL: Clean up temp files, archive plan, commit and push.' && echo 'See .claude/skills/janitor/prompt.md for cleanup checklist.'"
+            "command": "cat $CLAUDE_PROJECT_DIR/.claude/protocols/tpm-completion-checklist.md"
           },
           {
-            "type": "command",
-            "command": "echo '' && echo '═══════════════════════════════════════' && echo '🎭 MANDATORY UAT EXECUTION VERIFICATION' && echo '═══════════════════════════════════════' && echo '' && echo 'BLOCKING: UAT must have been EXECUTED, not just documented.' && echo '' && echo 'Verification script checks for:' && echo '  ✓ Evidence directory exists: 00 Inbox/uat-evidence/PLAN-ID/' && echo '  ✓ Playwright report exists: playwright-report.json' && echo '  ✓ Tests actually ran (count > 0)' && echo '  ✓ All tests passed (failures = 0)' && echo '' && echo 'Run: $CLAUDE_PROJECT_DIR/.claude/scripts/verify-uat-executed.sh PLAN-ID' && echo '' && echo 'Checklist-only UAT is INSUFFICIENT. Actual execution required.' && echo '═══════════════════════════════════════' && echo ''"
-          },
+            "type": "prompt",
+            "prompt": "Generate TPM reflection per schema .claude/schemas/tpm-reflection.json. Capture: ALL gate statuses (pass/fail/skip + reason), ALL blockers, patterns detected, recommendations. CRITICAL: Do not skip any gates. Output: inbox/reflections/plans/2026-01/{PLAN_ID}.jsonl (append)."
+          }
+        ]
+      },
+      {
+        "matcher": "qa-lead",
+        "hooks": [
           {
             "type": "command",
-            "command": "echo '' && echo '═══════════════════════════════════════' && echo '🔍 MANDATORY CLEANUP VERIFICATION' && echo '═══════════════════════════════════════' && echo '' && echo 'CRITICAL: Before returning, you MUST run cleanup verification:' && echo '' && echo '  $CLAUDE_PROJECT_DIR/.claude/scripts/verify-cleanup-complete.sh PLAN-ID' && echo '' && echo 'This script verifies:' && echo '  ✓ Plan file moved to completed/' && echo '  ✓ .state.json updated with SHIPPED status' && echo '  ✓ PORTFOLIO_STATUS.md updated' && echo '  ✓ All state changes committed to git' && echo '  ✓ Audit log contains completion event' && echo '  ✓ PR exists and is merged (or awaiting manual merge)' && echo '' && echo 'If verification fails, complete missing steps before returning.' && echo '═══════════════════════════════════════' && echo ''"
+            "command": "echo '✅ QA LEAD COMPLETION CHECKLIST' && echo '' && echo 'Verify ALL 5 passes completed:' && echo '  □ Pass 1: Correctness (logic matches intent)' && echo '  □ Pass 2: Integration (callers of modified functions)' && echo '  □ Pass 3: Security (OWASP patterns checked)' && echo '  □ Pass 4: Maintainability (code quality)' && echo '  □ Pass 5: Regression Risk (blast radius assessed)' && echo '' && echo 'Output JSON verdict: APPROVE | REQUEST_CHANGES | BLOCK'"
           }
         ]
       },
@@ -511,7 +560,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '' && echo '📝 CLAUDE.md UPDATE CHECK' && echo '' && echo 'If this change introduced any of the following, verify CLAUDE.md is updated:' && echo '  □ New patterns or conventions' && echo '  □ Environment variables' && echo '  □ Architectural changes' && echo '  □ New agents, skills, or commands' && echo '  □ Database schema changes' && echo '' && echo 'CLAUDE.md must reflect current implementation state.' && echo ''"
+            "command": "echo '📝 If major changes: verify CLAUDE.md updated (patterns, env vars, agents, schemas)'"
           }
         ]
       },
@@ -520,7 +569,25 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '' && echo '🔍 INSTITUTIONAL MEMORY VERIFICATION' && echo '' && echo 'Confirm you documented:' && echo '  □ Search queries executed against Qdrant' && echo '  □ Key findings from search results summarized' && echo '  □ Alignment analysis with past decisions completed' && echo '' && echo 'If any item is unchecked, your proposal/plan is INCOMPLETE.' && echo ''"
+            "command": "echo '🔍 Verify: Search queries documented, findings summarized, alignment analyzed'"
+          }
+        ]
+      },
+      {
+        "matcher": "requirements-analyst",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '📋 REQUIREMENTS - Verify artifacts exist in inbox/plans/.requirements/{PLAN_ID}*.md'"
+          }
+        ]
+      },
+      {
+        "matcher": "artificial-shadow-dev|hybrid-db-architect|qa-engineer",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Handoff checklist per schema .claude/schemas/handoff-checklist.json: □ Specific file paths, □ Testable claims, □ Known limitations. Append to: inbox/reflections/plans/2026-01/{PLAN_ID}.jsonl"
           }
         ]
       }

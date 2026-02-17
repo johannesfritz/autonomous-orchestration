@@ -1,3 +1,10 @@
+---
+paths:
+  - "**/*.py"
+  - "**/*.ts"
+  - "**/*.tsx"
+---
+
 # Common Development Patterns
 
 This document captures reusable code patterns used across both shadow-api and hotel-de-ville projects.

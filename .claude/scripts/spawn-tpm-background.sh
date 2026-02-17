@@ -6,7 +6,7 @@
 set -euo pipefail
 
 PLAN_ID="$1"
-PLAN_FILE="00 Inbox/plans/${PLAN_ID}.md"
+PLAN_FILE="inbox/plans/${PLAN_ID}.md"
 
 if [ ! -f "$PLAN_FILE" ]; then
     echo "❌ Error: Plan file not found: $PLAN_FILE"
@@ -14,7 +14,7 @@ if [ ! -f "$PLAN_FILE" ]; then
 fi
 
 # Create log directory for background execution
-LOG_DIR="00 Inbox/plans/.logs"
+LOG_DIR="inbox/plans/.logs"
 mkdir -p "$LOG_DIR"
 
 LOG_FILE="$LOG_DIR/${PLAN_ID}.log"
@@ -35,33 +35,34 @@ fi
 echo "🚀 Spawning TPM Orchestrator for $PLAN_ID in background..."
 echo "   Log: $LOG_FILE"
 
-# Spawn TPM orchestrator via Claude Code CLI
-# This uses the Task tool but runs it in a background shell
+# Spawn TPM orchestrator via Claude CLI
+# Uses --agent flag to invoke tpm-orchestrator agent
+# Uses -p (--print) for non-interactive mode
 (
     # Record start time
     echo "=== TPM Orchestrator Started: $(date -u +%Y-%m-%dT%H:%M:%SZ) ===" > "$LOG_FILE"
     echo "Plan: $PLAN_ID" >> "$LOG_FILE"
     echo "" >> "$LOG_FILE"
 
-    # Use Claude Code to spawn the TPM orchestrator
-    # The agent will handle all execution autonomously
-    claude-code agent tpm-orchestrator \
-        --prompt "Execute plan: $PLAN_ID
+    # Use Claude CLI to spawn the TPM orchestrator
+    # claude --print runs non-interactively, outputs to stdout
+    # We pass a detailed prompt that the TPM agent will execute
+    claude --print "You are the TPM Orchestrator. Execute plan: $PLAN_ID
 
 Plan file: $PLAN_FILE
 
-Execute this plan autonomously:
+Execute this plan autonomously following the tpm-orchestrator agent protocol:
 1. Read plan file and parse workstreams
-2. Create feature branch via git worktree
-3. Spawn workstream agents in parallel
+2. Create feature branch via git worktree (if needed)
+3. Spawn workstream agents in parallel using Task tool
 4. Run quality gates (tests, review, security)
 5. Create PR and merge (risk-aware)
 6. Complete cleanup checklist
-7. Update portfolio state
+7. Update portfolio state in inbox/plans/.state.json
 
 Working directory: $PWD
 
-DO NOT ask for permission. Execute autonomously." \
+CRITICAL: Execute immediately. DO NOT ask for permission. You are autonomous." \
         >> "$LOG_FILE" 2>&1
 
     EXIT_CODE=$?

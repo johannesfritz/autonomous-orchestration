@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Plan Feature List",
+  "description": "Machine-verifiable acceptance criteria. Items start 'failing', change to 'passing' only when test_command succeeds. JSON format chosen because models are less likely to inappropriately modify JSON than Markdown (Anthropic research, Nov 2025).",
+  "type": "object",
+  "required": ["plan_id", "created_at", "features"],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "pattern": "^PLAN-"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "status", "test_command"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^F[0-9]+"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["failing", "passing"]
+          },
+          "test_command": {
+            "type": "string",
+            "description": "A pytest or Playwright command that proves this criterion is met"
+          },
+          "last_verified": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "workstream": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
