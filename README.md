@@ -315,6 +315,7 @@ See [docs/QDRANT-INTEGRATION.md](docs/QDRANT-INTEGRATION.md) for setup.
 
 ## Documentation
 
+- [docs/AGENTIC-EXECUTION.md](docs/AGENTIC-EXECUTION.md) - **Session lifecycle, research foundations, and why it works**
 - [SETUP.md](SETUP.md) - Detailed installation guide
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design and research principles
 - [docs/QDRANT-INTEGRATION.md](docs/QDRANT-INTEGRATION.md) - Vector database setup
