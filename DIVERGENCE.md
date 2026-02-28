@@ -21,7 +21,7 @@
 | Protocols | 24 | 32+ | Synced (sw dev only; excludes stellaris-specific UATs) |
 | Scripts | 24 | 29+ | Synced (sw dev only; excludes Qdrant-dependent scripts) |
 | Hooks (shell) | 4 | 5 | Synced (excludes post-commit-sync-docs.sh - Qdrant dependent) |
-| Rules | 10 | 10 | Identical |
+| Rules | 14 | 14 | Identical (10 domain + 4 universal) |
 | Schemas | 6 | 6 | Identical |
 | Docs | 6 | - | Template-specific |
 
@@ -82,10 +82,14 @@
 
 ## Components
 
-### Rules (10) - Modular Documentation
+### Rules (14) - Modular Documentation
 
 ```
 rules/
+├── state-file-protocol.md             # Multi-session handoff (universal, always loaded)
+├── escalation-protocol.md             # Stop retrying after 3 failures (universal)
+├── project-folder-structure.md        # YYMMDD convention, process logs (universal)
+├── workspace-hygiene.md               # Clean up before returning results (universal)
 ├── architecture.md                    # Architecture patterns
 ├── core-patterns.md                   # Cross-cutting patterns
 ├── development/
@@ -219,6 +223,7 @@ rules/
 | 2026-01-03 | 12-Gap Fix Sync (+8 scripts, updated settings.json) |
 | 2026-01-07 | UAT Enforcement + Code Review Integration |
 | 2026-01-08 | Agent-Scoped Hooks & Skill Improvements (+6 verification scripts) |
+| 2026-02-28 | Add 4 universal rules (state-file-protocol, escalation-protocol, project-folder-structure, workspace-hygiene). These are always-loaded session rules that make autonomous operation work across sessions. Referenced by agentic-execution-setup.md but previously missing from template. |
 | 2026-02-17 | **Major Sync: 5-week catch-up** |
 |            | +1 agent: requirements-analyst.md |
 |            | +6 schemas: feature-list.json, tpm-reflection.json, session-reflection.json, handoff-checklist.json, data-science-audit.json, writing-audit.json |

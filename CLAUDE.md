@@ -3,7 +3,7 @@
 **Purpose:** Reusable Claude Code configuration template for autonomous multi-plan development orchestration.
 **Status:** Active template (full configuration)
 **Type:** Configuration template - copy to target projects
-**Last updated:** 2026-02-17
+**Last updated:** 2026-02-28
 
 ---
 
@@ -14,7 +14,7 @@
 | Agents | 17 | portfolio-manager, tpm-orchestrator, risk-manager, uat-protocol-designer, requirements-analyst, etc. |
 | Commands | 22 | /portfolio, /add-plan, /execute-plan, /discovery, /code-review, /setup-gitignore, etc. |
 | Protocols | 24 | code-standards, risk-assessment, quality gates, server safeguards, audit-logging, etc. |
-| Rules | 10 | orchestration, product-management, routing, testing (with `paths:` frontmatter) |
+| Rules | 14 | 4 universal (always loaded) + 10 domain (with `paths:` frontmatter) |
 | Skills | 12 | create-plan, queue-fix, run-test-suite, security-audit, etc. |
 | Hooks | 47 | PreToolUse, PostToolUse, SubagentStart/Stop, UserPromptSubmit |
 | Scripts | 24 | init-session.sh, scan-secrets.py, wait-for-ci.sh, run-uat.py, etc. |
@@ -126,7 +126,11 @@ autonomous-orchestration/
 │   │   ├── portfolio-manager-fixes.md
 │   │   └── ...
 │   │
-│   ├── rules/               # Conditional docs (paths: frontmatter)
+│   ├── rules/               # Auto-loaded constraints
+│   │   ├── state-file-protocol.md   # Multi-session handoff (universal)
+│   │   ├── escalation-protocol.md   # Stop retrying, escalate (universal)
+│   │   ├── project-folder-structure.md # YYMMDD convention (universal)
+│   │   ├── workspace-hygiene.md     # Cleanup before returning (universal)
 │   │   ├── orchestration/
 │   │   │   ├── orchestration.md
 │   │   │   └── routing.md           # paths: inbox/plans/**, .claude/agents/**
@@ -258,6 +262,21 @@ autonomous-orchestration/
           |
 6. Ship (auto-merge if risk < 7)
 ```
+
+---
+
+## Universal vs. Domain Rules
+
+Rules fall into two categories:
+
+| Type | Loading | Purpose | Count |
+|------|---------|---------|-------|
+| **Universal** | Always loaded (no `paths:` frontmatter) | Session lifecycle: handoffs, escalation, folder structure, cleanup | 4 |
+| **Domain** | Conditional (`paths:` frontmatter) | Domain knowledge: architecture, orchestration, testing, development | 10 |
+
+**Universal rules** make autonomous multi-session operation work. Without them, agents don't know how to hand off between sessions, when to stop retrying, or where to put outputs. These load every session (~1,200 tokens total).
+
+**Domain rules** use `paths:` frontmatter so they only load when relevant files are in scope, saving tokens when working outside that domain.
 
 ---
 

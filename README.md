@@ -64,7 +64,7 @@ That's it! The Portfolio Manager will analyze, prioritize, and auto-execute your
 | **Protocols** | 24 | Quality gates, safety enforcement, PM protocols, server safeguards |
 | **Hooks** | 47 | Lifecycle automation (PreToolUse, PostToolUse, SubagentStart/Stop) |
 | **Scripts** | 24 | Shell/Python utilities (init, secrets, change detection, CI verification) |
-| **Rules** | 10 | Modular docs with conditional loading via `paths:` frontmatter |
+| **Rules** | 14 | 4 universal (session lifecycle) + 10 domain (conditional via `paths:`) |
 | **Schemas** | 6 | JSON schemas for feature lists, reflections, handoffs |
 | **Templates** | 3 | Plan and hotfix templates with example |
 
@@ -230,7 +230,18 @@ Every plan goes through:
 
 ## Token Optimization
 
-Rules files use `paths:` frontmatter for conditional loading:
+### Session Handover Rules (Always Loaded)
+
+Four universal rules load every session to make autonomous multi-session operation work:
+
+- **state-file-protocol.md** — How agents hand off between sessions (cold-start test, verification before marking DONE)
+- **escalation-protocol.md** — When agents stop retrying and escalate (3-strike rule, no-progress detection)
+- **project-folder-structure.md** — Where outputs go (YYMMDD convention, process logs)
+- **workspace-hygiene.md** — Cleanup before returning results
+
+### Conditional Rules (Token Optimization)
+
+Domain rules files use `paths:` frontmatter for conditional loading:
 
 ```yaml
 ---
@@ -242,7 +253,7 @@ paths:
 ...
 ```
 
-This means `testing.md` (15 KB) only loads when test-related files are in context, saving ~3,800 tokens per non-testing session. Three rules use this pattern, saving ~7,400 tokens combined per typical session.
+This means `testing.md` (15 KB) only loads when test-related files are in context, saving ~3,800 tokens per non-testing session. The 10 domain rules use this pattern, while the 4 universal rules always load (~1,200 tokens).
 
 ---
 
