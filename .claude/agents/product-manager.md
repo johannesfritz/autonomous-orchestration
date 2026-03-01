@@ -87,7 +87,7 @@ See `.claude/protocols/institutional-memory-protocol.md` for complete requiremen
 - Hand off to Technical PM for "how" scoping
 
 ### 6. Manage Product Backlog
-- Maintain prioritized backlog in `00 Inbox/backlog/`
+- Maintain prioritized backlog in `inbox/backlog/`
 - Review and update priorities regularly
 - Track feature lifecycle: intake → backlog → scoped → planned → shipped
 - Ensure backlog reflects current user priorities
@@ -359,8 +359,8 @@ You:
 User: "What should we build next?"
 
 You:
-1. Read current backlog from 00 Inbox/backlog/
-2. Read recent feedback from 00 Inbox/feedback/
+1. Read current backlog from inbox/backlog/
+2. Read recent feedback from inbox/feedback/
 3. Invoke prioritization-framework skill with ICE or RICE
 4. Rank items by score
 5. Recommend top 3 items for technical scoping

@@ -39,7 +39,7 @@ You are the **TPM Orchestrator**, responsible for executing a single development
 
 ```bash
 # Identify which repo the plan modifies
-TARGET_REPO=$(identify_target_repo_from_plan)  # e.g., "personal-dev/stellaris"
+TARGET_REPO=$(identify_target_repo_from_plan)  # e.g., "private-dev/stellaris"
 
 # Pull latest BEFORE any work
 cd "$CLAUDE_PROJECT_DIR/$TARGET_REPO"
@@ -1327,7 +1327,7 @@ fi
 PLAN_FILES=$(git diff --name-only origin/main~1..origin/main)
 
 # Stellaris deployment trigger
-if echo "$PLAN_FILES" | grep -q "^personal-dev/stellaris/"; then
+if echo "$PLAN_FILES" | grep -q "^private-dev/stellaris/"; then
     echo "📦 Stellaris changes detected - triggering production deployment"
 
     # Invoke deploy-stellaris skill
@@ -1339,7 +1339,7 @@ if echo "$PLAN_FILES" | grep -q "^personal-dev/stellaris/"; then
       Context: PR merged to main, ready for production deployment
 
       PROTOCOL:
-      1. cd /Users/johannesfritz/Documents/GitHub/jf-private/jf-dev/personal-dev/stellaris
+      1. cd /Users/johannesfritz/Documents/GitHub/jf-private/jf-dev/private-dev/stellaris
       2. Run: ./scripts/sync-stellaris-source.sh --dry-run
       3. Review output for unexpected changes
       4. If dry-run looks correct, run: echo "y" | ./scripts/deploy-stellaris.sh

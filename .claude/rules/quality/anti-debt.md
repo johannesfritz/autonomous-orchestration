@@ -1,10 +1,10 @@
 ---
 paths:
-  - personal-dev/**/*.py
-  - personal-dev/**/*.ts
-  - personal-dev/**/*.tsx
-  - personal-dev/**/*.js
-  - personal-dev/**/*.jsx
+  - private-dev/**/*.py
+  - private-dev/**/*.ts
+  - private-dev/**/*.tsx
+  - private-dev/**/*.js
+  - private-dev/**/*.jsx
   - deployment/**
 ---
 

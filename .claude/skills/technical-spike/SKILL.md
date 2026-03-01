@@ -171,7 +171,7 @@ Spikes must NOT attempt to:
 
 ## Spike Output Format
 
-**Location:** `00 Inbox/spikes/spike-YYYY-MM-DD-topic.md`
+**Location:** `inbox/spikes/spike-YYYY-MM-DD-topic.md`
 
 **Template:**
 

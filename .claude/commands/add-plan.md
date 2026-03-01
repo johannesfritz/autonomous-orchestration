@@ -6,7 +6,7 @@ Examples:
   /add-plan PLAN-feature-a.md PLAN-feature-b.md        # Multiple plans
   /add-plan *.md                                        # Glob pattern (all .md in Inbox)
 
-Expects plan files to exist in 00 Inbox/ or 00 Inbox/plans/ directory.
+Expects plan files to exist in inbox/ or inbox/plans/ directory.
 
 ## Multi-Plan Benefits
 
@@ -22,9 +22,9 @@ Adding multiple plans in one command:
 
 **For EACH plan file** (processed sequentially to avoid ID collisions):
 
-If the plan file is NOT in `00 Inbox/plans/`:
+If the plan file is NOT in `inbox/plans/`:
 1. **Check for ID conflicts** - If plan ID already exists in completed/ or plans/, assign next available ID (PLAN-YYYY-NNN)
-2. **Move file** to `00 Inbox/plans/PLAN-YYYY-NNN.md`
+2. **Move file** to `inbox/plans/PLAN-YYYY-NNN.md`
 3. **Update ID** in the plan file header to match filename
 4. **Delete the original file** to avoid duplicates
 5. **Track the normalized path** for batch submission to Portfolio Manager
@@ -72,19 +72,19 @@ High-risk plans (risk ≥ 7) are queued but NOT auto-executed - they require man
 ### Step 1: Expand Input (handle globs)
 
 1. Parse the argument(s) to get list of plan files
-2. If glob pattern (e.g., `*.md`), expand to matching files in `00 Inbox/`
+2. If glob pattern (e.g., `*.md`), expand to matching files in `inbox/`
 3. Validate each file exists
 
 ### Step 2: Sequential Normalization (prevents ID collisions)
 
 For EACH plan file in order:
 
-1. Check existing plan IDs in `00 Inbox/plans/` and `00 Inbox/plans/completed/`
+1. Check existing plan IDs in `inbox/plans/` and `inbox/plans/completed/`
 2. Find max NNN value across all existing PLAN-YYYY-NNN files
 3. If plan needs new ID:
    - Assign PLAN-YYYY-(max+1).md
    - Increment max for next file in batch
-4. Copy file to `00 Inbox/plans/PLAN-YYYY-NNN.md`
+4. Copy file to `inbox/plans/PLAN-YYYY-NNN.md`
 5. Edit the ID in the new file to match filename
 6. Delete the original file
 7. Add normalized path to `normalized_files` list

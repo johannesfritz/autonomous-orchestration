@@ -45,7 +45,7 @@ UAT is OPTIONAL for:
 
 ### Step 1: Generate UAT Checklist (REQUIRED)
 
-**File location:** `00 Inbox/uat-checklists/{PLAN_ID}-uat.md`
+**File location:** `inbox/uat-checklists/{PLAN_ID}-uat.md`
 
 **Template:**
 
@@ -259,19 +259,19 @@ Fill in the UAT checklist:
 
 ```bash
 # Check UAT checklist exists
-if [ ! -f "00 Inbox/uat-checklists/${PLAN_ID}-uat.md" ]; then
+if [ ! -f "inbox/uat-checklists/${PLAN_ID}-uat.md" ]; then
     echo "❌ UAT checklist not found"
     exit 1
 fi
 
 # Check for completion markers
-if ! grep -q "Overall Result: ✅ PASS" "00 Inbox/uat-checklists/${PLAN_ID}-uat.md"; then
+if ! grep -q "Overall Result: ✅ PASS" "inbox/uat-checklists/${PLAN_ID}-uat.md"; then
     echo "❌ UAT not passed"
     exit 1
 fi
 
 # Check for signature
-if ! grep -q "Tester Signature:" "00 Inbox/uat-checklists/${PLAN_ID}-uat.md"; then
+if ! grep -q "Tester Signature:" "inbox/uat-checklists/${PLAN_ID}-uat.md"; then
     echo "❌ UAT not signed off"
     exit 1
 fi
@@ -345,9 +345,9 @@ Gate 1: Tests → Gate 2: Code Review → Gate 3: Security → Gate 4: UAT → G
 
 All UAT artifacts stored in:
 
-- **Checklists:** `00 Inbox/uat-checklists/{PLAN_ID}-uat.md`
-- **Screenshots:** `00 Inbox/uat-evidence/{PLAN_ID}/`
-- **Test recordings:** `00 Inbox/uat-evidence/{PLAN_ID}/recordings/`
+- **Checklists:** `inbox/uat-checklists/{PLAN_ID}-uat.md`
+- **Screenshots:** `inbox/uat-evidence/{PLAN_ID}/`
+- **Test recordings:** `inbox/uat-evidence/{PLAN_ID}/recordings/`
 - **Playwright reports:** `hotel-de-ville/frontend/playwright-report/`
 
 Keep evidence for:
@@ -358,7 +358,7 @@ Keep evidence for:
 
 ## Example: Complete UAT Checklist
 
-See: `00 Inbox/uat-checklists/PLAN-2025-001-uat.md` (example)
+See: `inbox/uat-checklists/PLAN-2025-001-uat.md` (example)
 
 ---
 

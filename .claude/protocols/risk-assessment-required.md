@@ -13,7 +13,7 @@ This is a **MANDATORY** safety gate enforced by hooks. You CANNOT skip this step
 This protocol is triggered when:
 - Portfolio Manager is analyzing new plans
 - TPM Orchestrator is about to execute a plan
-- Any agent is working with development plans in `00 Inbox/plans/`
+- Any agent is working with development plans in `inbox/plans/`
 
 ---
 
@@ -27,7 +27,7 @@ Read the plan file and check if it has a `## Risk Assessment` section.
 
 ```bash
 # Check if risk assessment exists
-grep -q "## Risk Assessment" "00 Inbox/plans/PLAN-XXXX.md"
+grep -q "## Risk Assessment" "inbox/plans/PLAN-XXXX.md"
 
 # If not found, risk assessment is missing
 ```
@@ -39,7 +39,7 @@ grep -q "## Risk Assessment" "00 Inbox/plans/PLAN-XXXX.md"
 Task(
   subagent_type='risk-manager',
   description='Assess risk for PLAN-XXXX',
-  prompt='Perform comprehensive risk assessment for plan file: 00 Inbox/plans/PLAN-XXXX.md
+  prompt='Perform comprehensive risk assessment for plan file: inbox/plans/PLAN-XXXX.md
 
 Assess all four risk dimensions:
 - User Disruption Risk
@@ -63,7 +63,7 @@ After Risk Manager completes:
 
 ```bash
 # Re-read the plan file
-Read: 00 Inbox/plans/PLAN-XXXX.md
+Read: inbox/plans/PLAN-XXXX.md
 
 # Extract risk assessment section
 # Look for:
@@ -173,7 +173,7 @@ This section documents the complete escalation workflow when risk assessment ret
 
 When Risk Manager determines overall risk ≥ 7/10, it MUST:
 
-1. Set plan status to `AWAITING_APPROVAL` in `00 Inbox/plans/.state.json`
+1. Set plan status to `AWAITING_APPROVAL` in `inbox/plans/.state.json`
 2. Update plan file header with escalation metadata
 
 ```bash
@@ -242,7 +242,7 @@ If a plan shows `REQUIRES APPROVAL`, check for approval:
 
 ```markdown
 # Look for approval marker in plan file
-grep -q "## Manual Approval" "00 Inbox/plans/PLAN-XXXX.md"
+grep -q "## Manual Approval" "inbox/plans/PLAN-XXXX.md"
 
 # If found, check for:
 # **Decision:** APPROVED

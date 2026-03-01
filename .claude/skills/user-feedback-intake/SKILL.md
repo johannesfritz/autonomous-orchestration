@@ -81,7 +81,7 @@ Use these rules to categorize feedback:
 
 ## Output Format
 
-Write intake records to `00 Inbox/feedback/intake-YYYY-MM-DD.md` with this structure:
+Write intake records to `inbox/feedback/intake-YYYY-MM-DD.md` with this structure:
 
 ```markdown
 # Feedback Intake: [Date]
@@ -131,17 +131,17 @@ Before processing feedback, search for duplicates:
 
 1. **Search existing plans:**
    ```bash
-   grep -r "pronunciation" "00 Inbox/plans/"
+   grep -r "pronunciation" "inbox/plans/"
    ```
 
 2. **Search backlog:**
    ```bash
-   grep -r "export PDF" "00 Inbox/backlog/"
+   grep -r "export PDF" "inbox/backlog/"
    ```
 
 3. **Search previous intake records:**
    ```bash
-   grep -r "dark mode" "00 Inbox/feedback/"
+   grep -r "dark mode" "inbox/feedback/"
    ```
 
 If duplicate found, mark in intake record:
@@ -191,7 +191,7 @@ For each feedback item:
 4. Assess impact (number of users affected, severity)
 
 ### Step 4: Write Intake Record
-- Create `00 Inbox/feedback/intake-YYYY-MM-DD.md`
+- Create `inbox/feedback/intake-YYYY-MM-DD.md`
 - Use structured format above
 - Include summary with patterns and next steps
 
@@ -242,7 +242,7 @@ You (skill execution):
 3. Categorize each item
 4. Search for duplicates
 5. Extract underlying user needs
-6. Write intake record to 00 Inbox/feedback/intake-2025-12-31.md
+6. Write intake record to inbox/feedback/intake-2025-12-31.md
 7. Return summary:
 
    "Processed 12 open feedback items from Stellaris.
@@ -261,7 +261,7 @@ You (skill execution):
    - Add offline access to backlog for prioritization
    - Performance issue needs Technical PM scoping
 
-   Full intake record: 00 Inbox/feedback/intake-2025-12-31.md"
+   Full intake record: inbox/feedback/intake-2025-12-31.md"
 ```
 
 ---
@@ -304,7 +304,7 @@ Call: mcp__stellaris-admin__get_feedback_stats
 
 - **Read operations are safe** - get_open_feedback and get_feedback_details are read-only
 - **Write operations require care** - respond_to_feedback creates user-visible notifications
-- **Feedback directory auto-created** - If `00 Inbox/feedback/` doesn't exist, create it
+- **Feedback directory auto-created** - If `inbox/feedback/` doesn't exist, create it
 - **One intake per day** - Use date-based filenames to avoid overwrites
 - **Product Manager owns next steps** - Skill only processes and structures data
 - **Duplicate detection is critical** - Avoid redundant work on already-planned features

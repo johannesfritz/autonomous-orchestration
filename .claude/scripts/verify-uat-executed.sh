@@ -24,7 +24,7 @@ fi
 echo "🔍 Verifying UAT execution for $PLAN_ID..."
 
 # Check for evidence directory
-EVIDENCE_DIR="$REPO_ROOT/00 Inbox/uat-evidence/$PLAN_ID"
+EVIDENCE_DIR="$REPO_ROOT/inbox/uat-evidence/$PLAN_ID"
 
 if [ ! -d "$EVIDENCE_DIR" ]; then
     echo ""

@@ -19,11 +19,11 @@ This command scores and ranks backlog items using RICE, ICE, or MoSCoW framework
 
 ## Workflow
 
-1. **Read current intake items** from `00 Inbox/feedback/`
-2. **Read existing backlog** from `00 Inbox/backlog/`
+1. **Read current intake items** from `inbox/feedback/`
+2. **Read existing backlog** from `inbox/backlog/`
 3. **Ask which framework to use** if not specified (default: ICE for quick triage)
 4. **Invoke prioritization-framework skill** to score items
-5. **Output ranked backlog** to `00 Inbox/backlog/prioritized-backlog.md`
+5. **Output ranked backlog** to `inbox/backlog/prioritized-backlog.md`
 6. **Highlight top 3 items** ready for technical scoping
 
 ## Frameworks
@@ -60,7 +60,7 @@ After running `/prioritize-backlog`, you will receive:
 - **Ranked backlog:** Sorted by score (highest priority first)
 - **Top 3 highlights:** Features ready for Technical PM scoping
 - **Deferred items:** Low-priority features with reasoning
-- **Backlog file:** `00 Inbox/backlog/prioritized-backlog.md` (RICE/ICE) or `00 Inbox/backlog/release-plan-[name].md` (MoSCoW)
+- **Backlog file:** `inbox/backlog/prioritized-backlog.md` (RICE/ICE) or `inbox/backlog/release-plan-[name].md` (MoSCoW)
 
 ## Example
 

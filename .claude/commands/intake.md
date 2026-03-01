@@ -22,7 +22,7 @@ This command fetches user feedback from the Stellaris production database via SS
 1. **Invoke user-feedback-intake skill** to fetch and categorize open feedback from Stellaris database
 2. **Search for duplicates** in existing plans and backlog to avoid redundant work
 3. **Extract underlying user needs** (not just stated solutions)
-4. **Output structured intake records** to `00 Inbox/feedback/intake-YYYY-MM-DD.md`
+4. **Output structured intake records** to `inbox/feedback/intake-YYYY-MM-DD.md`
 5. **Summarize findings** with high-priority items, patterns detected, and recommended next steps
 
 ## Output
@@ -30,7 +30,7 @@ This command fetches user feedback from the Stellaris production database via SS
 After running `/intake`, you will receive:
 
 - **Summary:** Total items processed, high-priority count, patterns detected
-- **Intake file:** Structured markdown file at `00 Inbox/feedback/intake-YYYY-MM-DD.md`
+- **Intake file:** Structured markdown file at `inbox/feedback/intake-YYYY-MM-DD.md`
 - **Next steps:** Recommendations for Product Manager (prioritize, escalate, defer)
 
 ## Example

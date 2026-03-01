@@ -140,7 +140,7 @@ Generate a minimal HOTFIX plan:
 
 ### HOTFIX ID Assignment
 
-1. List existing hotfixes: `ls "00 Inbox/plans/HOTFIX-*.md" 2>/dev/null | sort | tail -1`
+1. List existing hotfixes: `ls "inbox/plans/HOTFIX-*.md" 2>/dev/null | sort | tail -1`
 2. Extract number, increment by 1
 3. Format: `HOTFIX-YYYY-NNN` (e.g., `HOTFIX-2025-001`)
 
@@ -153,7 +153,7 @@ Generate a minimal HOTFIX plan:
 ### Save the hotfix:
 
 ```bash
-# Write to 00 Inbox/plans/HOTFIX-YYYY-NNN.md
+# Write to inbox/plans/HOTFIX-YYYY-NNN.md
 ```
 
 ### Submit to portfolio:
@@ -180,7 +180,7 @@ Hotfix queued and submitted to Portfolio Manager.
 
 **HOTFIX-YYYY-NNN:** [Brief description]
 **Status:** Queued for execution
-**File:** 00 Inbox/plans/HOTFIX-YYYY-NNN.md
+**File:** inbox/plans/HOTFIX-YYYY-NNN.md
 
 The fix will execute in the background. You can:
 - Check status: `/plan-status HOTFIX-YYYY-NNN`

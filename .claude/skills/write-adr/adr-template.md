@@ -69,6 +69,6 @@
 ## Links
 
 - [Related ADR-XXX: Title](ADR-XXX-title.md)
-- [Related Plan: PLAN-2025-XXX](../../00 Inbox/plans/PLAN-2025-XXX.md)
-- [Technical Spike: Topic](../../00 Inbox/spikes/spike-2025-01-15-topic.md)
+- [Related Plan: PLAN-2025-XXX](../../inbox/plans/PLAN-2025-XXX.md)
+- [Technical Spike: Topic](../../inbox/spikes/spike-2025-01-15-topic.md)
 - [External documentation or research](https://example.com)

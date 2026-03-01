@@ -1,6 +1,6 @@
 ---
 paths:
-  - personal-dev/stellaris/**
+  - private-dev/stellaris/**
   - stellaris/**
 ---
 

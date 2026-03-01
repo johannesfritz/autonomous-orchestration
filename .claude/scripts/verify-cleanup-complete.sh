@@ -36,8 +36,8 @@ success() {
 # === 1. Check Plan File Location ===
 echo "## 1. Plan File Location"
 
-ACTIVE_PLAN="00 Inbox/plans/${PLAN_ID}.md"
-COMPLETED_PLAN="00 Inbox/plans/completed/${PLAN_ID}.md"
+ACTIVE_PLAN="inbox/plans/${PLAN_ID}.md"
+COMPLETED_PLAN="inbox/plans/completed/${PLAN_ID}.md"
 
 if [ -f "$COMPLETED_PLAN" ]; then
     success "Plan file in completed/ folder"
@@ -48,7 +48,7 @@ elif [ -f "$ACTIVE_PLAN" ]; then
     if echo "$STATUS" | grep -q "AWAITING_MERGE_APPROVAL"; then
         success "Plan file in active folder (awaiting manual merge - OK)"
     else
-        error "Plan file still in 00 Inbox/plans/ but status is $STATUS (should be moved to completed/)"
+        error "Plan file still in inbox/plans/ but status is $STATUS (should be moved to completed/)"
     fi
 else
     error "Plan file not found in active/ or completed/"
@@ -58,7 +58,7 @@ fi
 echo ""
 echo "## 2. Portfolio State (.state.json)"
 
-STATE_FILE="00 Inbox/plans/.state.json"
+STATE_FILE="inbox/plans/.state.json"
 
 if [ ! -f "$STATE_FILE" ]; then
     error ".state.json not found"
@@ -98,7 +98,7 @@ fi
 echo ""
 echo "## 3. Portfolio Dashboard (PORTFOLIO_STATUS.md)"
 
-DASHBOARD="00 Inbox/PORTFOLIO_STATUS.md"
+DASHBOARD="inbox/PORTFOLIO_STATUS.md"
 
 if [ ! -f "$DASHBOARD" ]; then
     warning "PORTFOLIO_STATUS.md not found (non-critical)"
@@ -124,7 +124,7 @@ echo ""
 echo "## 4. Git Commit Status"
 
 # Check if there are uncommitted changes in portfolio state files
-UNCOMMITTED=$(git status --porcelain "00 Inbox/plans/" "00 Inbox/PORTFOLIO_STATUS.md" "00 Inbox/system_state.json" "00 Inbox/audit_log.jsonl" 2>/dev/null || true)
+UNCOMMITTED=$(git status --porcelain "inbox/plans/" "inbox/PORTFOLIO_STATUS.md" "inbox/system_state.json" "inbox/audit_log.jsonl" 2>/dev/null || true)
 
 if [ -z "$UNCOMMITTED" ]; then
     success "All portfolio state changes committed"
@@ -139,7 +139,7 @@ fi
 echo ""
 echo "## 5. Audit Log (audit_log.jsonl)"
 
-AUDIT_LOG="00 Inbox/audit_log.jsonl"
+AUDIT_LOG="inbox/audit_log.jsonl"
 
 if [ ! -f "$AUDIT_LOG" ]; then
     warning "audit_log.jsonl not found (should exist)"

@@ -240,7 +240,7 @@ You: "Invoking create-plan skill to generate development plan for pronunciation 
 
 [Invoke create-plan skill with feature details]
 
-You: "Plan created at 00 Inbox/plans/PLAN-2025-XXX.md. Submitting to portfolio via /add-plan."
+You: "Plan created at inbox/plans/PLAN-2025-XXX.md. Submitting to portfolio via /add-plan."
 ```
 
 ---

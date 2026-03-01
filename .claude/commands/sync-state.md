@@ -15,7 +15,7 @@ Reconcile portfolio state files from ground truth sources (git branches, complet
 git branch -a | grep "feature/"
 
 # List completed plans (indicates SHIPPED plans)
-ls -la "00 Inbox/plans/completed/"
+ls -la "inbox/plans/completed/"
 
 # Check recent merged PRs
 gh pr list --state merged --limit 20 --json number,title,headRefName,mergedAt
@@ -23,7 +23,7 @@ gh pr list --state merged --limit 20 --json number,title,headRefName,mergedAt
 
 ### 2. Cross-Reference with .state.json
 
-For each plan in `00 Inbox/plans/.state.json`:
+For each plan in `inbox/plans/.state.json`:
 
 | Current Status | Ground Truth Finding | Correct Status |
 |----------------|---------------------|----------------|
@@ -46,7 +46,7 @@ After correcting `.state.json`:
 
 ### 4. Log Reconciliation Event
 
-Append to `00 Inbox/audit_log.jsonl`:
+Append to `inbox/audit_log.jsonl`:
 
 ```json
 {

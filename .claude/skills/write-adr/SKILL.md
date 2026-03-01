@@ -24,7 +24,7 @@ Identify which project this ADR belongs to based on context:
 
 - **Stellaris** → `stellaris/docs/adr/`
 - **Hotel de Ville** → `hotel-de-ville/docs/adr/`
-- **Repository-wide** → `00 Inbox/adr/` (for tooling, processes, meta-decisions)
+- **Repository-wide** → `inbox/adr/` (for tooling, processes, meta-decisions)
 - **Cross-project** → Create in both project folders with cross-reference
 
 **Detection heuristics:**
@@ -177,8 +177,8 @@ Location: `.claude/skills/write-adr/adr-template.md`
 ## Links
 
 - [Related ADR-XXX: Title](ADR-XXX-title.md)
-- [Related Plan: PLAN-2025-XXX](../../00 Inbox/plans/PLAN-2025-XXX.md)
-- [Technical Spike: Topic](../../00 Inbox/spikes/spike-2025-01-15-topic.md)
+- [Related Plan: PLAN-2025-XXX](../../inbox/plans/PLAN-2025-XXX.md)
+- [Technical Spike: Topic](../../inbox/spikes/spike-2025-01-15-topic.md)
 - [External documentation or research](https://example.com)
 ```
 
@@ -263,7 +263,7 @@ Before finalizing an ADR, verify:
 
 **If project can't be determined:**
 1. Ask user which project
-2. Default to repository-wide (00 Inbox/adr/) if unclear
+2. Default to repository-wide (inbox/adr/) if unclear
 3. Document assumption in ADR metadata
 
 ---

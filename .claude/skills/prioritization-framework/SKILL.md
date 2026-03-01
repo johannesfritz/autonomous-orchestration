@@ -172,7 +172,7 @@ All rated on 1-10 scale:
 
 ### RICE/ICE Ranked Backlog
 
-Write to `00 Inbox/backlog/prioritized-backlog.md`:
+Write to `inbox/backlog/prioritized-backlog.md`:
 
 ```markdown
 # Prioritized Backlog
@@ -202,7 +202,7 @@ Write to `00 Inbox/backlog/prioritized-backlog.md`:
 
 ### MoSCoW Release Plan
 
-Write to `00 Inbox/backlog/release-plan-[release-name].md`:
+Write to `inbox/backlog/release-plan-[release-name].md`:
 
 ```markdown
 # Release Plan: [Release Name/Version]
@@ -262,8 +262,8 @@ Write to `00 Inbox/backlog/release-plan-[release-name].md`:
 ### Step 1: Gather Input
 
 Collect items to prioritize from:
-- `00 Inbox/feedback/` (recent user feedback)
-- `00 Inbox/backlog/` (existing backlog items)
+- `inbox/feedback/` (recent user feedback)
+- `inbox/backlog/` (existing backlog items)
 - User-provided feature list
 
 For each item, you need:
@@ -348,15 +348,15 @@ Before finalizing backlog:
 Product Manager: "Prioritize the current backlog using ICE scoring"
 
 You (skill execution):
-1. Read items from 00 Inbox/feedback/intake-2025-12-30.md
-2. Read items from 00 Inbox/backlog/unprioritized.md
+1. Read items from inbox/feedback/intake-2025-12-30.md
+2. Read items from inbox/backlog/unprioritized.md
 3. For each item:
    - Rate Impact: How valuable to users? (1-10)
    - Rate Confidence: How certain of success? (1-10)
    - Rate Ease: How easy to build? (1-10)
    - Calculate ICE score
 4. Sort by score (highest first)
-5. Write to 00 Inbox/backlog/prioritized-backlog.md
+5. Write to inbox/backlog/prioritized-backlog.md
 6. Return summary:
 
    "Prioritized 15 backlog items using ICE framework.
@@ -380,7 +380,7 @@ You (skill execution):
    - Spike for offline lessons approach
    - Defer low-priority items to future release
 
-   Full backlog: 00 Inbox/backlog/prioritized-backlog.md"
+   Full backlog: inbox/backlog/prioritized-backlog.md"
 ```
 
 ---

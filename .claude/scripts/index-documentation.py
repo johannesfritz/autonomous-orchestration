@@ -144,7 +144,7 @@ def get_changed_files(since_commit: Optional[str] = None) -> List[Path]:
             "CLAUDE.md",
             ".claude/rules/",
             ".claude/protocols/",
-            "00 Inbox/plans/completed/",
+            "inbox/plans/completed/",
         ]
 
         changed_files = []

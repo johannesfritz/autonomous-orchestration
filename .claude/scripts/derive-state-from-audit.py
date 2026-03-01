@@ -8,7 +8,7 @@ the current state of all plans by replaying events in order.
 Usage:
     python3 derive-state-from-audit.py [audit_log_path]
 
-    If no path is provided, defaults to "00 Inbox/audit_log.jsonl"
+    If no path is provided, defaults to "inbox/audit_log.jsonl"
 
 Output:
     JSON object mapping plan IDs to their derived states
@@ -187,7 +187,7 @@ def main() -> None:
     if len(sys.argv) > 1:
         audit_path = sys.argv[1]
     else:
-        audit_path = '00 Inbox/audit_log.jsonl'
+        audit_path = 'inbox/audit_log.jsonl'
 
     # Derive state from audit log
     state = derive_state(audit_path)
@@ -196,7 +196,7 @@ def main() -> None:
     if len(sys.argv) > 2 and sys.argv[2] == '--compare':
         state_file_path = (
             sys.argv[3] if len(sys.argv) > 3
-            else '00 Inbox/plans/.state.json'
+            else 'inbox/plans/.state.json'
         )
         discrepancies = compare_with_state_file(state, state_file_path)
 

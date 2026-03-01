@@ -24,7 +24,7 @@ This skill will:
 - Check for dependencies on other plans
 - Include discovery context (PM validation, UX specs, technical specs, ADRs)
 - Format the plan properly
-- Save to 00 Inbox/plans/ with descriptive filename
+- Save to inbox/plans/ with descriptive filename
 - Optionally submit to portfolio via /add-plan
 
 ---
@@ -367,21 +367,21 @@ Generate a descriptive plan ID:
 
 Write the plan to:
 ```
-00 Inbox/plans/PLAN-[kebab-case-name].md
+inbox/plans/PLAN-[kebab-case-name].md
 ```
 
 **Examples:**
-- `00 Inbox/plans/PLAN-fsrs-consolidation.md`
-- `00 Inbox/plans/PLAN-offline-mode.md`
-- `00 Inbox/plans/PLAN-audio-pronunciation.md`
+- `inbox/plans/PLAN-fsrs-consolidation.md`
+- `inbox/plans/PLAN-offline-mode.md`
+- `inbox/plans/PLAN-audio-pronunciation.md`
 
-**Note:** Plans are now saved in `00 Inbox/plans/` subdirectory for better organization.
+**Note:** Plans are now saved in `inbox/plans/` subdirectory for better organization.
 
 ### Step 6: Ask About Submission
 
 **Ask the user:**
 ```
-Plan created and saved to 00 Inbox/plans/PLAN-[name].md
+Plan created and saved to inbox/plans/PLAN-[name].md
 
 Would you like me to:
 1. Submit to portfolio now (/add-plan) - Auto-executes if ready

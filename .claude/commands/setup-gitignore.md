@@ -36,13 +36,13 @@ If *.Rproj or *.R files exist → r-analysis
 ## Example
 
 ```bash
-# User: /setup-gitignore personal-dev/new-project
+# User: /setup-gitignore private-dev/new-project
 
 # Claude detects package.json with nuxt, applies node-nuxt template
-cp templates/gitignore/node-nuxt.gitignore personal-dev/new-project/.gitignore
+cp templates/gitignore/node-nuxt.gitignore private-dev/new-project/.gitignore
 
 # Verify
-cd personal-dev/new-project && git status
+cd private-dev/new-project && git status
 ```
 
 ## After Setup

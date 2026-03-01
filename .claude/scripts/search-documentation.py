@@ -105,7 +105,7 @@ def search_documentation(query: str, mode: str = "all", limit: int = 10) -> List
         # Only completed plans
         search_filter = Filter(
             must=[
-                FieldCondition(key="file_path", match=MatchValue(value="00 Inbox/plans/completed/"))
+                FieldCondition(key="file_path", match=MatchValue(value="inbox/plans/completed/"))
             ]
         )
     

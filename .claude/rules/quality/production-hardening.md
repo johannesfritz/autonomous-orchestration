@@ -1,11 +1,11 @@
 ---
 paths:
-  - personal-dev/**/migrations/**
-  - personal-dev/**/alembic/**
-  - personal-dev/**/models.py
-  - personal-dev/**/schema.py
-  - personal-dev/**/auth/**
-  - personal-dev/**/services/**
+  - private-dev/**/migrations/**
+  - private-dev/**/alembic/**
+  - private-dev/**/models.py
+  - private-dev/**/schema.py
+  - private-dev/**/auth/**
+  - private-dev/**/services/**
   - deployment/**
 ---
 

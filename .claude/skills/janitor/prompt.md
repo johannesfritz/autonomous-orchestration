@@ -51,7 +51,7 @@ Check for plan files that should be archived:
 
 ```bash
 # Plans with SHIPPED status still in active plans/
-ls "00 Inbox/plans/"*.md 2>/dev/null | while read plan; do
+ls "inbox/plans/"*.md 2>/dev/null | while read plan; do
   if grep -q "Status.*SHIPPED\|Status.*completed" "$plan"; then
     echo "ORPHANED: $plan should be in completed/"
   fi
@@ -79,10 +79,10 @@ Verify `.state.json` matches actual plan files:
 import json
 from pathlib import Path
 
-state_path = Path("00 Inbox/plans/.state.json")
+state_path = Path("inbox/plans/.state.json")
 if state_path.exists():
     state = json.loads(state_path.read_text())
-    plans_dir = Path("00 Inbox/plans")
+    plans_dir = Path("inbox/plans")
 
     # Check for plans in state that don't exist as files
     for plan_id in state.get("plans", {}):
@@ -144,7 +144,7 @@ git push
 - `node_modules/` directories (required for builds)
 - `.venv/` or `venv/` directories (Python environments)
 - `.git/` directory
-- Any file in `00 Inbox/` unless explicitly orphaned
+- Any file in `inbox/` unless explicitly orphaned
 - Production database files (`.db` without temp suffixes)
 - Configuration files (`.env`, `*.json`, `*.toml`, `*.yaml`)
 
@@ -159,7 +159,7 @@ git push
 
 When invoked after TPM orchestrator completes:
 
-1. **Archive the completed plan** to `00 Inbox/plans/completed/`
+1. **Archive the completed plan** to `inbox/plans/completed/`
 2. **Update `.state.json`** with completion timestamp
 3. **Clean up branch** if feature branch was used
 4. **Remove any temp files** created during execution

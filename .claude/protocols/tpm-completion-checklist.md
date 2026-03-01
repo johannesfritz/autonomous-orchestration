@@ -92,7 +92,7 @@ If any step fails, do not proceed to the next. Investigate and fix the issue.
 
 **Check for User Requests section:**
 ```bash
-grep -A 5 "## User Requests" "00 Inbox/plans/$PLAN_ID.md"
+grep -A 5 "## User Requests" "inbox/plans/$PLAN_ID.md"
 ```
 
 If the section exists AND contains feedback IDs, complete the user notification protocol:
@@ -126,7 +126,7 @@ If the section exists AND contains feedback IDs, complete the user notification 
 ### 1. Update Plan Status in `.state.json`
 
 ```bash
-# File: 00 Inbox/plans/.state.json
+# File: inbox/plans/.state.json
 # Update the plan entry:
 {
   "PLAN-YYYY-NNN": {
@@ -149,7 +149,7 @@ If the section exists AND contains feedback IDs, complete the user notification 
 
 ```bash
 # Only if status is SHIPPED (not AWAITING_MERGE_APPROVAL)
-mv "00 Inbox/plans/PLAN-YYYY-NNN.md" "00 Inbox/plans/completed/PLAN-YYYY-NNN.md"
+mv "inbox/plans/PLAN-YYYY-NNN.md" "inbox/plans/completed/PLAN-YYYY-NNN.md"
 
 # Update the plan file header with:
 - **Status:** SHIPPED
@@ -160,7 +160,7 @@ mv "00 Inbox/plans/PLAN-YYYY-NNN.md" "00 Inbox/plans/completed/PLAN-YYYY-NNN.md"
 ### 3. Update Portfolio Dashboard
 
 ```bash
-# File: 00 Inbox/PORTFOLIO_STATUS.md
+# File: inbox/PORTFOLIO_STATUS.md
 # Update sections:
 1. Executive Summary - decrement "Currently Executing", increment "Shipped"
 2. Currently Executing - remove this plan
@@ -173,7 +173,7 @@ mv "00 Inbox/plans/PLAN-YYYY-NNN.md" "00 Inbox/plans/completed/PLAN-YYYY-NNN.md"
 **CRITICAL: Always commit state files after plan completion.**
 
 ```bash
-git add -A "00 Inbox/plans/" "00 Inbox/PORTFOLIO_STATUS.md" "00 Inbox/system_state.json" "00 Inbox/audit_log.jsonl"
+git add -A "inbox/plans/" "inbox/PORTFOLIO_STATUS.md" "inbox/system_state.json" "inbox/audit_log.jsonl"
 git commit -m "Update portfolio state: PLAN-YYYY-NNN shipped"
 git push
 ```
@@ -199,7 +199,7 @@ Before returning, verify:
 
 ```python
 # Read current state
-state = json.load(open("00 Inbox/plans/.state.json"))
+state = json.load(open("inbox/plans/.state.json"))
 
 # Update plan status
 state["plans"][plan_id]["status"] = "SHIPPED"
@@ -215,7 +215,7 @@ state["metadata"]["total_plans_shipped"] += 1
 state["metadata"]["last_updated"] = datetime.now().isoformat() + "Z"
 
 # Write back
-json.dump(state, open("00 Inbox/plans/.state.json", "w"), indent=2)
+json.dump(state, open("inbox/plans/.state.json", "w"), indent=2)
 ```
 
 ---

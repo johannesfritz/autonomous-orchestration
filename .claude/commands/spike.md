@@ -4,7 +4,7 @@ Start an objective-driven technical investigation.
 2. Classify as Technical (feasibility) or Functional (behavior)
 3. Define success criteria (what proves the answer)
 4. Use the technical-spike skill to conduct investigation
-5. Document findings in 00 Inbox/spikes/
+5. Document findings in inbox/spikes/
 6. Provide recommendation for next steps
 
 Remember: A spike ends when the objective is reached, not after a time limit.

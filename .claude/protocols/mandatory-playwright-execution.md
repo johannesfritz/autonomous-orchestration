@@ -92,7 +92,7 @@ if [ "$PLAN_HAS_FRONTEND" = "true" ]; then
         STATUS="FAILED_UAT"
 
         # Create failure report
-        cat > "00 Inbox/failed-plans/${PLAN_ID}-uat-failure.md" << EOF
+        cat > "inbox/failed-plans/${PLAN_ID}-uat-failure.md" << EOF
 # UAT Failure: $PLAN_ID
 
 **Date:** $(date -Iseconds)
@@ -265,14 +265,14 @@ Add to `.claude/settings.json`:
 PLAN_ID=$(cat /tmp/current-plan-id 2>/dev/null || echo "unknown")
 
 # Check for Playwright execution evidence
-if [ ! -f "00 Inbox/uat-evidence/${PLAN_ID}/playwright-report.json" ]; then
+if [ ! -f "inbox/uat-evidence/${PLAN_ID}/playwright-report.json" ]; then
     echo "❌ BLOCKING: No Playwright execution evidence found"
     echo "UAT gate requires actual test execution, not just checklist"
     exit 1
 fi
 
 # Check execution was successful
-FAILURES=$(jq '.stats.failures' "00 Inbox/uat-evidence/${PLAN_ID}/playwright-report.json" 2>/dev/null)
+FAILURES=$(jq '.stats.failures' "inbox/uat-evidence/${PLAN_ID}/playwright-report.json" 2>/dev/null)
 
 if [ "$FAILURES" != "0" ] && [ "$FAILURES" != "null" ]; then
     echo "❌ BLOCKING: UAT had $FAILURES failures"
