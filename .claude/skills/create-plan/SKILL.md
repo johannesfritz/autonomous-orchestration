@@ -1,3 +1,8 @@
+---
+name: create-plan
+description: "Convert a validated feature discovery into a structured development plan with feature_list.json, acceptance criteria, and workstream breakdown. Use when user requests a new feature plan or after /discovery completes."
+---
+
 # Create Plan Skill
 
 Interactive plan creation skill that converts feature ideas into properly formatted development plans.

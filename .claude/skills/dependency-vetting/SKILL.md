@@ -1,19 +1,6 @@
 ---
 name: dependency-vetting
-description: |
-  Vet new package dependencies before installation. Triggers when adding packages
-  via pip, npm, yarn, or similar package managers. Checks for typosquatting,
-  known vulnerabilities, low adoption (potential supply chain risk), and package
-  metadata anomalies.
-
-  Use when:
-  - User asks to install a new package
-  - pip install, npm install, yarn add commands detected
-  - requirements.txt or package.json modifications
-  - User asks "is this package safe?"
-
-  Blocks: Typosquats, critical vulnerabilities
-  Warns: Low adoption, suspicious metadata
+description: "Vet new package dependencies before installation. Triggers when adding packages via pip, npm, yarn, or similar package managers. Checks for typosquatting, known vulnerabilities, low adoption (potential supply chain risk), and package metadata anomalies. Use when: user asks to install a new package, pip/npm/yarn install commands detected, requirements.txt or package.json modifications, or user asks 'is this package safe?'"
 allowed-tools: Bash, Read, WebFetch
 model: haiku
 ---

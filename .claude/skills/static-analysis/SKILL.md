@@ -1,18 +1,6 @@
 ---
 name: static-analysis
-description: |
-  Perform automated static code analysis on modified files. Triggers automatically
-  after code changes to catch common issues before QA Lead review. Checks for:
-  code complexity, dead code, type errors, import issues, and style violations.
-
-  Use when:
-  - Code files have been modified
-  - Before committing changes
-  - As pre-check for QA Lead review
-  - User asks "analyze this code" or "check for issues"
-
-  This skill runs lightweight static analysis tools (pylint, mypy, ruff for Python;
-  eslint, tsc for TypeScript) and reports findings in structured format.
+description: "Perform automated static code analysis on modified files. Triggers automatically after code changes to catch common issues before QA Lead review. Checks for: code complexity, dead code, type errors, import issues, and style violations. Use when: code files have been modified, before committing changes, as pre-check for QA Lead review, or user asks 'analyze this code' or 'check for issues'."
 allowed-tools: Read, Grep, Glob, Bash
 model: haiku
 ---

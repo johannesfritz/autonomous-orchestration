@@ -1,17 +1,6 @@
 ---
 name: integration-testing
-description: |
-  Run integration tests after workstreams complete to verify system-level behavior.
-  Triggers after unit tests pass but before code review. Starts required services
-  (via docker-compose), runs integration test suites, and verifies API contracts.
-
-  Use when:
-  - All workstreams in a plan complete
-  - Unit tests pass
-  - Before code review phase
-  - User asks "run integration tests"
-
-  If no integration tests exist: Warn but proceed (don't block).
+description: "Run integration tests after workstreams complete to verify system-level behavior. Triggers after unit tests pass but before code review. Starts required services (via docker-compose), runs integration test suites, and verifies API contracts. Use when: all workstreams in a plan complete, unit tests pass, before code review phase, or user asks 'run integration tests'."
 allowed-tools: Bash, Read, Glob, Grep
 model: sonnet
 ---

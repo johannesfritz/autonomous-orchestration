@@ -1,6 +1,6 @@
 # Template vs. Production Divergence Report
 
-**Last Verified:** 2026-02-17
+**Last Verified:** 2026-03-01
 **Template Location:** `claude-setup/autonomous-orchestration/`
 **Production Location:** `jf-private/jf-dev/.claude/`
 
@@ -17,7 +17,7 @@
 | settings.json | 596 lines | 612 lines | Synced (filtered: no Qdrant hooks, no stellaris-admin MCP) |
 | Agents | 17 | 17+ | Synced (sw dev only) |
 | Commands | 22 | 27+ | Synced (sw dev only; excludes inbox, search-docs, sync-docs) |
-| Skills | 12 | 16+ | Synced (sw dev only; excludes deploy-stellaris, local-uat, roam-sync, sancho-review) |
+| Skills | 12 | 19+ | Synced (sw dev only; excludes deploy-stellaris, local-uat, roam-sync, sancho-review) |
 | Protocols | 24 | 32+ | Synced (sw dev only; excludes stellaris-specific UATs) |
 | Scripts | 24 | 29+ | Synced (sw dev only; excludes Qdrant-dependent scripts) |
 | Hooks (shell) | 4 | 5 | Synced (excludes post-commit-sync-docs.sh - Qdrant dependent) |
@@ -223,6 +223,7 @@ rules/
 | 2026-01-03 | 12-Gap Fix Sync (+8 scripts, updated settings.json) |
 | 2026-01-07 | UAT Enforcement + Code Review Integration |
 | 2026-01-08 | Agent-Scoped Hooks & Skill Improvements (+6 verification scripts) |
+| 2026-03-01 | **Skill Description Fix:** Add YAML frontmatter to create-plan (was invisible). Convert multiline `\|` descriptions to inline strings for dependency-vetting, integration-testing, static-analysis. Add skill.md to janitor (had prompt.md only). Matches production config consistency fix. |
 | 2026-02-28 | Add 4 universal rules (state-file-protocol, escalation-protocol, project-folder-structure, workspace-hygiene). These are always-loaded session rules that make autonomous operation work across sessions. Referenced by agentic-execution-setup.md but previously missing from template. |
 | 2026-02-17 | **Major Sync: 5-week catch-up** |
 |            | +1 agent: requirements-analyst.md |
